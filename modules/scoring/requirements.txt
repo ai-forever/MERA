@@ -1,0 +1,4 @@
+transformers==4.30.2
+omegaconf==2.0.6
+boto3
+scikit-learn==1.0.2

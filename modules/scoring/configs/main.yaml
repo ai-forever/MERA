@@ -1,0 +1,13 @@
+args:
+  working_dir: "working_dir"
+  log_dir: "logs"
+  verbose: "1"
+  sample_submission_dir_name: "sample_submission"
+  seed: 1234
+  errors_comments: "configs/errors_comments.yaml"
+  dataset_repo_id: "ai-forever/MERA"
+sample_submission:
+  good_path: "examples/sample_submission.zip"
+  bad_path: "examples/sample_submission_bad.zip"
+  good_resp_path: "examples/sample_response.json"
+  bad_resp_path: "examples/sample_response_bad.json"

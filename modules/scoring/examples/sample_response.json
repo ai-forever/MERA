@@ -1,0 +1,160 @@
+{
+    "id": 1234,
+    "results": {
+        "BPS": {
+            "acc": 0.49
+        },
+        "CheGeKa": {
+            "em": 0.0,
+            "f1": 0.001201923076923077
+        },
+        "LCS": {
+            "acc": 0.078
+        },
+        "MathLogicQA": {
+            "acc": 0.2379702537182852
+        },
+        "MultiQ": {
+            "em": 0.005555555555555556,
+            "f1": 0.021870219014724045
+        },
+        "PARus": {
+            "acc": 0.492
+        },
+        "RCB": {
+            "acc": 0.3378995433789954,
+            "f1_macro": 0.3383335745645775
+        },
+        "RWSD": {
+            "acc": 0.0
+        },
+        "SimpleAr": {
+            "acc": 0.0
+        },
+        "USE": {
+            "grade_norm": 0.060784313725490195
+        },
+        "ruDetox": {
+            "fl": 0.5578551230338372,
+            "j": 0.3816129346637701,
+            "sim": 0.8054497441265253,
+            "sta": 0.8405460153513176
+        },
+        "ruEthics": {
+            "correct.justice": 0.05020856170875817,
+            "correct.law": 0.07830396004971925,
+            "correct.moral": -0.08346819418405328,
+            "correct.utilitarianism": -0.024393037349895674,
+            "correct.virtue": 0.037727498455149874,
+            "ethical.justice": -0.07713103749826518,
+            "ethical.law": -0.001934545879364499,
+            "ethical.moral": -9.105511969567648e-05,
+            "ethical.utilitarianism": 0.0037156535319434305,
+            "ethical.virtue": 0.0738710178906162,
+            "good.justice": -0.02232405272967756,
+            "good.law": 0.01951635912572728,
+            "good.moral": 0.006374961981576146,
+            "good.utilitarianism": 0.06492166530158856,
+            "good.virtue": -0.06111365371617636
+        },
+        "ruHHH": {
+            "acc": 0.5337078651685393,
+            "acc.harmless": 0.5172413793103449,
+            "acc.helpful": 0.4915254237288136,
+            "acc.honest": 0.5901639344262295
+        },
+        "ruHateSpeech": {
+            "acc": 0.4981132075471698,
+            "acc.другое": 0.4426229508196721,
+            "acc.женщины": 0.5740740740740741,
+            "acc.лгбт": 0.29411764705882354,
+            "acc.мигранты": 0.42857142857142855,
+            "acc.мужчины": 0.5142857142857142,
+            "acc.национальность": 0.4594594594594595
+        },
+        "ruHumanEval": {
+            "pass@1": 0.0,
+            "pass@10": 0.0,
+            "pass@5": 0.0
+        },
+        "ruMMLU": {
+            "acc": 0.24141519250780438,
+            "acc.abstract_algebra": 0.5,
+            "acc.anatomy": 0.4,
+            "acc.astronomy": 0.4,
+            "acc.business_ethics": 0.2,
+            "acc.clinical_knowledge": 0.2727272727272727,
+            "acc.college_biology": 0.1111111111111111,
+            "acc.college_chemistry": 0.2727272727272727,
+            "acc.college_computer_science": 0.0,
+            "acc.college_mathematics": 0.4,
+            "acc.college_medicine": 0.2549019607843137,
+            "acc.college_physics": 0.3,
+            "acc.computer_security": 0.2,
+            "acc.conceptual_physics": 0.3,
+            "acc.econometrics": 0.2727272727272727,
+            "acc.electrical_engineering": 0.3,
+            "acc.elementary_mathematics": 0.2,
+            "acc.formal_logic": 0.5,
+            "acc.global_facts": 0.2,
+            "acc.high_school_biology": 0.2857142857142857,
+            "acc.high_school_chemistry": 0.3,
+            "acc.high_school_computer_science": 0.3333333333333333,
+            "acc.high_school_european_history": 0.30303030303030304,
+            "acc.high_school_geography": 0.24050632911392406,
+            "acc.high_school_government_and_politics": 0.2962962962962963,
+            "acc.high_school_macroeconomics": 0.20588235294117646,
+            "acc.high_school_mathematics": 0.0,
+            "acc.high_school_microeconomics": 0.2,
+            "acc.high_school_physics": 0.0,
+            "acc.high_school_psychology": 0.0625,
+            "acc.high_school_statistics": 0.4,
+            "acc.high_school_us_history": 0.2,
+            "acc.high_school_world_history": 0.4375,
+            "acc.human_aging": 0.3,
+            "acc.human_sexuality": 0.3,
+            "acc.international_law": 0.3333333333333333,
+            "acc.jurisprudence": 0.15384615384615385,
+            "acc.logical_fallacies": 0.3,
+            "acc.machine_learning": 0.2,
+            "acc.management": 0.2,
+            "acc.marketing": 0.2857142857142857,
+            "acc.medical_genetics": 0.5454545454545454,
+            "acc.miscellaneous": 0.18181818181818182,
+            "acc.moral_disputes": 0.2,
+            "acc.moral_scenarios": 0.2,
+            "acc.nutrition": 0.2857142857142857,
+            "acc.philosophy": 0.17647058823529413,
+            "acc.prehistory": 0.3,
+            "acc.professional_accounting": 0.2,
+            "acc.professional_law": 0.25,
+            "acc.professional_medicine": 0.1,
+            "acc.professional_psychology": 0.2,
+            "acc.public_relations": 0.35714285714285715,
+            "acc.security_studies": 0.0,
+            "acc.sociology": 0.2,
+            "acc.us_foreign_policy": 0.2,
+            "acc.virology": 0.0625,
+            "acc.world_religions": 0.21153846153846154
+        },
+        "ruModAr": {
+            "acc": 0.0
+        },
+        "ruMultiAr": {
+            "acc": 0.0
+        },
+        "ruOpenBookQA": {
+            "acc": 0.2325,
+            "f1_macro": 0.23250468078345715
+        },
+        "ruTiE": {
+            "acc": 0.49767441860465117
+        },
+        "ruWorldTree": {
+            "acc": 0.21714285714285714,
+            "f1_macro": 0.217112546769622
+        },
+        "total_score": 0.17058262521762277
+    },
+    "status": "OK"
+}

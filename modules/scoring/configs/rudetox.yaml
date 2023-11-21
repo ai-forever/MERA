@@ -1,0 +1,8 @@
+extension: .json
+split: test
+device: cuda
+style_model_path: IlyaGusev/rubertconv_toxic_clf
+meaning_model_path: s-nlp/rubert-base-cased-conversational-paraphrase-v1
+cola_model_path: s-nlp/ruRoberta-large-RuCoLa-v1
+calibrations_ru_path: ../../lm-evaluation-harness/lm_eval/tasks/rudetox/score_calibrations_ru.pkl
+use_in_total: false

@@ -1,0 +1,4 @@
+extension: .json
+split: test
+use_in_total: true
+max_grade_point: 34
