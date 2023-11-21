@@ -1,6 +1,26 @@
 # MERA
 
-MERA (Multimodal Evaluation for Russian-language Architectures) is a new open benchmark for the Russian language for evaluating fundamental models.
+<p align="center">
+  <picture>
+    <img alt="MERA" src="docs/mera-logo.svg" style="max-width: 100%;">
+  </picture>
+</p>
+
+<p align="center">
+    <a href="https://opensource.org/licenses/MIT">
+    <img alt="License" src="https://img.shields.io/badge/License-MIT-yellow.svg">
+    </a>
+    <a href="https://github.com/ai-forever/sage/releases">
+    <img alt="Release" src="https://img.shields.io/badge/release-v1.0.0-blue">
+    </a>
+
+</p>
+
+<h2 align="center">
+    <p> MERA (Multimodal Evaluation for Russian-language Architectures) is a new open benchmark for the Russian language for evaluating fundamental models.
+</p>
+</h2>
+
 
 ## About MERA
 
