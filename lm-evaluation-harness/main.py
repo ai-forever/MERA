@@ -116,7 +116,7 @@ def main():
 
     batch_sizes = ",".join(map(str, results["config"]["batch_sizes"]))
     print(
-        f"{args.model} ({args.model_args}), limit: {args.limit}, provide_description: {args.provide_description}, "
+        f"{args.model} ({args.model_args}), limit: {args.limit}, "
         f"num_fewshot: {args.num_fewshot}, batch_size: {args.batch_size}{f' ({batch_sizes})' if batch_sizes else ''}"
     )
     print(evaluator.make_table(results))
