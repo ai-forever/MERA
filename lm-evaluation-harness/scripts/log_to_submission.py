@@ -3,8 +3,9 @@ import glob
 import json
 import os
 import shutil
-
+import datasets
 import numpy as np
+
 
 _TASKS = {}
 
@@ -59,17 +60,16 @@ class BaseTask(object):
         return self.doc_to_meta(doc)["id"]
 
     def load(self):
-        dataset = load_json(self.dataset_path)["data"]["test"]
+        dataset = datasets.load_dataset(path="ai-forever/MERA", name=self.src_name)["test"]
         examples = dict()
         for example in dataset:
             doct_id = self.doc_to_id(example)
             examples[doct_id] = example
         return examples
 
-    def __init__(self, outputs_dir, dst_dir, dataset_path):
+    def __init__(self, outputs_dir, dst_dir):
         self.outputs_dir = outputs_dir
         self.dst_dir = dst_dir
-        self.dataset_path = dataset_path
         self.dataset = self.load()
 
 
@@ -277,7 +277,8 @@ class USE(TextTask):
 @register_task
 class ruTiE(TextTask):
     def load(self):
-        dataset = load_json(self.dataset_path)["data"]["test"]
+        dataset = datasets.load_dataset(path="ai-forever/MERA", name=self.src_name)["test"]
+        dataset = [list(dataset)]
         return dataset
 
     @property
@@ -348,25 +349,8 @@ def create_submission(outputs_dir, dst_dir, dataset_dir):
     paths = [x for x in get_files_from_dir(dataset_dir) if x.endswith("task.json")]
     no_tasks = []
     for task_name, task_cls in _TASKS.items():
-        dst = None
-        for task_path in paths:
-            # try resolve
-            if task_name.lower() in task_path:
-                dst = task_path
-                print("Process", task_name, "dataset path", dst)
-                break
-            dst_task_name = os.path.split(os.path.split(task_path)[0])[-1].lower()
-            k = len(set(task_name.lower()).intersection(set(dst_task_name))) / max(len(dst_task_name), len(task_name))
-            if 0.65 < k:
-                dst = task_path
-                print("Process", task_name, "dataset path resolved from", dst, dst_task_name, k)
-                break
-        if dst is None:
-            print("Can't find", task_name)
-            no_tasks.append(task_name)
-        else:
-            task = task_cls(outputs_dir=outputs_dir, dst_dir=dst_dir, dataset_path=dst)
-            _ = task.convert()
+        task = task_cls(outputs_dir=outputs_dir, dst_dir=dst_dir)
+        _ = task.convert()
         print("---------------------")
     print("Not refactored tasks", no_tasks)
     zip_path = shutil.make_archive(dst_dir, "zip", dst_dir)
