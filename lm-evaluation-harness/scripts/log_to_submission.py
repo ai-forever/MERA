@@ -332,7 +332,6 @@ def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--outputs_dir", type=str, help="lm harness outputs")
     parser.add_argument("--dst_dir", type=str, default="submission/", help="dir to save files for submission")
-    parser.add_argument("--dataset_dir", type=str, default="lm_eval/datasets/", help="dir with datasets")
     parser.add_argument(
         "--logs_public_submit",
         type=bool,
@@ -344,9 +343,8 @@ def get_args():
     return res
 
 
-def create_submission(outputs_dir, dst_dir, dataset_dir):
+def create_submission(outputs_dir, dst_dir):
     os.makedirs(dst_dir, exist_ok=True)
-    paths = [x for x in get_files_from_dir(dataset_dir) if x.endswith("task.json")]
     no_tasks = []
     for task_name, task_cls in _TASKS.items():
         task = task_cls(outputs_dir=outputs_dir, dst_dir=dst_dir)
@@ -375,7 +373,7 @@ def pack_submission_logs(outputs_dir: str, dst_dir: str):
 
 def main():
     args = get_args()
-    _ = create_submission(args.outputs_dir, args.dst_dir, args.dataset_dir)
+    _ = create_submission(args.outputs_dir, args.dst_dir)
     if args.logs_public_submit:
         print("Packing logs for public submission...")
         pack_submission_logs(args.outputs_dir, args.dst_dir)
