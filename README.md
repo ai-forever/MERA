@@ -72,7 +72,7 @@ Our aim is to evaluate all the models:
 
 *Our team and partners:* 
 
-*SberDevices, Sber AI, Yandex, Skoltech AI, MTC AI, NRU HSE, Russian Academy of Sciences, etc.*
+*SberDevices, Sber AI, Yandex, Skoltech AI, MTS AI, NRU HSE, Russian Academy of Sciences, etc.*
 
 *Powered by [Aliance AI](https://a-ai.ru/)*
 
