@@ -1,0 +1,35 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Pyre type checker
+.pyre/
+
+# vim stuff
+*.ropeproject
+*.swp
+
+# intellij
+*.idea
+
+# models
+*.model
+*.pt
+*.pth
+*.ckpt
+*.bin
+.s3_cache/
+
+# MAC
+.DS_Store
+
+
+env
+*.pyc
+data/
+lm_cache
+lm_data
+private_scripts
+
+*.egg-info/
