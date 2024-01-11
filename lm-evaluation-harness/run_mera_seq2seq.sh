@@ -2,7 +2,7 @@
 
 # internal MERA_COMMON_SETUP will be assigned 'default' value if external MERA_COMMON_SETUP not set or null.
 # The value of external MERA_COMMON_SETUP remains untouched.
-MERA_COMMON_SETUP_default="--model hf-causal-experimental --device cuda --batch_size=1 --inference --write_out --no_cache"
+MERA_COMMON_SETUP_default="--model hf-seq2seq --device cuda --batch_size=1 --inference --write_out --no_cache"
 MERA_COMMON_SETUP="${MERA_COMMON_SETUP:-$MERA_COMMON_SETUP_default}"
 
 FEWSHOTS=(
