@@ -22,6 +22,7 @@ The results of human benchmarking are presented in the table below.
 | ruEthics | *** | 5 MCC | 645 | 645 |
 | ruHateSpeech | 0.985 | Accuracy | 265 | 268 |
 | ruHHH | 0.814 | Accuracy | 177 | 178 |
+| ruHumanEval | 1.0 | pass@k | N/A | N/A |
 | ruMMLU | 0.898 | Accuracy | N/A | 961 |
 | ruModAr | 0.999 | Accuracy | 1794 | 6000 |
 | ruMultiAr | 1.0 | Accuracy | 519 | 1024 |
@@ -32,7 +33,6 @@ The results of human benchmarking are presented in the table below.
 | ruWorldTree | 0.838 / 0.837 | F1-score / Accuracy | 525 | 525 |
 | ruOpenBookQA | 0.875 / 0.865 | F1-score / Accuracy | 400 | 400 |
 | USE | 0.701 | Grade Norm | N/A | N/A |
-| ruHumanEval | 1 | pass@k | N/A | N/A |
 
 ### Russian SuperGLUE and TAPE
 
@@ -59,6 +59,10 @@ The 5 MCC scoring for the ruEthics dataset consists of a set of Matthews Correla
 | moral            | 0.880         | 0.837         | 0.811 |
 | utilitarianism   | 0.684         | 0.675         | 0.665 |
 | virtue           | 0.813         | 0.802         | 0.771 |
+
+### ruHumanEval
+
+The generated functions are evaluated using the pass@k metric. It depends on the number of correct solutions and uses the k coefficient k = {1, 5, 10}. By focusing on functional correctness rather than text similarity, the pass@k metric offers a more meaningful and practical assessment of a model's ability to solve programming challenges. This approach aligns more closely with the practices of human developers and provides a valuable benchmark for the ongoing development of code generation models. The human-level for all the 3 metrics (pass@1, pass@5, pass@10) is 1.0.
 
 ### ruMMLU
 
