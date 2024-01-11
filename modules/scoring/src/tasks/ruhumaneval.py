@@ -17,7 +17,7 @@ class ruHumanEval(Task):
             return 0
         if len(y_true) != len(y_pred):
             return 0
-        if isinstance(y_true[0], type(y_pred[0])):
+        if not isinstance(y_true[0], type(y_pred[0])):
             return 0
         tests = []
         for idx, test in enumerate(y_true):
@@ -55,10 +55,10 @@ class ruHumanEval(Task):
     def sample_submission(self):
         res = []
         for doc_id in self.gold.doc_ids():
-            tests = eval(self.gold[doc_id]["inputs"]["tests"])
+            tests = self.gold[doc_id]["outputs"]
             doc = {
-                "outputs": [[
-                    str(random_choice(list(x.values()))) for x in tests] for _ in range(max(self.task_conf.ks))],
+                "outputs":
+                    [np.random.choice(tests, size=len(tests), replace=True).tolist() for _ in range(max(self.task_conf.ks))],
                 "meta": {"id": doc_id}
             }
             res.append(doc)
