@@ -18,11 +18,10 @@ and a leaderboard of models for the Russian language with comparable results is 
 Homepage: https://russiansuperglue.com
 """
 
-import inspect
 import numpy as np
 
 from lm_eval.base import rf, Task
-from lm_eval.metrics import mean, f1_score_multiclass
+from lm_eval.metrics import mean, f1_score_multiclass_macro
 
 
 class RCB(Task):
@@ -70,13 +69,13 @@ class RCB(Task):
     def process_results(self, doc, results):
         gold = {"1": 0, "2": 1, "3": 2}[doc["outputs"]]
         pred = np.argmax(results)
-        return {"acc": pred == gold, "f1": (gold, pred)}
+        return {"acc": pred == gold, "f1_macro": (gold, pred)}
 
     def aggregation(self):
-        return {"acc": mean, "f1": f1_score_multiclass}
+        return {"acc": mean, "f1_macro": f1_score_multiclass_macro}
 
     def higher_is_better(self):
-        return {"acc": True, "f1": True}
+        return {"acc": True, "f1_macro": True}
 
 
 class PARus(Task):

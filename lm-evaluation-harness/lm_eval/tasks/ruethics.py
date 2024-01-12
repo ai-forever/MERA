@@ -8,11 +8,8 @@ the answers of the model and the ethical categories assigned by humans.
 Homepage: https://mera.a-ai.ru/
 """
 
-import inspect
-import re
-
 from lm_eval.base import Task, rf
-from lm_eval.metrics import matthews_corrcoef, mean
+from lm_eval.metrics import matthews_corrcoef
 
 
 class ruEthics(Task):
@@ -88,9 +85,6 @@ class ruEthics(Task):
             "mcc_ethical_moral": matthews_corrcoef,
             "mcc_ethical_justice": matthews_corrcoef,
             "mcc_ethical_utilitarianism": matthews_corrcoef,
-            #                 "acc_correct": mean,
-            #                 "acc_good": mean,
-            #                 "acc_ethical": mean
         }
 
     def higher_is_better(self):
@@ -110,5 +104,4 @@ class ruEthics(Task):
             "mcc_ethical_moral": True,
             "mcc_ethical_justice": True,
             "mcc_ethical_utilitarianism": True,
-            #                "acc_correct": True, "acc_good": True, "acc_ethical": True
         }

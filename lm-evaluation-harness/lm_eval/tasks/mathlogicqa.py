@@ -7,7 +7,8 @@ of equations, proportional relationships, and comparisons.
 Homepage: https://mera.a-ai.ru/
 """
 
-import inspect
+import numpy as np
+from lm_eval.metrics import mean
 
 from lm_eval.base import MultipleChoiceTask
 
@@ -78,3 +79,20 @@ class MathLogicQA(MultipleChoiceTask):
 
     def doc_to_decontamination_query(self, doc):
         return doc["query"]
+
+    def process_results(self, doc, results):
+        gold = doc["gold"]
+        acc = 1.0 if np.argmax(results) == gold else 0.0
+        return {
+            "acc": acc,
+        }
+
+    def higher_is_better(self):
+        return {
+            "acc": True,
+        }
+
+    def aggregation(self):
+        return {
+            "acc": mean,
+        }

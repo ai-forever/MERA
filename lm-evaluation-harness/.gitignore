@@ -12,6 +12,7 @@ __pycache__/
 
 # intellij
 *.idea
+*.run
 
 # models
 *.model
@@ -26,6 +27,7 @@ __pycache__/
 
 
 env
+*.ipynb_checkpoints
 *.pyc
 data/
 lm_cache

@@ -9,8 +9,6 @@ to think sequentially.
 Homepage: https://mera.a-ai.ru/
 """
 
-import inspect
-
 from lm_eval.metrics import mean
 from lm_eval.base import Task, rf
 

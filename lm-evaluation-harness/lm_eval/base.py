@@ -6,10 +6,12 @@ import os
 import re
 from abc import abstractmethod
 from typing import Iterable
+from itertools import repeat
 
 import datasets
 import numpy as np
 import torch
+import transformers
 import torch.nn.functional as F
 from accelerate import find_executable_batch_size
 from accelerate.utils.memory import should_reduce_batch_size, is_xpu_available, is_npu_available
@@ -17,7 +19,7 @@ from sqlitedict import SqliteDict
 from tqdm import tqdm
 
 from lm_eval import utils
-from lm_eval.metrics import bits_per_byte, mean, weighted_mean, weighted_perplexity
+from lm_eval.metrics import bits_per_byte, mean, weighted_perplexity
 
 
 class LM(abc.ABC):
@@ -160,6 +162,103 @@ class BaseLM(LM):
     def tok_decode(self, tokens: Iterable[int]):
         pass
 
+    def check_generation_ability(self):
+        # if already checked, returne the result
+        if hasattr(self, "_can_generate"):
+            return self._can_generate
+        # otherwise run checking with fail output
+        else:
+            self._can_generate = self.generation_available()
+            return self._can_generate
+
+    def generation_available(self):
+        # check whether model can generate new tokens, as it needs for greedy_until reqs
+        if not self.model.can_generate():
+            print(
+                "WARNING! The model you are currently trying to score the model that is supposed "
+                "to be unable to generate tokens which is an essential part of the benchmark.\n"
+                "If this behaviour is usual for your model, ignore this warning.\nOtherwise, "
+                "consider using the other model that has `model.can_generate()` property set to `True` "
+                "to be able to assess the performance of your model om generation tasks!"
+            )
+            return False
+        else:
+            # if it can, then need to check default position_ids generation for Causal
+            try:
+                inps = torch.tensor([10, 20, 30])
+                attns = torch.tensor([0, 1, 1])
+                new = self.model.prepare_inputs_for_generation(
+                    input_ids=inps,
+                    attention_mask=attns,
+                )
+                if "position_ids" not in new.keys() and "input_ids" not in new.keys():
+                    print(
+                        "Method `model.prepare_inputs_for_generation` does not "
+                        "return input_ids and position_ids.\nUsing no preparation for "
+                        "`model.forward`."
+                    )
+                    return False
+                elif "position_ids" not in new.keys() and "input_ids" in new.keys():
+                    print(
+                        "Method `model.prepare_inputs_for_generation` does not "
+                        "return position_ids.\nNo position_ids may lead to irreproducible "
+                        "results."
+                    )
+                    return True
+                elif "position_ids" in new.keys() and "input_ids" not in new.keys():
+                    print(
+                        "`model.prepare_inputs_for_generation` method does not "
+                        "return input_ids.\nUsing no preparation for `model.forward`."
+                    )
+                    return False
+                else:
+                    print("Using `model.prepare_inputs_for_generation` method for `model.forward`.")
+                    return True
+            # any exception is considered a failure
+            except Exception as e:
+                print(
+                    "While checking method `model.prepare_inputs_for_generation` for some "
+                    f"input data an error occurred: {e}\n"
+                    "Pay attention that the result of the scoring may depend on the length "
+                    "of the sequences in a batch (if batch is more than 1).\nNo preparation means "
+                    "no position_ids which may lead to irreproducible results."
+                )
+                return False
+
+    def tokenizer_check(self):
+        # check that the model has at least as many embeddings as there are tokens in the tokenizer
+        if len(self.tokenizer) > len(list(self.model.parameters())[0]):
+            print(
+                "Warning! The length of the vocabulary of the tokenizer is more than "
+                "the number of vectors in the first hidden layer.\nIf this is the Embedding layer, "
+                "make sure you have embeddings for all tokens in the vocabulary."
+            )
+        # check tokenizer has EOS token, otherwise do nothing
+        if self.tokenizer.eos_token is None:
+            print("Tokenizer does not have eos_token!")
+
+        # check tokenizer has BOS token, otherwise do nothing
+        if self.tokenizer.bos_token is None:
+            print("Tokenizer does not have eos_token!")
+
+        # check tokenizer has unk_token_id. When trying to get id of a candidate
+        # pad token it may appear, so check it exists
+        if self.tokenizer.unk_token is None:
+            print("Tokenizer does not have unk_token!")
+            unk_id = -1
+        else:
+            unk_id = self.tokenizer.unk_token_id
+
+        # need pad token for padding (batch > 1), if no then replace by eos
+        if self.tokenizer.pad_token is None and self.batch_size != 1:
+            print(
+                "Warning! The tokenizer does not have pad_token with batch_size more than 1.\n"
+                "If this is not the expected behaviour, check out the tokenizer you are using and "
+                "tokenizer_config.json.\nSetting pad_token and equal to eos_token."
+            )
+            self.tokenizer.pad_token = self.tokenizer.eos_token
+            self.tokenizer.pad_token_id = self.tokenizer.eos_token_id
+
     @abstractmethod
     def _model_generate(self, context, max_length, eos_token_id):
         pass
@@ -211,8 +310,15 @@ class BaseLM(LM):
             oom = False
             try:
                 test_batch = torch.ones((1, cur_length), device=self.device).long()
+                test_attn = torch.ones((1, cur_length), device=self.device).long()
+                test_conts = torch.ones((1, cur_length), device=self.device).long()
+                call_args = {
+                    "input_ids": test_batch,
+                    "attention_mask": test_attn,
+                    "labels": test_conts,
+                }
                 for _ in range(5):
-                    _ = F.log_softmax(self._model_call(test_batch), dim=-1).cpu()
+                    out = F.log_softmax(self._model_call(call_args), dim=-1).cpu()
             except Exception as e:
                 if should_reduce_batch_size(e):  # OOM happened
                     clear_cache()
@@ -227,55 +333,50 @@ class BaseLM(LM):
             max_length = proper_len_search(100, max_length, threshold)
         return max_length
 
-    def _detect_batch_size(self, requests=None, pos=0):
+    def _detect_batch_size(self, requests=None, pos: int = 0):
         if requests:
-            _, context_enc, continuation_enc = requests[pos]
-            max_length = len((context_enc + continuation_enc)[-(self.max_length + 1) :][:-1])
+            # for loglike requests when know the longest request
+            _, ctx = requests[pos]
+            max_length = len(ctx[-(self.max_length + 1) :][:-1])
         else:
             max_length = self.max_length
 
         # if OOM, then halves batch_size and tries again
         @find_executable_batch_size(starting_batch_size=self.max_batch_size)
         def forward_batch(batch_size):
+            batched_conts = torch.ones((batch_size, max_length), device=self.device).long()
             test_batch = torch.ones((batch_size, max_length), device=self.device).long()
+            attn_batch = torch.ones((batch_size, max_length), device=self.device).long()
+            call_args = {
+                "input_ids": test_batch,
+                "attention_mask": attn_batch,
+                "labels": batched_conts,
+            }
             for _ in range(5):
-                _ = F.log_softmax(self._model_call(test_batch), dim=-1).cpu()
+                out = F.log_softmax(self._model_call(call_args), dim=-1)
+
             return batch_size
 
         batch_size = forward_batch()
         utils.clear_torch_cache()
-
         return batch_size
 
     # subclass must implement properties vocab_size, eot_token_id, max_gen_toks, batch_size, device, max_length.
     # TODO: enforce this somehow
 
-    def _encode_pair(self, context, continuation):
-        n_spaces = len(context) - len(context.rstrip())
-        if n_spaces > 0:
-            continuation = context[-n_spaces:] + continuation
-            context = context[:-n_spaces]
-        whole_enc = self.tok_encode(context + continuation)
-        context_enc = self.tok_encode(context)
-        context_enc_len = len(context_enc)
-        continuation_enc = whole_enc[context_enc_len:]
-        return context_enc, continuation_enc
-
-    def loglikelihood(self, requests):
+    def loglikelihood(self, requests, task=None):
         new_reqs = []
         for context, continuation in requests:
-            if context == "":
-                # end of text as context
-                context_enc, continuation_enc = [self.eot_token_id], self.tok_encode(continuation)
-            else:
-                context_enc, continuation_enc = self._encode_pair(context, continuation)
+            ctx = self.tok_encode(context + continuation, False)
+            new_reqs.append(((context, continuation), ctx))
 
-            new_reqs.append(((context, continuation), context_enc, continuation_enc))
+        override_bs = None if task != "rutie" else 1
 
-        return self._loglikelihood_tokens(new_reqs)
+        return self._loglikelihood_tokens(new_reqs, override_bs=override_bs)
 
     def loglikelihood_rolling(self, requests):
         # TODO: Implement caching once we've confirmed the perplexity implementation
+        # Not used so far
 
         # automatic batch size detection for vectorization
         adaptive_batch_size = None
@@ -330,7 +431,7 @@ class BaseLM(LM):
             #   automatic adaptive batches much much easier to implement
             # - any OOMs will happen right away rather than near the end
 
-            toks = x[1] + x[2]
+            toks = x[1]
             return -len(toks), tuple(toks)
 
         re_ord = utils.Reorderer(requests, _collate)
@@ -358,8 +459,20 @@ class BaseLM(LM):
             fn=_batch_scheduler if self.batch_size == "auto" and n_reordered_requests > 0 and not override_bs else None,
         ):
             inps = []
+            attns = []
             cont_toks_list = []
             inplens = []
+
+            # dict for logs
+            logs_ctx = {
+                "tokenizer_pad_token": [self.tokenizer.pad_token, self.tokenizer.pad_token_id],
+                "tokenizer_eos_token": [self.tokenizer.eos_token, self.tokenizer.eos_token_id],
+                "tokenizer_bos_token": [self.tokenizer.bos_token, self.tokenizer.bos_token_id],
+                "attr_batch_size": self.batch_size if self.batch_size != "auto" else self.batch_sizes,
+                "attr_max_length": self.max_length,
+                "input_ids_check": [],
+                "real_tokens_count": [],
+            }
 
             padding_length = None
 
@@ -367,11 +480,10 @@ class BaseLM(LM):
             # tensors, then we pack them together into a batch, call the model, and then pick it all apart
             # again because vectorizing is annoying
 
-            for _, context_enc, continuation_enc in chunk:
+            for _, ctx in chunk:
                 # sanity check
-                assert len(context_enc) > 0
-                assert len(continuation_enc) > 0
-                assert len(continuation_enc) <= self.max_length
+                assert len(ctx) > 0
+                assert len(ctx) <= self.max_length
 
                 # how this all works:
                 #          CTX      CONT
@@ -381,51 +493,97 @@ class BaseLM(LM):
                 # cont_toks      4 5 6 7 8 9      [:, -len(continuation_enc):, :self.vocab_size] slice
 
                 # when too long to fit in context, truncate from the left
+                # truncate the last token - do not need its probs
                 inp = torch.tensor(
-                    (context_enc + continuation_enc)[-(self.max_length + 1) :][:-1],
+                    ctx[-(self.max_length + 1) :][:-1],
                     dtype=torch.long,
                 ).to(self.device)
                 (inplen,) = inp.shape
 
-                cont = continuation_enc
+                # continuation from 2 token till end
+                cont = torch.tensor(
+                    ctx[-(self.max_length + 1) :][1:],
+                    dtype=torch.long,
+                )
+
+                logs_ctx["input_ids_check"].extend([[sum(inp.tolist()[1:]), sum(cont.tolist()[:-1])]])
+                assert inp.tolist()[1] == cont.tolist()[0] and len(inp.tolist()) == len(cont.tolist())
 
                 # since in _collate we make sure length is descending, the longest is always the first one.
                 padding_length = padding_length if padding_length is not None else inplen
 
-                # pad length from seq to padding_length
+                # pad length from seq to padding_length from LEFT side
+                attn = torch.cat(
+                    [
+                        torch.zeros(padding_length - inplen, dtype=torch.long).to(inp.device),
+                        torch.ones_like(inp).to(inp.device),
+                    ],
+                    dim=0,
+                )
                 inp = torch.cat(
                     [
-                        inp,  # [seq]
                         torch.zeros(padding_length - inplen, dtype=torch.long).to(inp.device),  # [padding_length - seq]
+                        inp,  # [seq]
                     ],
                     dim=0,
                 )
 
                 inps.append(inp.unsqueeze(0))  # [1, padding_length]
+                attns.append(attn.unsqueeze(0))
                 cont_toks_list.append(cont)
                 inplens.append(inplen)
 
-            batched_inps = torch.cat(inps, dim=0)  # [batch, padding_length]
-            multi_logits = F.log_softmax(self._model_call(batched_inps), dim=-1).cpu()  # [batch, padding_length, vocab]
+                logs_ctx["real_tokens_count"].extend([attn.sum(dim=-1).item()])
 
-            for (cache_key, _, _), logits, inp, inplen, cont_toks in zip(
-                chunk, multi_logits, inps, inplens, cont_toks_list
+            if len(inps) == 1:
+                batched_inps = {"input_ids": inps[0], "attention_mask": attns[0]}
+            else:
+                # TODO: better replace torch.cat with smth else to preserve memory
+                batched_inps = {"input_ids": torch.cat(inps, dim=0), "attention_mask": torch.cat(attns, dim=0)}
+            try:
+                if self.AUTO_MODEL_CLASS == transformers.AutoModelForCausalLM:
+                    multi_logits = F.log_softmax(
+                        self._model_call(batched_inps), dim=-1
+                    ).cpu()  # [batch, padding_length, vocab]
+                elif self.AUTO_MODEL_CLASS == transformers.AutoModelForSeq2SeqLM:
+                    multi_logits = F.log_softmax(self._model_call(batched_inps, batched_inps), dim=-1).cpu()
+            except Exception as e:
+                error_msg = {
+                    "header": "Error occurred while processing loglikelyhood requests for seq2seq models",
+                    "content": e,
+                    "chunk": chunk,
+                }
+                print(error_msg)
+                raise
+
+            for (cache_key, _), logits, inplen, cont, ctx_logs in zip(
+                chunk,
+                multi_logits,
+                inplens,
+                cont_toks_list,
+                zip(
+                    logs_ctx["input_ids_check"],
+                    logs_ctx["real_tokens_count"],
+                    repeat(logs_ctx["tokenizer_pad_token"]),
+                    repeat(logs_ctx["tokenizer_eos_token"]),
+                    repeat(logs_ctx["tokenizer_bos_token"]),
+                    repeat(logs_ctx["attr_batch_size"]),
+                    repeat(logs_ctx["attr_max_length"]),
+                ),
             ):
-                # Slice to original seq length
-                contlen = len(cont_toks)
-                inplen = inplen + (
-                    logits.shape[0] - padding_length
-                )  # if "virtual tokens" (from prompt tuning) are added, inplen is larger
-                logits = logits[inplen - contlen : inplen].unsqueeze(0)  # [1, seq, vocab]
+                # consider no special tokens have been added
+                # truncate left-side padding logits
+                logits = logits[-inplen:].unsqueeze(0)  # [1, seq, vocab]
 
                 # Check if per-token argmax is exactly equal to continuation
                 greedy_tokens = logits.argmax(dim=-1)
-                cont_toks = torch.tensor(cont_toks, dtype=torch.long).unsqueeze(0)  # [1, seq]
-                max_equal = (greedy_tokens == cont_toks).all()
+                # TODO: greedy only for continuation tokens
+                max_equal = (greedy_tokens == cont).all()
 
-                # Obtain log-probs at the corresponding continuation token indices
+                # Obtain log-probs for the entire input sequence
                 # last_token_slice = logits[:, -1, :].squeeze(0).tolist()
-                logits = torch.gather(logits, 2, cont_toks.unsqueeze(-1)).squeeze(-1)  # [1, seq]
+                # cont should have tokens over [1, THIS, 1] dimension
+                logits = torch.gather(logits, 2, cont.unsqueeze(-1).unsqueeze(0)).squeeze(-1)  # [1, seq]
 
                 # Answer: (log prob, is-exact-match)
                 answer = (float(logits.sum()), bool(max_equal))
@@ -434,7 +592,22 @@ class BaseLM(LM):
                 if cache_key is not None:
                     self.cache_hook.add_partial("loglikelihood", cache_key, answer)
 
-                res.append(answer)
+                res.extend(
+                    [
+                        [
+                            answer,
+                            {
+                                "input_ids_check": ctx_logs[0],
+                                "real_tokens_count": ctx_logs[1],
+                                "tokenizer_pad_token": ctx_logs[2],
+                                "tokenizer_eos_token": ctx_logs[3],
+                                "tokenizer_bos_token": ctx_logs[4],
+                                "attr_batch_size": ctx_logs[5],
+                                "attr_max_length": ctx_logs[6],
+                            },
+                        ]
+                    ]
+                )
 
         return re_ord.get_original(res)
 
@@ -460,7 +633,16 @@ class BaseLM(LM):
 
         warn_stop_seq = False
         for context, request_args in tqdm(re_ord.get_reordered()):
-            until = request_args["until"]
+            until = request_args.get("until", self.tokenizer.eos_token)  # dirty, tokenizer may be undefined
+            logs_ctx = {
+                "until": until,
+                "tokenizer_pad_token": [self.tokenizer.pad_token, self.tokenizer.pad_token_id],
+                "tokenizer_eos_token": [self.tokenizer.eos_token, self.tokenizer.eos_token_id],
+                "tokenizer_bos_token": [self.tokenizer.bos_token, self.tokenizer.bos_token_id],
+                "attr_batch_size": self.batch_size,
+                "attr_max_length": self.max_length,
+                "attr_max_gen_toks": self.max_gen_toks,
+            }
             if isinstance(until, str):
                 until = [until]
 
@@ -470,7 +652,9 @@ class BaseLM(LM):
                 except ValueError:
                     if not warn_stop_seq:
                         print(
-                            "Warning: a primary stop sequence is multi-token! Will default to EOS token for this tokenizer. Consider using `hf-causal-experimental` for multi-token stop sequence support for the time being."
+                            "Warning: a primary stop sequence is multi-token! Will default to EOS token for this "
+                            "tokenizer. Consider using `hf-causal-experimental` for multi-token stop sequence support "
+                            "for the time being."
                         )
                         warn_stop_seq = True
                     primary_until = self.eot_token_id
@@ -480,20 +664,42 @@ class BaseLM(LM):
             context_enc = torch.tensor([self.tok_encode(context)[self.max_gen_toks - self.max_length :]]).to(
                 self.device
             )
+            logs_ctx["ctx_ids"] = context_enc.shape
 
             max_gen_tokens = min(self.max_gen_toks, request_args.get("max_length", self.max_gen_toks))
+            logs_ctx["max_gen_tokens"] = max_gen_tokens
+            logs_ctx["max_length"] = request_args.get("max_length", None)
+
             if task == "humaneval":
-                cont = self._model_generate(
-                    context_enc, context_enc.shape[1] + max_gen_tokens, primary_until, task, num_generation
-                )
-                s = [self.tok_decode(cont[it][0].tolist()[context_enc.shape[1] :]) for it in range(num_generation)]
+                try:
+                    cont = self._model_generate(
+                        context_enc, context_enc.shape[1] + max_gen_tokens, primary_until, task, num_generation
+                    )
+                except Exception as e:
+                    error_msg = {
+                        "header": "Error occurred while processing greedy_until requests",
+                        "content": e,
+                        "chunk": context,
+                    }
+                    print(error_msg)
+                    raise
+                s = [self.tok_decode(cont[it].tolist()[context_enc.shape[1] :]) for it in range(num_generation)]
                 for elem in range(len(s)):
                     for term in until:
                         s[elem] = s[elem].split(term)[0]
                 self.cache_hook.add_partial("greedy_until", (context, until), s)
-                res += [s]
+                res.extend([[s, logs_ctx]])
             else:
-                cont = self._model_generate(context_enc, context_enc.shape[1] + max_gen_tokens, primary_until)
+                try:
+                    cont = self._model_generate(context_enc, context_enc.shape[1] + max_gen_tokens, primary_until)
+                except Exception as e:
+                    error_msg = {
+                        "header": "Error occurred while processing greedy_until requests",
+                        "content": e,
+                        "chunk": context,
+                    }
+                    print(error_msg)
+                    raise
                 s = self.tok_decode(cont[0].tolist()[context_enc.shape[1] :])
 
                 for term in until:
@@ -501,7 +707,7 @@ class BaseLM(LM):
 
                 self.cache_hook.add_partial("greedy_until", (context, until), s)
 
-                res.append(s)
+                res.extend([[s, logs_ctx]])
 
         return re_ord.get_original(res)
 

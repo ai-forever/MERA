@@ -9,14 +9,11 @@ multi-hop reasoning, ethical concepts, logic and commonsense knowledge.
 Homepage: https://tape-benchmark.com/
 """
 
-import inspect
-
 import numpy as np
-import sklearn
 import transformers.data.metrics.squad_metrics as squad_metrics
 
 from lm_eval.base import Task, MultipleChoiceTask, rf
-from lm_eval.metrics import mean, metric_max_over_ground_truths
+from lm_eval.metrics import mean, metric_max_over_ground_truths, f1_score_multiclass_macro
 
 
 class CheGeKa(Task):
@@ -243,6 +240,26 @@ class RuWorldTree(MultipleChoiceTask):
     def doc_to_decontamination_query(self, doc):
         return doc["query"]
 
+    def doc_to_target(self, doc):
+        return " " + doc["choices"][doc["gold"]]
+
+    def construct_requests(self, doc, ctx):
+        lls = [rf.loglikelihood(ctx, " {}".format(choice))[0] for choice in doc["choices"]]
+
+        return lls
+
+    def process_results(self, doc, results):
+        gold = doc["gold"]
+        pred = np.argmax(results)
+
+        return {"acc": float(pred == gold), "f1_macro": (gold, pred)}
+
+    def higher_is_better(self):
+        return {"acc": True, "f1_macro": True}
+
+    def aggregation(self):
+        return {"acc": mean, "f1_macro": f1_score_multiclass_macro}
+
 
 class RuOpenBookQA(MultipleChoiceTask):
     VERSION = 0
@@ -305,3 +322,20 @@ class RuOpenBookQA(MultipleChoiceTask):
 
     def doc_to_decontamination_query(self, doc):
         return doc["query"]
+
+    def construct_requests(self, doc, ctx):
+        lls = [rf.loglikelihood(ctx, " {}".format(choice))[0] for choice in doc["choices"]]
+
+        return lls
+
+    def process_results(self, doc, results):
+        gold = doc["gold"]
+        pred = np.argmax(results)
+
+        return {"acc": float(pred == gold), "f1_macro": (gold, pred)}
+
+    def higher_is_better(self):
+        return {"acc": True, "f1_macro": True}
+
+    def aggregation(self):
+        return {"acc": mean, "f1_macro": f1_score_multiclass_macro}

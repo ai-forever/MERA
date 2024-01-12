@@ -6,7 +6,6 @@ Turing-test Interview Emulation (RuTie) is a Russian-language test for simulatio
 Homepage: https://mera.a-ai.ru/
 """
 
-import inspect
 import numpy as np
 from lm_eval.base import rf, Task
 from lm_eval.metrics import mean

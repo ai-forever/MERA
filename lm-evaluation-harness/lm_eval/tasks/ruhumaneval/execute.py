@@ -71,7 +71,9 @@ def unsafe_execute(check_program, test_cases, entry_point, result, timeout):
             for test in test_cases:
                 try:
                     test_res = locals()[entry_point](**test)
-                    test_res = str(test_res)
+                    # there are no None in testset outputs, no need in "None" option
+                    if test_res is not None:
+                        test_res = str(test_res)
                 except:
                     test_res = None
                 res.append(test_res)
