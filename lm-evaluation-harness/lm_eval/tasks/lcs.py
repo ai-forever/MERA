@@ -8,8 +8,6 @@ predict the length of the longest common subsequence between the strings.
 Homepage: https://mera.a-ai.ru/
 """
 
-import inspect
-
 from lm_eval.base import Task, rf
 from lm_eval.metrics import mean
 from numpy import argmax

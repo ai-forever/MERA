@@ -1,8 +1,6 @@
 """
 ruHumanEval
 """
-import inspect
-
 import ast
 from .execute import check_correctness
 from concurrent.futures import ThreadPoolExecutor
@@ -44,14 +42,18 @@ class ruHumanEval(Task):
         return " " + str(doc["outputs"])
 
     def construct_requests(self, doc, ctx):
-        return rf.greedy_until(ctx, {"until": ["."]})
+        # if model starts generating without proper tabulation, the code won't work
+        # or this means that the code of the function is completed
+        return rf.greedy_until(ctx, {"until": ["\nclass", "\ndef", "\n#", "\nif", "\nprint"]})
 
     def execute_function(self, resp_func, doc, timeout=3.0, num_workers=2):
         test_cases = ast.literal_eval(doc["inputs"]["tests"])
         entry_point = doc["meta"]["entry_point"]
+        # resp_func contains the continuation for the provided in prompt beginning
+        full_function = doc["inputs"]["function"] + resp_func
 
         with ThreadPoolExecutor(max_workers=num_workers) as executor:
-            args = (resp_func, test_cases, entry_point, timeout)
+            args = (full_function, test_cases, entry_point, timeout)
             future = executor.submit(check_correctness, *args)
             result = future.result()
         return result["result"]
@@ -61,7 +63,7 @@ class ruHumanEval(Task):
             return 0
         if len(true) != len(pred):
             return 0
-        if type(true[0]) != type(pred[0]):
+        if not isinstance(true[0], type(pred[0])):
             return 0
         tests = []
         for idx, test in enumerate(true):
@@ -70,7 +72,7 @@ class ruHumanEval(Task):
                     test.append(1)
                 else:
                     test.append(0)
-            except:
+            except Exception:
                 test.append(0)
         return sum(tests) / len(tests)
 

@@ -1,10 +1,8 @@
-import math
 from pathlib import Path
 from typing import List, Mapping, NewType, Optional, Tuple, Union
 
 import peft
 import torch
-import torch.nn.functional as F
 import transformers
 from peft import __version__ as PEFT_VERSION
 from tqdm import tqdm
@@ -242,12 +240,23 @@ class HuggingFaceAutoLM(BaseLM):
         if not use_accelerate and not (load_in_4bit or load_in_8bit):
             try:
                 self.model.to(self._device)
-            except:
+            except Exception:
                 print(
-                    "Failed to place model onto specified device. This may be because the model is quantized via `bitsandbytes`. If the desired GPU is being used, this message is safe to ignore."
+                    "Failed to place model onto specified device. This may be because the model is quantized "
+                    "via `bitsandbytes`. If the desired GPU is being used, this message is safe to ignore."
                 )
+
+        # TODO: add logging of no-pad cases
+        self.tokenizer_check()
+
+        # check that the model can generate tokens
+        self.can_generate = self.check_generation_ability()
+
         # Check possible problems with max_length at initialization
         self._max_length = self._detect_max_length()
+
+        # to avoid multiple batch_size calculations
+        self.batch_size_found = False
 
     def _create_auto_model(
         self,
@@ -331,6 +340,8 @@ class HuggingFaceAutoLM(BaseLM):
         subfolder: str,
         tokenizer: Optional[str] = None,
         trust_remote_code: Optional[bool] = False,
+        padding_side="left",
+        truncation_side="left",
     ) -> transformers.PreTrainedTokenizer:
         """Returns a pre-trained tokenizer from a pre-trained tokenizer configuration."""
         tokenizer = self.AUTO_TOKENIZER_CLASS.from_pretrained(
@@ -338,7 +349,8 @@ class HuggingFaceAutoLM(BaseLM):
             revision=revision + ("/" + subfolder if subfolder is not None else ""),
             trust_remote_code=trust_remote_code,
         )
-        tokenizer.pad_token = tokenizer.eos_token
+        tokenizer.padding_side = padding_side
+        tokenizer.truncation_side = truncation_side
         return tokenizer
 
     @property
@@ -406,15 +418,22 @@ class HuggingFaceAutoLM(BaseLM):
     def device(self) -> Union[int, str, torch.device]:
         return self._device
 
-    def tok_encode(self, string: str) -> TokenSequence:
+    def tok_encode(self, string: str, add_special_tokens=False) -> TokenSequence:
         # TODO: Merge `tok_encode_batch` here.
-        return self.tokenizer.encode(string, add_special_tokens=self.add_special_tokens)
+        return self.tokenizer.encode(
+            string,
+            add_special_tokens=add_special_tokens,
+            truncation=True,
+            max_length=self.max_length,
+        )
 
     def tok_encode_batch(self, strings: List[str]) -> TokenSequence:
         return self.tokenizer(
             strings,
             padding=True,
+            truncation=True,
             add_special_tokens=self.add_special_tokens,
+            max_length=self.max_length,
             return_tensors="pt",
         )
 
@@ -423,31 +442,48 @@ class HuggingFaceAutoLM(BaseLM):
 
     def greedy_until(self, requests: List[Tuple[str, Union[List[str], str]]], task=None, num_generation=1):
         def _collate(x):
-            tokens = self.tok_encode(x[0])
+            tokens = self.tok_encode(x[0], self.add_special_tokens)
             return len(tokens), x[0]
 
         results = []
-        print(len(requests))
         reorder = utils.Reorderer(requests, _collate)
-        print(len(reorder))
 
+        # find optimal batch_size
         adaptive_batch_size = None
-        if self.batch_size == "auto":
-            # using rolling window with maximum context
-            print("Passed argument batch_size = auto. Detecting largest batch size")
-            batch_size = self._detect_batch_size()
-            print(f"Determined Largest batch size: {batch_size}")
-            adaptive_batch_size = batch_size
+        if task == "humaneval":
+            batch_size = 1
+        else:
+            if self.batch_size == "auto" and not self.batch_size_found:
+                # using rolling window with maximum context
+                print("Passed argument batch_size = auto. Detecting largest batch size")
+                batch_size = self._detect_batch_size()
+                print(f"Determined Largest batch size: {batch_size}")
+                self.batch_size_found = batch_size
+            else:
+                # in case one more greedy query begins
+                batch_size = self.batch_size_found
+        adaptive_batch_size = batch_size
 
         for chunk in utils.chunks(
             tqdm(reorder.get_reordered(), disable=False),
-            self.batch_size if self.batch_size != "auto" else adaptive_batch_size,
+            self.batch_size if (self.batch_size != "auto" and task != "humaneval") else adaptive_batch_size,
         ):
             context = [c[0] for c in chunk]
             request_args = chunk[0][1]
-            stop = request_args.get("until", None)
+            stop = request_args.get("until", self.tokenizer.eos_token)
             stop_sequences = stop if isinstance(stop, list) else [stop]
             max_generation_length = request_args.get("max_length", None)
+
+            logs_ctx = {
+                "until": stop,
+                "max_generation_length": max_generation_length,
+                "tokenizer_pad_token": [self.tokenizer.pad_token, self.tokenizer.pad_token_id],
+                "tokenizer_eos_token": [self.tokenizer.eos_token, self.tokenizer.eos_token_id],
+                "tokenizer_bos_token": [self.tokenizer.bos_token, self.tokenizer.bos_token_id],
+                "attr_batch_size": self.batch_size if self.batch_size != "auto" else adaptive_batch_size,
+                "attr_max_length": self.max_length,
+                "attr_max_gen_toks": self.max_gen_toks,
+            }
 
             assert isinstance(max_generation_length, int) or max_generation_length is None
             assert isinstance(stop_sequences, list) or stop_sequences is None
@@ -463,34 +499,61 @@ class HuggingFaceAutoLM(BaseLM):
             else:
                 max_tokens = max_generation_length
 
+            logs_ctx["attr_max_tokens"] = max_tokens
+
             token_context = self.tok_encode_batch(context)
 
+            logs_ctx["input_ids_shape"] = list(token_context["input_ids"].shape)
+            logs_ctx["real_tokens_per_batch"] = list(token_context["attention_mask"].sum(dim=-1))
+
             if task == "humaneval":
-                responses = self._model_generate(
-                    inputs=token_context,
-                    max_tokens=max_tokens,
-                    stop=until,
-                )
-                responses = [self.tok_decode(responses[it].tolist()) for it in range(len(responses))]
+                try:
+                    responses = self._model_generate(
+                        inputs=token_context,
+                        max_tokens=max_tokens,
+                        stop=until,
+                        task=task,
+                        num_generation=num_generation,
+                    )
+                except Exception as e:
+                    error_msg = {
+                        "header": "Error occurred while processing greedy_until requests",
+                        "content": e,
+                        "chunk": context,
+                    }
+                    print(error_msg)
+                    raise
+
+                # responses is List[torch.Tensor], but not torch.Tensor
+                responses = self.tok_decode(responses)
 
                 responses_full = []
                 for response in responses:
-                    new = []
-                    for resp in response:
-                        # Ensure the generated responses do not contain the stop sequences.
-                        for term in until:
-                            resp = resp.split(term)[0]
-                            new.append(resp)
-                        # partial caching
-                        self.cache_hook.add_partial("greedy_until", (context, until), response)
-                    responses_full += [new]
-                results += [responses_full]
+                    # Ensure the generated responses do not contain the stop sequences.
+                    for term in until:
+                        response = response.split(term)[0]
+                    # partial caching
+                    responses_full.extend([response])
+                # caching all the generations for the same request
+                self.cache_hook.add_partial("greedy_until", (context, until), responses_full)
+                results.extend([[responses_full, logs_ctx]])
             else:
-                responses = self._model_generate(
-                    inputs=token_context,
-                    max_tokens=max_tokens,
-                    stop=until,
-                )
+                try:
+                    responses = self._model_generate(
+                        inputs=token_context,
+                        max_tokens=max_tokens,
+                        stop=until,
+                    )
+                except Exception as e:
+                    error_msg = {
+                        "header": "Error occurred while processing greedy_until requests",
+                        "content": e,
+                        "chunk": context,
+                    }
+                    print(error_msg)
+                    raise
+
+                # responses is torch.Tensor[torch.Tensor]
                 responses = self.tok_decode(responses.tolist())
 
                 for response in responses:
@@ -499,7 +562,8 @@ class HuggingFaceAutoLM(BaseLM):
                         response = response.split(term)[0]
                     # partial caching
                     self.cache_hook.add_partial("greedy_until", (context, until), response)
-                results.append(response)
+                    results.extend([[response, logs_ctx]])
+
         return reorder.get_original(results)
 
 
@@ -528,11 +592,14 @@ class AutoCausalLM(HuggingFaceAutoLM):
             tokenizer=tokenizer,
             trust_remote_code=trust_remote_code,
         )
-        tokenizer.padding_side = "left"
         return tokenizer
 
     def _model_call(self, inputs: TokenSequence, labels: Optional[TokenSequence] = None) -> TokenSequence:
-        return self.model(inputs)["logits"]
+        with torch.no_grad():
+            if self.can_generate:
+                return self.model(**self.model.prepare_inputs_for_generation(**inputs)).logits
+            else:
+                return self.model(**inputs).logits
 
     def _model_generate(
         self,
@@ -551,38 +618,42 @@ class AutoCausalLM(HuggingFaceAutoLM):
 
         stopping_criteria = stop_sequences_criteria(self.tokenizer, stop, input_ids.shape[1], input_ids.shape[0])
 
+        generation_kwargs = {
+            "pad_token_id": self.tokenizer.pad_token_id,
+            "eos_token_id": self.tokenizer.eos_token_id,
+            "bos_token_id": self.tokenizer.bos_token_id,
+            # GPT style models require the `generate` `max_length` arg to include the
+            # context length, so we instead set `max_new_tokens` which is the number
+            # of new tokens to generate, excluding the current number of tokens.
+            "max_new_tokens": max_tokens,
+        }
+
         if task == "humaneval":
-            arr = []
-            for it in range(num_generation):
-                generations = self.model.generate(
+            generations = []
+            for i in range(num_generation):
+                torch.manual_seed(i)
+                gen = self.model.generate(
                     input_ids=input_ids,
                     attention_mask=attention_mask,
-                    # GPT style models require the `generate` `max_length` arg to include the
-                    # context length, so we instead set `max_new_tokens` which is the number
-                    # of new tokens to generate, excluding the current number of tokens.
-                    max_new_tokens=max_tokens,
                     stopping_criteria=stopping_criteria,
                     do_sample=True,
+                    **generation_kwargs,
                 )
-                res = utils.select_continuation_from_batch_left_padding(
-                    generations, max_context_size=inputs["input_ids"].size(1)
-                )
-                arr += [res]
-            return res
+                # need to make it 1-d tensor and remove prompt ids
+                generations.extend([gen.squeeze(0)[inputs["input_ids"].size(1) :]])
+            return generations
         else:
             generations = self.model.generate(
                 input_ids=input_ids,
                 attention_mask=attention_mask,
-                # GPT style models require the `generate` `max_length` arg to include the
-                # context length, so we instead set `max_new_tokens` which is the number
-                # of new tokens to generate, excluding the current number of tokens.
-                max_new_tokens=max_tokens,
                 stopping_criteria=stopping_criteria,
                 do_sample=False,
+                **generation_kwargs,
             )
-        return utils.select_continuation_from_batch_left_padding(
-            generations, max_context_size=inputs["input_ids"].size(1)
-        )
+            res = utils.select_continuation_from_batch_left_padding(
+                generations, max_context_size=inputs["input_ids"].size(1)
+            )
+            return res
 
 
 class AutoSeq2SeqLM(HuggingFaceAutoLM):
@@ -594,106 +665,20 @@ class AutoSeq2SeqLM(HuggingFaceAutoLM):
     AUTO_MODEL_CLASS = transformers.AutoModelForSeq2SeqLM
     AUTO_PEFT_CLASS = peft.PeftModel
 
-    def loglikelihood(self, requests: List[Tuple[str, str]]) -> List[Tuple[float, bool]]:
-        new_requests = []
-        for chunk in utils.chunks(requests, self.batch_size):
-            context, continuation = zip(*chunk)
-
-            # Fill empty contexts with the EOT token.
-            context = [f"{self.eot_token}" if len(text) == 0 else text for text in context]
-            context_enc = self.tok_encode_batch(context)
-            for key in context_enc:
-                context_enc[key] = context_enc[key][:, -self.max_length :]
-
-            # Remove leading whitespace introduced by the default
-            # `text_target_separator` since the context and continuation
-            # will not be concatenated as a single (decoder) input.
-            continuation = [text.lstrip() for text in continuation]
-            continuation_enc = self.tok_encode_batch(list(continuation))
-            for key in continuation_enc:
-                continuation_enc[key] = continuation_enc[key][:, -self.max_length :]
-
-            new_requests.append(((context, continuation), context_enc, continuation_enc))
-        return self._loglikelihood_tokens(new_requests)
-
-    def loglikelihood_rolling(self, requests: List[Tuple[str, str]]) -> List[float]:
-        loglikelihoods = []
-        for (string,) in tqdm(requests):
-            rolling_token_windows = list(
-                map(
-                    utils.make_disjoint_window,
-                    utils.get_rolling_token_windows(
-                        token_list=self.tok_encode(string),
-                        prefix_token=self.eot_token_id,
-                        max_seq_len=self.max_length,
-                        context_len=1,
-                    ),
-                )
-            )
-            contexts, conts = utils.split_and_pad_windows(
-                rolling_token_windows,
-                pad_token_id=self.eot_token_id,
-                max_seq_len=self.max_length,
-            )
-            # Manually create BatchEncoding tensors with attention masks as
-            # expected by `self._model_call` in `self._loglikelihood_tokens`.
-            contexts_enc = torch.Tensor(contexts).long()
-            contexts_enc = transformers.tokenization_utils_base.BatchEncoding(
-                {
-                    "input_ids": contexts_enc,
-                    "attention_mask": (contexts_enc != self.eot_token_id).long(),
-                }
-            )
-            conts_enc = torch.Tensor(conts).long()
-            conts_enc = transformers.tokenization_utils_base.BatchEncoding(
-                {
-                    "input_ids": conts_enc,
-                    "attention_mask": (conts_enc != self.eot_token_id).long(),
-                }
-            )
-            # TODO: Extract out this call so it only gets called once and also
-            # somehow figure out partial caching for.
-            rolling_token_windows_request = [((contexts, conts), contexts_enc, conts_enc)]
-            string_nll = self._loglikelihood_tokens(rolling_token_windows_request, disable_tqdm=True)
-            string_nll = [x[0] for x in string_nll]  # discard is_greedy
-            string_nll = sum(string_nll)
-            loglikelihoods.append(string_nll)
-        return loglikelihoods
-
-    def _loglikelihood_tokens(
-        self,
-        requests: List[Tuple[Tuple[str, str], TokenSequence, TokenSequence]],
-        disable_tqdm: Optional[bool] = False,
-    ) -> List[Tuple[float, bool]]:
-        results = []
-        for chunk in tqdm(requests, total=math.ceil(len(requests)), disable=disable_tqdm):
-            cache_keys, inputs_tokens, targets_tokens = chunk
-            inputs_tokens = inputs_tokens.to(self.device)
-            targets_tokens = targets_tokens.to(self.device)
-            outputs = self._model_call(inputs=inputs_tokens, labels=targets_tokens)
-            log_softmaxes = F.log_softmax(outputs.logits, dim=-1)
-
-            output_iterator = zip(
-                zip(cache_keys[0], cache_keys[1]),
-                log_softmaxes,
-                targets_tokens["input_ids"],
-                targets_tokens["attention_mask"],
-            )
-            for cache_key, log_softmax, target_tokens, target_mask in output_iterator:
-                length = target_mask.sum()
-                log_softmax = log_softmax[:length]
-                target_tokens = target_tokens[:length]
-                greedy_tokens = log_softmax.argmax(dim=-1)
-                max_equal = (greedy_tokens == target_tokens).all()
-                target_logits = torch.gather(log_softmax, 1, target_tokens.unsqueeze(-1)).squeeze(-1)
-                answer = (float(target_logits.sum()), bool(max_equal))
-                results.append(answer)
-                if cache_key is not None:
-                    self.cache_hook.add_partial("loglikelihood", cache_key, answer)
-        return results
-
     def _model_call(self, inputs: TokenSequence, labels: Optional[TokenSequence] = None) -> TokenSequence:
-        return self.model(**inputs, labels=labels["input_ids"])
+        if isinstance(inputs, dict) and "labels" in inputs.keys():
+            with torch.no_grad():
+                if self.can_generate:
+                    return self.model(**self.model.prepare_inputs_for_generation(**inputs)).logits
+                else:
+                    return self.model(**inputs).logits
+        with torch.no_grad():
+            if self.can_generate:
+                return self.model(
+                    **self.model.prepare_inputs_for_generation(**inputs), labels=labels["input_ids"]
+                ).logits
+            else:
+                return self.model(**inputs, labels=labels["input_ids"]).logits
 
     def _model_generate(
         self,
@@ -703,8 +688,8 @@ class AutoSeq2SeqLM(HuggingFaceAutoLM):
         task=None,
         num_generation=1,
     ) -> TokenSequence:
-        input_ids = inputs["input_ids"][:, -self.max_length :].to(self.device)
-        attention_mask = inputs["attention_mask"][:, -self.max_length :].to(self.device)
+        input_ids = inputs["input_ids"].to(self.device)
+        attention_mask = inputs["attention_mask"].to(self.device)
 
         # Generate one token to calculate the number of start tokens prepended to decoder_input_ids
         # (leaving this here in case the below assumption is violated in the future)
@@ -717,27 +702,36 @@ class AutoSeq2SeqLM(HuggingFaceAutoLM):
 
         # Assume that there will always only be one token in the decoder inputs, assumption holds for existing HF models
         stopping_criteria = stop_sequences_criteria(self.tokenizer, stop, 1, input_ids.shape[0])
+
+        generation_kwargs = {
+            "pad_token_id": self.tokenizer.pad_token_id,
+            "eos_token_id": self.tokenizer.eos_token_id,
+            "bos_token_id": self.tokenizer.bos_token_id,
+            "max_new_tokens": max_tokens,
+        }
+
         if task == "humaneval":
-            res = []
-            for it in range(num_generation):
-                generations = self.model.generate(
+            generations = []
+            for i in range(num_generation):
+                torch.manual_seed(i)
+                gen = self.model.generate(
                     input_ids=input_ids,
                     attention_mask=attention_mask,
-                    max_new_tokens=max_tokens,
                     stopping_criteria=stopping_criteria,
                     do_sample=True,
+                    **generation_kwargs,
                 )
-                res += [generations]
-            return res
+                # make generation 1-d tensor
+                generations.extend([gen.squeeze(0)])
         else:
             generations = self.model.generate(
                 input_ids=input_ids,
                 attention_mask=attention_mask,
-                max_new_tokens=max_tokens,
                 stopping_criteria=stopping_criteria,
                 do_sample=False,
+                **generation_kwargs,
             )
-            return generations
+        return generations
 
 
 class MultiTokenEOSCriteria(transformers.StoppingCriteria):

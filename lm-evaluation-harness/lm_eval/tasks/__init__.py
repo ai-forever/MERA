@@ -57,7 +57,6 @@ TASK_REGISTRY = {
     "rummlu": rummlu.RuMMLU,
     # ruTIE
     "rutie": rutie.RUTIE,
-    # ruHumanEval
     "ruhumaneval": ruhumaneval.ruHumanEval,
 }
 

@@ -7,7 +7,6 @@ of tasks with four possible answers, only one of which is correct.
 Homepage: https://mera.a-ai.ru/
 """
 
-import inspect
 import numpy as np
 
 from lm_eval.metrics import mean
@@ -193,32 +192,19 @@ class RuMMLU(MultipleChoiceTask):
 
     def process_results(self, doc, results):
         gold = doc["gold"]
-
         acc = 1.0 if np.argmax(results) == gold else 0.0
-        completion_len = np.array([float(len(i)) for i in doc["choices"]])
-        acc_norm = 1.0 if np.argmax(results / completion_len) == gold else 0.0
-
         sub = doc["meta"]["domain"]
-
         return {
             "acc": acc,
-            "acc_norm": acc_norm,
             f"acc_{sub}": acc,
-            f"acc_norm_{sub}": acc_norm,
         }
 
     def higher_is_better(self):
         metrics = {f"acc_{sub}": True for sub in SUBJECTS}
-        metrics_norm = {f"acc_norm_{sub}": True for sub in SUBJECTS}
-        metrics.update(metrics_norm)
         metrics["acc"] = True
-        metrics["acc_norm"] = True
         return metrics
 
     def aggregation(self):
         metrics = {f"acc_{sub}": mean for sub in SUBJECTS}
-        metrics_norm = {f"acc_norm_{sub}": mean for sub in SUBJECTS}
-        metrics.update(metrics_norm)
         metrics["acc"] = mean
-        metrics["acc_norm"] = mean
         return metrics

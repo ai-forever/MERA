@@ -12,11 +12,8 @@ type involve setting up correspondences between two lists.
 Homepage: https://mera.a-ai.ru/
 """
 
-import inspect
-
 import numpy as np
 import re
-import sklearn
 
 from lm_eval.base import Task, rf
 

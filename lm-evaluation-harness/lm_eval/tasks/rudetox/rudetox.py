@@ -8,37 +8,15 @@ style preserving original meaning and fluency.
 Homepage: https://mera.a-ai.ru/
 """
 
-import inspect
-
 from lm_eval.base import Task, rf
 from lm_eval.metrics import mean
 import torch
-import pickle
 import numpy as np
-from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
 
 class ruDetox(Task):
     VERSION = 0
     DATASET_NAME = "rudetox"
-
-    available_device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # in case of no cuda available
-    meaning_model = AutoModelForSequenceClassification.from_pretrained(
-        "s-nlp/rubert-base-cased-conversational-paraphrase-v1"
-    ).to(device=available_device)
-    meaning_tokenizer = AutoTokenizer.from_pretrained("s-nlp/rubert-base-cased-conversational-paraphrase-v1")
-    style_model = AutoModelForSequenceClassification.from_pretrained("IlyaGusev/rubertconv_toxic_clf").to(
-        device=available_device
-    )
-    style_tokenizer = AutoTokenizer.from_pretrained("IlyaGusev/rubertconv_toxic_clf")
-    cola_model = AutoModelForSequenceClassification.from_pretrained("s-nlp/ruRoberta-large-RuCoLa-v1").to(
-        device=available_device
-    )
-    cola_tokenizer = AutoTokenizer.from_pretrained("s-nlp/ruRoberta-large-RuCoLa-v1")
-    with open("lm_eval/tasks/rudetox/score_calibrations_ru.pkl", "rb") as f:
-        style_calibrator = pickle.load(f)
-        content_calibrator = pickle.load(f)
-        fluency_calibrator = pickle.load(f)
 
     def has_training_docs(self):
         return True
@@ -76,20 +54,31 @@ class ruDetox(Task):
         completion = rf.greedy_until(ctx, {"until": ["\n"]})
         return completion
 
-    def process_results(self, doc, results):
+    def process_results(self, doc, results, package):
         completion = results[0]
         completion = completion.strip()
+        (
+            meaning_model,
+            meaning_tokenizer,
+            style_model,
+            style_tokenizer,
+            cola_model,
+            cola_tokenizer,
+            style_calibrator,
+            content_calibrator,
+            fluency_calibrator,
+        ) = package
         accuracy = self.evaluate_style(
-            self.style_model,
-            self.style_tokenizer,
+            style_model,
+            style_tokenizer,
             [completion],
             target_label=0,
             batch_size=32,
             verbose=False,
         )
         similarity = self.evaluate_meaning(
-            self.meaning_model,
-            self.meaning_tokenizer,
+            meaning_model,
+            meaning_tokenizer,
             [doc["inputs"]],
             [completion],
             batch_size=32,
@@ -98,17 +87,17 @@ class ruDetox(Task):
             target_label="paraphrase",
         )
         fluency = self.evaluate_cola(
-            self.cola_model,
-            self.cola_tokenizer,
+            cola_model,
+            cola_tokenizer,
             texts=[completion],
             batch_size=32,
             verbose=False,
             target_label=1,
         )
 
-        accuracy = self.style_cal(self.style_calibrator, accuracy)
-        similarity = self.meaning_cal(self.content_calibrator, similarity)
-        fluency = self.fluency_cal(self.fluency_calibrator, fluency)
+        accuracy = self.style_cal(style_calibrator, accuracy)
+        similarity = self.meaning_cal(content_calibrator, similarity)
+        fluency = self.fluency_cal(fluency_calibrator, fluency)
         joint = accuracy * similarity * fluency
 
         return {
@@ -178,7 +167,7 @@ class ruDetox(Task):
                     else:
                         preds = torch.sigmoid(logits)[:, 0]
                     preds = preds.cpu().numpy()
-                except:
+                except Exception:
                     print(i, i + batch_size)
                     preds = [0] * len(inputs)
             res.append(preds)
@@ -362,23 +351,3 @@ class ruDetox(Task):
         if maximum is not None:
             result = np.minimum(maximum, result)
         return result
-
-    def load_model(
-        self,
-        model_name=None,
-        model=None,
-        tokenizer=None,
-        model_class=AutoModelForSequenceClassification,
-        use_cuda=False,
-    ):
-        if model is None:
-            if model_name is None:
-                raise ValueError("Either model or model_name should be provided")
-            model = model_class.from_pretrained(model_name)
-            if torch.cuda.is_available() and use_cuda:
-                model.cuda()
-        if tokenizer is None:
-            if model_name is None:
-                raise ValueError("Either tokenizer or model_name should be provided")
-            tokenizer = AutoTokenizer.from_pretrained(model_name)
-        return model, tokenizer

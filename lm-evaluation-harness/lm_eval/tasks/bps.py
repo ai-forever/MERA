@@ -7,8 +7,6 @@ algorithmic concepts like stacks, recursion, or dynamic programming.
 
 Homepage: https://mera.a-ai.ru/
 """
-
-import inspect
 import re
 
 from lm_eval.base import Task, rf

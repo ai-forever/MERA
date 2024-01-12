@@ -18,6 +18,7 @@ def _get_dtype(dtype: Union[str, torch.dtype]) -> torch.dtype:
 
 class HFLM(BaseLM):
     _DEFAULT_MAX_LENGTH = 2048
+    AUTO_MODEL_CLASS = transformers.AutoModelForCausalLM
 
     def __init__(
         self,
@@ -103,6 +104,13 @@ class HFLM(BaseLM):
         self.max_batch_size = max_batch_size
 
         self._max_length = max_length
+
+        # TODO: add logging of no-pad cases
+        self.tokenizer_check()
+
+        # check that the model can generate tokens
+        self.can_generate = self.check_generation_ability()
+
         # Check possible problems with max_length at initialization
         self._max_length = self._detect_max_length()
 
@@ -139,8 +147,8 @@ class HFLM(BaseLM):
         # TODO: fix multi-gpu
         return self._device
 
-    def tok_encode(self, string: str):
-        return self.tokenizer.encode(string, add_special_tokens=False)
+    def tok_encode(self, string: str, add_special_tokens=False):
+        return self.tokenizer.encode(string, add_special_tokens=add_special_tokens)
 
     def tok_decode(self, tokens):
         return self.tokenizer.decode(tokens)
@@ -154,20 +162,37 @@ class HFLM(BaseLM):
         logits returned from the model
         """
         with torch.no_grad():
-            return self.model(inps)[0]
+            if self.can_generate:
+                return self.model(**self.model.prepare_inputs_for_generation(**inps)).logits
+            else:
+                return self.model(**inps).logits
 
     def _model_generate(self, context, max_length, eos_token_id, task=None, num_generation=1):
+        generation_kwargs = {
+            "pad_token_id": self.tokenizer.pad_token_id,
+            "eos_token_id": self.tokenizer.eos_token_id,
+            "bos_token_id": self.tokenizer.bos_token_id,
+            "max_length": max_length,
+        }
         if task == "humaneval":
-            generation_kwargs = {"do_sample": True, "max_length": max_length}
+            generations = []
+            for i in range(num_generation):
+                torch.manual_seed(i)
+                gen = self.model.generate(
+                    input_ids=context,
+                    attention_mask=torch.ones_like(context, device=context.device),
+                    do_sample=True,
+                    **generation_kwargs,
+                )
+                generations.extend([gen.squeeze(0)])
+            return generations
         else:
-            generation_kwargs = {"do_sample": False, "max_length": max_length}
-        if eos_token_id is not None:
-            generation_kwargs["eos_token_id"] = eos_token_id
-            generation_kwargs["pad_token_id"] = eos_token_id  # setting eos_token_id as pad token
-        if task == "humaneval":
-            return [self.model.generate(context, **generation_kwargs) for i in range(num_generation)]
-        else:
-            return self.model.generate(context, **generation_kwargs)
+            return self.model.generate(
+                input_ids=context,
+                attention_mask=torch.ones_like(context, device=context.device),
+                do_sample=True,
+                **generation_kwargs,
+            )
 
 
 # for backwards compatibility

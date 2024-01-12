@@ -6,14 +6,16 @@ from typing import Dict
 
 import numpy as np
 import transformers
+import torch
 
 from tqdm import tqdm
+from torch.utils.collect_env import get_pretty_env_info
+from transformers import __version__ as trans_version
 
 import lm_eval.base
 import lm_eval.metrics
 import lm_eval.models
 import lm_eval.tasks
-from lm_eval.models.gpt2 import HFLM
 from lm_eval.utils import positional_deprecated, run_task_tests
 
 
@@ -138,7 +140,22 @@ def simple_evaluate(
             inference=inference,
             k=3,
         )
-    if len(task_dict) > 0 and ("ruhumaneval" in tasks and "rutie" in tasks):
+    if "rudetox" in task_dict:
+        rudetox_task = task_dict.pop("rudetox")
+        rudetox_results = evaluate(
+            lm=lm,
+            task_dict={"rudetox": rudetox_task},
+            num_fewshot=num_fewshot,
+            limit=limit,
+            bootstrap_iters=bootstrap_iters,
+            description_dict=description_dict,
+            decontamination_ngrams_path=decontamination_ngrams_path,
+            write_out=write_out,
+            output_base_path=output_base_path,
+            inference=inference,
+            need_scoring_models=True,
+        )
+    if len(task_dict) > 0 and ("ruhumaneval" in tasks and "rutie" in tasks and "rudetox" in tasks):
         results = evaluate(
             lm=lm,
             task_dict=task_dict,
@@ -157,7 +174,10 @@ def simple_evaluate(
         results["results"]["rutie"] = rutie_results["results"]["rutie"]
         results["versions"]["rutie"] = rutie_results["versions"]["rutie"]
         results["tasks"]["rutie"] = rutie_results["tasks"]["rutie"]
-    elif len(task_dict) > 0 and "rutie" in tasks:
+        results["results"]["rudetox"] = rudetox_results["results"]["rudetox"]
+        results["versions"]["rudetox"] = rudetox_results["versions"]["rudetox"]
+        results["tasks"]["rudetox"] = rudetox_results["tasks"]["rudetox"]
+    elif len(task_dict) > 0 and ("ruhumaneval" in tasks and "rutie" in tasks):
         results = evaluate(
             lm=lm,
             task_dict=task_dict,
@@ -173,6 +193,47 @@ def simple_evaluate(
         results["results"]["rutie"] = rutie_results["results"]["rutie"]
         results["versions"]["rutie"] = rutie_results["versions"]["rutie"]
         results["tasks"]["rutie"] = rutie_results["tasks"]["rutie"]
+        results["results"]["ruhumaneval"] = humaneval_results["results"]["ruhumaneval"]
+        results["versions"]["ruhumaneval"] = humaneval_results["versions"]["ruhumaneval"]
+        results["tasks"]["ruhumaneval"] = humaneval_results["tasks"]["ruhumaneval"]
+    elif len(task_dict) > 0 and ("ruhumaneval" in tasks and "rudetox" in tasks):
+        results = evaluate(
+            lm=lm,
+            task_dict=task_dict,
+            num_fewshot=num_fewshot,
+            limit=limit,
+            bootstrap_iters=bootstrap_iters,
+            description_dict=description_dict,
+            decontamination_ngrams_path=decontamination_ngrams_path,
+            write_out=write_out,
+            output_base_path=output_base_path,
+            inference=inference,
+        )
+        results["results"]["rudetox"] = rudetox_results["results"]["rudetox"]
+        results["versions"]["rudetox"] = rudetox_results["versions"]["rudetox"]
+        results["tasks"]["rudetox"] = rudetox_results["tasks"]["rudetox"]
+        results["results"]["ruhumaneval"] = humaneval_results["results"]["ruhumaneval"]
+        results["versions"]["ruhumaneval"] = humaneval_results["versions"]["ruhumaneval"]
+        results["tasks"]["ruhumaneval"] = humaneval_results["tasks"]["ruhumaneval"]
+    elif len(task_dict) > 0 and ("rudetox" in tasks and "rutie" in tasks):
+        results = evaluate(
+            lm=lm,
+            task_dict=task_dict,
+            num_fewshot=num_fewshot,
+            limit=limit,
+            bootstrap_iters=bootstrap_iters,
+            description_dict=description_dict,
+            decontamination_ngrams_path=decontamination_ngrams_path,
+            write_out=write_out,
+            output_base_path=output_base_path,
+            inference=inference,
+        )
+        results["results"]["rutie"] = rutie_results["results"]["rutie"]
+        results["versions"]["rutie"] = rutie_results["versions"]["rutie"]
+        results["tasks"]["rutie"] = rutie_results["tasks"]["rutie"]
+        results["results"]["rudetox"] = rudetox_results["results"]["rudetox"]
+        results["versions"]["rudetox"] = rudetox_results["versions"]["rudetox"]
+        results["tasks"]["rudetox"] = rudetox_results["tasks"]["rudetox"]
     elif len(task_dict) > 0 and "ruhumaneval" in tasks:
         results = evaluate(
             lm=lm,
@@ -189,8 +250,42 @@ def simple_evaluate(
         results["results"]["ruhumaneval"] = humaneval_results["results"]["ruhumaneval"]
         results["versions"]["ruhumaneval"] = humaneval_results["versions"]["ruhumaneval"]
         results["tasks"]["ruhumaneval"] = humaneval_results["tasks"]["ruhumaneval"]
+    elif len(task_dict) > 0 and "rudetox" in tasks:
+        results = evaluate(
+            lm=lm,
+            task_dict=task_dict,
+            num_fewshot=num_fewshot,
+            limit=limit,
+            bootstrap_iters=bootstrap_iters,
+            description_dict=description_dict,
+            decontamination_ngrams_path=decontamination_ngrams_path,
+            write_out=write_out,
+            output_base_path=output_base_path,
+            inference=inference,
+        )
+        results["results"]["rudetox"] = rudetox_results["results"]["rudetox"]
+        results["versions"]["rudetox"] = rudetox_results["versions"]["rudetox"]
+        results["tasks"]["rudetox"] = rudetox_results["tasks"]["rudetox"]
+    elif len(task_dict) > 0 and "rutie" in tasks:
+        results = evaluate(
+            lm=lm,
+            task_dict=task_dict,
+            num_fewshot=num_fewshot,
+            limit=limit,
+            bootstrap_iters=bootstrap_iters,
+            description_dict=description_dict,
+            decontamination_ngrams_path=decontamination_ngrams_path,
+            write_out=write_out,
+            output_base_path=output_base_path,
+            inference=inference,
+        )
+        results["results"]["rutie"] = rutie_results["results"]["rutie"]
+        results["versions"]["rutie"] = rutie_results["versions"]["rutie"]
+        results["tasks"]["rutie"] = rutie_results["tasks"]["rutie"]
     elif len(task_dict) == 0 and "rutie" in tasks:
         results = rutie_results
+    elif len(task_dict) == 0 and "rudetox" in tasks:
+        results = rudetox_results
     elif len(task_dict) == 0 and "ruhumaneval" in tasks:
         results = humaneval_results
     else:
@@ -213,6 +308,11 @@ def simple_evaluate(
         model_name = model
     elif isinstance(model, transformers.PreTrainedModel):
         model_name = "pretrained=" + model.config._name_or_path
+    try:
+        pretty_env_info = get_pretty_env_info()
+    except Exception as err:
+        pretty_env_info = str(err)
+    transformers_version = "Transformers: %s" % trans_version
     results["config"] = {
         "model": model_name,
         "model_args": model_args,
@@ -224,6 +324,8 @@ def simple_evaluate(
         "limit": limit,
         "bootstrap_iters": bootstrap_iters,
         "description_dict": description_dict,
+        "pretty_env_info": pretty_env_info,
+        "transformers_version": transformers_version,
     }
 
     return results
@@ -390,18 +492,21 @@ def evaluate_humaneval(
         #       solution. we could also implement some kind of auto-grouping here;
         #       they should end up next to each other.
 
-        print("Running", reqtype, "requests")
-        resps = getattr(lm, reqtype)(
-            [req.args for req in reqs], task="humaneval", num_generation=n
-        )  # getting the responses
+        print("Running", task_name, "requests")
+        # getting the responses
+        resps = getattr(lm, reqtype)([req.args for req in reqs], task="humaneval", num_generation=n)
+        unpacked_resps = list(zip(*resps))
+        resps = unpacked_resps[0]
+        logs = unpacked_resps[1]
         resps = [x if req.index is None else x[req.index] for x, req in zip(resps, reqs)]
 
-        for resp, (i, task_name, doc, doc_id) in zip(resps, requests_origin[reqtype]):
+        for resp, (i, task_name, doc, doc_id), log in zip(resps, requests_origin[reqtype], logs):
             process_res_queue[(task_name, doc_id)].append((i, resp))
 
             if write_out:
                 doc_id2idx = doc_id2idx_collection[task_name]
                 write_out_info[task_name][doc_id2idx[doc_id]][f"logit_{i}"] = resp
+                write_out_info[task_name][doc_id2idx[doc_id]][f"logs_{i}"] = str(log)
                 task = task_dict[task_name]
                 if isinstance(task, lm_eval.base.MultipleChoiceTask):
                     write_out_info[task_name][doc_id2idx[doc_id]]["truth"] = doc["gold"]
@@ -655,7 +760,10 @@ def evaluate_rutie(
             # doc_id: unique id that we can get back to a doc using `docs`
             requests_origin[req.request_type].append((i, task_name, doc, doc_id))
 
-            resp = getattr(lm, req.request_type)([req.args])
+            resp = getattr(lm, req.request_type)([req.args], task="rutie")
+            unpack_resp = [resp[0][0], resp[0][1]]
+            resp = [unpack_resp[0]]
+            logs = unpack_resp[1]
             resp = resp if req.index is None else resp[-1][req.index]
 
             process_res_queue[(task_name, doc_id)].append((i, resp))
@@ -664,6 +772,7 @@ def evaluate_rutie(
                 write_out_info[task_name][-1][f"prompt_{i}"] = "".join((map(lambda x: "".join(x), req.args)))
 
                 write_out_info[task_name][doc_id][f"logit_{i}"] = resp
+                write_out_info[task_name][doc_id][f"logs_{i}"] = str(logs)
                 task = task_dict[task_name]
                 write_out_info[task_name][doc_id]["truth"] = task.doc_to_target(doc)
 
@@ -780,6 +889,7 @@ def evaluate(
     write_out=False,
     output_base_path=None,
     inference=False,
+    need_scoring_models=False,
 ):
     """Instantiate and evaluate a model on a list of tasks.
 
@@ -921,14 +1031,18 @@ def evaluate(
 
         print("Running", reqtype, "requests")
         resps = getattr(lm, reqtype)([req.args for req in reqs])
+        unpacked_resps = list(zip(*resps))
+        resps = unpacked_resps[0]
+        logs = unpacked_resps[1]
         resps = [x if req.index is None else x[req.index] for x, req in zip(resps, reqs)]
 
-        for resp, (i, task_name, doc, doc_id) in zip(resps, requests_origin[reqtype]):
+        for resp, (i, task_name, doc, doc_id), logs in zip(resps, requests_origin[reqtype], logs):
             process_res_queue[(task_name, doc_id)].append((i, resp))
 
             if write_out:
                 doc_id2idx = doc_id2idx_collection[task_name]
                 write_out_info[task_name][doc_id2idx[doc_id]][f"logit_{i}"] = resp
+                write_out_info[task_name][doc_id2idx[doc_id]][f"logs_{i}"] = str(logs)
                 task = task_dict[task_name]
                 if isinstance(task, lm_eval.base.MultipleChoiceTask):
                     write_out_info[task_name][doc_id2idx[doc_id]]["truth"] = doc["gold"]
@@ -937,6 +1051,48 @@ def evaluate(
 
     if not inference:
         vals = collections.defaultdict(list)
+
+        # get scoring models for rudetox
+        if need_scoring_models:
+            print("Loading scoring models!")
+            available_device = torch.device(
+                "cuda" if torch.cuda.is_available() else "cpu"
+            )  # in case of no cuda available
+            meaning_model = transformers.AutoModelForSequenceClassification.from_pretrained(
+                "s-nlp/rubert-base-cased-conversational-paraphrase-v1"
+            ).to(device=available_device)
+            meaning_tokenizer = transformers.AutoTokenizer.from_pretrained(
+                "s-nlp/rubert-base-cased-conversational-paraphrase-v1"
+            )
+            style_model = transformers.AutoModelForSequenceClassification.from_pretrained(
+                "IlyaGusev/rubertconv_toxic_clf"
+            ).to(device=available_device)
+            style_tokenizer = transformers.AutoTokenizer.from_pretrained("IlyaGusev/rubertconv_toxic_clf")
+            cola_model = transformers.AutoModelForSequenceClassification.from_pretrained(
+                "s-nlp/ruRoberta-large-RuCoLa-v1"
+            ).to(device=available_device)
+            cola_tokenizer = transformers.AutoTokenizer.from_pretrained("s-nlp/ruRoberta-large-RuCoLa-v1")
+            import warnings
+            import pickle
+
+            warnings.filterwarnings("ignore")
+            with open("lm_eval/datasets/rudetox/score_calibrations_ru.pkl", "rb") as f:
+                style_calibrator = pickle.load(f)
+                content_calibrator = pickle.load(f)
+                fluency_calibrator = pickle.load(f)
+            warnings.filterwarnings("default")
+            package = [
+                meaning_model,
+                meaning_tokenizer,
+                style_model,
+                style_tokenizer,
+                cola_model,
+                cola_tokenizer,
+                style_calibrator,
+                content_calibrator,
+                fluency_calibrator,
+            ]
+            print("Scoring models have been loaded successfully!")
 
         # unpack results and sort back in order and return control to Task
         for (task_name, doc_id), requests in process_res_queue.items():
@@ -948,7 +1104,11 @@ def evaluate(
 
             doc_id2idx = doc_id2idx_collection[task_name]
 
-            metrics = task.process_results(doc, requests)
+            if need_scoring_models:
+                metrics = task.process_results(doc, requests, package)
+            else:
+                metrics = task.process_results(doc, requests)
+
             for metric, value in metrics.items():
                 vals[(task_name, metric)].append(value)
 
@@ -959,6 +1119,19 @@ def evaluate(
                 if decontaminate and task_name in overlaps:
                     if doc_id2idx[doc_id] not in overlaps[task_name]:
                         vals[(task_name, metric + decontaminate_suffix)].append(value)
+
+        if need_scoring_models:
+            del meaning_model
+            del meaning_tokenizer
+            del style_model
+            del style_tokenizer
+            del cola_model
+            del cola_tokenizer
+            del style_calibrator
+            del content_calibrator
+            del fluency_calibrator
+            del package
+            torch.cuda.empty_cache()
 
         # aggregate results
         for (task_name, metric), items in vals.items():

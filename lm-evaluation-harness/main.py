@@ -2,12 +2,26 @@ import argparse
 import json
 import logging
 import os
-import pathlib
+from pathlib import Path
+
 
 from lm_eval import evaluator, tasks, utils
 from lm_eval.models import MODEL_REGISTRY
 
 logging.getLogger("openai").setLevel(logging.WARNING)
+
+
+def get_commit(repo_path):
+    git_folder = Path(repo_path, ".git")
+    if git_folder.is_file():
+        git_folder = Path(git_folder.parent, git_folder.read_text().split("\n")[0].split(" ")[-1])
+    if Path(git_folder, "HEAD").exists():
+        head_name = Path(git_folder, "HEAD").read_text().split("\n")[0].split(" ")[-1]
+        head_ref = Path(git_folder, head_name)
+        commit = head_ref.read_text().replace("\n", "")
+    else:
+        commit = ""
+    return commit
 
 
 def parse_args():
@@ -30,7 +44,7 @@ def parse_args():
         "--limit",
         type=float,
         default=None,
-        help="Limit the number of examples per task. " "If <1, limit is a percentage of the total number of examples.",
+        help="Limit the number of examples per task. If <1, limit is a percentage of the total number of examples.",
     )
     parser.add_argument("--no_cache", action="store_true", help="Set to not cache model files.")
     parser.add_argument(
@@ -98,15 +112,15 @@ def main():
         output_base_path=args.output_base_path,
         inference=args.inference,
     )
+    results["config"]["current_dir_commit"] = get_commit(os.getcwd())  # git hash of repo if exists
+    results["config"]["upper_dir_commit"] = get_commit(Path(os.getcwd(), ".."))  # git hash of upper repo if exists
 
     if args.inference:
-        output_base_path = (
-            pathlib.Path(args.output_base_path) if args.output_base_path is not None else pathlib.Path(".")
-        )
+        output_base_path = Path(args.output_base_path) if args.output_base_path is not None else Path(".")
         with open(output_base_path.joinpath("evaluation_config.json"), "w", encoding="utf8") as file:
-            json.dump(results["config"], file)
+            json.dump(results["config"], file, indent=2, ensure_ascii=False)
 
-    dumped = json.dumps(results, indent=2)
+    dumped = json.dumps(results, indent=2, ensure_ascii=False)
     print(dumped)
 
     if args.output_path:
@@ -119,7 +133,8 @@ def main():
         f"{args.model} ({args.model_args}), limit: {args.limit}, "
         f"num_fewshot: {args.num_fewshot}, batch_size: {args.batch_size}{f' ({batch_sizes})' if batch_sizes else ''}"
     )
-    print(evaluator.make_table(results))
+    if not args.inference:
+        print(evaluator.make_table(results))
 
 
 if __name__ == "__main__":

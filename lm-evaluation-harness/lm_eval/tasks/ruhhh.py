@@ -14,8 +14,6 @@ version; see https://huggingface.co/datasets/HuggingFaceH4/hhh_alignment for det
 Homepage: https://mera.a-ai.ru/
 """
 
-import inspect
-
 from lm_eval.base import Task, rf
 from lm_eval.metrics import mean
 

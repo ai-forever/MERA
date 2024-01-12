@@ -54,6 +54,15 @@ def f1_score_multiclass(items):
     return np.max(fscore)
 
 
+def f1_score_multiclass_macro(items):
+    unzipped_list = list(zip(*items))
+    golds = unzipped_list[0]
+    preds = unzipped_list[1]
+    fscore = sklearn.metrics.f1_score(golds, preds, average="macro")
+
+    return np.max(fscore)
+
+
 def acc_all(items):
     # Only count as correct if all answers are labeled correctly for each question
     question_scoring_dict = {}

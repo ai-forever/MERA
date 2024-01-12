@@ -8,7 +8,7 @@ from typing import Dict
 class RWSD(Task):
     @property
     def choices(self):
-        return ["A", "B", "C", "D"]
+        return ["Да", "Нет"]
 
     def aggregation(self) -> Dict:
         return {"acc": mean}
