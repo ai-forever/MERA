@@ -29,7 +29,7 @@ Our contributions to this project are:
 
 - Instruction-based tasks available on 🤗 HuggingFace [dataset card](https://huggingface.co/datasets/ai-forever/MERA).
 - Customized version of LM-Harness evaluation code for models (`v0.3.0`).
-- Benchmark website with the [Leaderboard](https://mera.a-ai.ru/en) and the scoring submission system.
+- Benchmark website with the [Leaderboard](https://mera.a-ai.ru/en/leaderboard) and the scoring submission system.
 - Baselines of the open models and Human Benchmark.
 
 
@@ -78,10 +78,10 @@ MERA is a collaborative project created in a union of industry and academia with
 
 The repository has the following structure:
 
-- [`examples`](examples/instruction.ipynb) -- the examples of loading and using data.
-- [`humanbenchmarks`](humanbenchmarks/README.md) -- materials and code for human evaluation.
-- [`modules`](modules/scoring/README.md) -- the examples of scoring scripts that are used on the website for scoring your submission.
-- [`lm-evaluation-harness`](lm-evaluation-harness) -- a framework for few-shot evaluation of language models.
+- [`examples`](examples/instruction.ipynb) — the examples of loading and using data.
+- [`humanbenchmarks`](humanbenchmarks/README.md) — materials and code for human evaluation.
+- [`modules`](modules/scoring/README.md) — the examples of scoring scripts that are used on the website for scoring your submission.
+- [`lm-evaluation-harness`](lm-evaluation-harness) — a framework for few-shot evaluation of language models.
     
 
 ## The process of submission is the following:
