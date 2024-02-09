@@ -49,6 +49,14 @@ See more on parameters in next section.
 Notice two different bash scripts: `run_mera.sh` for models compatible with transformers' `AutoModelForCausalLM` class,
 and `run_mera_seq2seq.sh` for models compatible with transformers' `AutoModelForSeq2SeqLM` class.
 
+Sample command for running benchmark with OpenAI API GPT-3 based models with `run_mera_openai_api.sh` script:
+
+```linux
+MERA_FOLDER="./davinci-002_defaults" MERA_MODEL_STRING="model=davinci-002" OPENAI_API_KEY=*YOUR API KEY* bash run_mera_openai_api.sh
+```
+
+Paste your OpenAI API key instead of `*YOUR API KEY*`. Script runs only GPT-3 based models like `davinci-002` or `babbage-002`. Running of deprecated models is not guaranteed!
+
 ### Run specific bencmark manually (ruMMLU example)
 
 Running specific benchmark available with `main.py` script.
