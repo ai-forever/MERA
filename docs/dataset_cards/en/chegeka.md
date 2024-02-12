@@ -2,7 +2,7 @@
 
 ## Task Description
 
-CheGeKa is a Jeopardy!-like Russian QA dataset collected from the official Russian quiz database ChGK and belongs to the open-domain question-answering group of tasks. The dataset was created based on the [corresponding dataset](https://tape-benchmark.com/datasets.html#chegeka) from the TAPE benchmark [1].
+CheGeKa is a Jeopardy!-like the Russian QA dataset collected from the official Russian quiz database ChGK and belongs to the open-domain question-answering group of tasks. The dataset was created based on the [corresponding dataset](https://tape-benchmark.com/datasets.html#chegeka) from the TAPE benchmark [1].
 
 **Keywords:** Reasoning, World Knowledge, Logic, Question-Answering, Open-Domain QA
 
