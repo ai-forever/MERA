@@ -25,7 +25,7 @@ The dataset explores:
     - `language_structure` (ability to perceive word forms and structural-formative relations in a sentence: inflections, text consistency, spelling/syntax, etc.);
     - `topic_modelling` (ability to determine the subject of the text);
     - `multilanguage` (cross-lingual and multilingual tasks);
-    - `algorithmic_transformations`  (different texts-shifters, sorting characters, adding/removing parts, duplications, and so on).
+    - `algorithmic_transformations`  (different text shifters, sorting characters, adding/removing parts, duplications, and so on).
 
 3. The ability of the model to distinguish between the basic classes of problems that are necessary to solve the emulation of the Turing test (they make up the dataset):
     - `world` (knowledge about the world);
@@ -52,18 +52,18 @@ The dataset explores:
     - `choice1` is a possible answer `1`;
     - `choice2` is a possible answer `2`;
 - `outputs` is the answer information, possible options: `1` or `2`;
-- `meta` is a dictionary containing meta information about the dataset:
+- `meta` is a dictionary containing meta-information about the dataset:
     - `dialog_id` is the dialogue id (from zero);
     - `question_id` is the serial id of the question in the dialogue;
     - `category` is the question category;
-    - `use_context` is True if one needs context to answer the question (else False);
-    - `turing_imitation`is the simulation class.
+    - `use_context` is `true` if one needs context to answer the question (else `false`);
+    - `turing_imitation` is a list of the the simulation classes.
 
 ### Data Instances
 
 One complete example of a task is one dialogue. Formally, the dialogue looks like this:
 
-```json
+```
 [
     {
         "instruction": "Вам дан диалог, в котором необходимо продолжить реплики. Учитывая контекст диалога, и два варианта ответа на реплику (вопрос) ответьте на последний вопрос.\n{context}\n{question}\n1. {choice1}\n2. {choice2}\nКакой ответ наиболее правильный?",
@@ -106,9 +106,9 @@ For example:
 
 - Take the dialog `dialog_id=0`.
 - Submit questions to the model consistently by `question_id` and get the result.
-- The `context` field on the first question is an empty string, with each subsequent question of the dialog, `{question}\nОтвет:` is written in the `context` field and the answer from the previous replies, the answer is written in the form of text, which is taken from the answer option from the fields `choice1` or `choice2`. So, the instruction for the second reply of the dialogue, if we answered the first question that a Person has four legs (choice 2), looks like this:
+- The `context` field on the first question is an empty string, with each subsequent question of the dialog, `{question}\nОтвет:` is written in the `context` field, and the answer from the previous replies; the answer is written in the form of text, which is taken from the answer option from the fields `choice1` or `choice2`. So, the instruction for the second reply of the dialogue, if we answered the first question that a Person has four legs (choice 2), looks like this:
 
-    ```markdown
+    ```
     Вам дан диалог, в котором необходимо продолжить реплики. Учитывая предыдущий контекст диалога, и два варианта ответа на вопрос ответьте на последний.
     Сколько ног у человека?
     Четыре
@@ -120,7 +120,7 @@ For example:
 
 - Next, it is necessary to substitute by analogy the question and answer options of the following ordinal example from the dataset and send them to the model:
 
-    ```markdown
+    ```
     Вам дан диалог, в котором необходимо продолжить реплики. Учитывая предыдущий контекст диалога, и два варианта ответа на вопрос ответьте на последний.
     Сколько ног у человека?
     Четыре
@@ -157,7 +157,7 @@ The dataset is a full-fledged long dialogue, with binary tasks on various topics
 
 ### Human benchmark
 
-Accuracy for this task is `0.977`.
+Accuracy for this task is `0.942`.
 
 ## Limitations
 
