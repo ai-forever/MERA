@@ -34,7 +34,7 @@ Each dataset sample represents a `premise` and two `options` for continuing situ
 
 Below is an example from the dataset:
 
-```json
+```
 {
     "instruction": "Дано описание ситуации:\n'{premise}'\nи два фрагмента текста:\n1. {choice1}\n2. {choice2}\nОпредели, какой из двух фрагментов является следствием описанной ситуации? Ответь одной цифрой 1 или 2, ничего не добавляя.",
     "inputs": {
@@ -64,7 +64,7 @@ For effect: `"Дано описание ситуации:\n'{premise}'\nи дв�
 
 ### Dataset Creation
 
-The dataset was taken initially from the RussianSuperGLUE set and reformed in an instructured-based format. All examples for the original set from RussianSuperGLUE were collected from open news sources and literary magazines, then manually cross-checked and supplemented by human evaluation on Yandex.Toloka.
+The dataset was taken initially from the RussianSuperGLUE set and reformed in an instruction format. All examples for the original set from RussianSuperGLUE were collected from open news sources and literary magazines, then manually cross-checked and supplemented by human evaluation on Yandex.Toloka.
 
 Please, be careful! [PArsed RUssian Sentences](https://parus-proj.github.io/PaRuS/parus_pipe.html) is not the same dataset. It’s not a part of the Russian SuperGLUE.
 
