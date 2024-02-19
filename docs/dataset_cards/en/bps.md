@@ -47,7 +47,7 @@ Below is an example from the dataset:
 
 ### Data Splits
 
-The train consists of 250 examples, and the test set includes 1000 examples.
+The train consists of `250` examples, and the test set includes `1000` examples.
 
 ### Prompts
 

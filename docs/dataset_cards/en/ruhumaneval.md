@@ -59,7 +59,7 @@ Below is an example from the dataset:
 
 ### Data Splits
 
-The training set contains 164 tasks with test cases and answers from the original dataset. The test set contains 164 tasks with closed answers specially collected by authors for this benchmark. For the test set, we provide only test cases without outputs and solutions.
+The training set contains `164` tasks with test cases and answers from the original dataset. The test set contains `164` tasks with closed answers specially collected by authors for this benchmark. For the test set, we provide only test cases without outputs and solutions.
 
 ### Prompts
 
@@ -75,13 +75,16 @@ The training set was translated into Russian from the dataset [openai_humaneval
 
 ### Metrics
 
-The model is evaluated using the pass@k metric, which is computed as follows:
+The model is evaluated using the `pass@k` metric, which is computed as follows:
 
 $$ pass@k:=\mathbb{E}_{problems}\left[1-\frac{\binom{n-c}{k}}{\binom{n}{k}}\right] $$
 
 Notation: *n* is the total number of generated solution options, *c* is the number of solutions that are correct, *k* is the selected indicator, how many options are taken into account.
 
-To calculate pass@k, n ≥ k solutions are generated for each problem and are run through test cases (we use n = 200 and k ≤ 100 and an average of 10 test cases per problem). Then, the number of the correct solutions is calculated (c ≤ n). The solution is considered to be correct if it passes all test cases. That means the result of running solutions on test cases should be equal to the correct answers (outputs) for one problem. Such an evaluation process yields an unbiased score.
+To calculate `pass@k`, `n ≥ k` solutions are generated for each problem and are run through test cases (we use n = 200 and k ≤ 100 and an average of 10 test cases per problem). Then, the number of the correct solutions is calculated (`c ≤ n`). The solution is considered to be correct if it passes all test cases. That means the result of running solutions on test cases should be equal to the correct answers (outputs) for one problem. Such an evaluation process yields an unbiased score.
+
+### Human evaluation
+Dataset includes algorithmic problems that require knowledge of the Python programming language, which is too complex skill for an average annotator. All problems have strict solutions, therefore all human evaluation metrics are taken as `1.0`.
 
 ## References
 

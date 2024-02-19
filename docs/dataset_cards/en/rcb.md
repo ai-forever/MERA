@@ -49,14 +49,14 @@ Below is an example from the dataset:
     }
 }
 ```
-
+The answer options are written in the `outputs` (string): `1`- the hypothesis follows from the situation, `2` - the hypothesis contradicts the situation, or `3` - the hypothesis is independent of the situation.
 ### Data Splits
 
-The dataset contains 438 training samples, 220 validation samples, and 438 test samples. The number of sentences for the entire set is 2715, and the total number of tokens is 3.7 · 10^3.
+The dataset contains `438` training samples, `220` validation samples, and `438` test samples. The number of sentences for the entire set is 2715, and the total number of tokens is 3.7 · 10^3.
 
 ### Prompts
 
-We prepare 10 different prompts of various difficulties for this task.
+We prepare 9 different prompts of various difficulties for this task.
 
 An example of the prompt is given below:
 
@@ -76,7 +76,7 @@ The metrics are Accuracy and Average Macro F1.
 
 Human Benchmark was measured on a test set with Yandex.Toloka project with the overlap of 3 reviewers per task.
 
-Average Macro F1 and Accuracy results are `0.68` / `0.702`, respectively.
+Accuracy and Average Macro F1 results are `0.587` / `0.565`, respectively.
 
 ## References
 
