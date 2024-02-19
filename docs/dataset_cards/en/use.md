@@ -101,10 +101,10 @@ Example from the dataset for *matching* task:
         "id": 866
 	}
 }
+```
 
 Example from the dataset for *multiple_choice_based_on_text* task:
-
-```json
+```
 {
 	"instruction": "Прочитайте текст и выполните задание по тексту. Ответом к заданию является число или последовательность чисел, перечисленных через запятую без пробелов.\nТекст: {text}\nЗадание: {task}\nВарианты ответа:\n{choices}\nОтвет: ",
 	"inputs": {
@@ -172,14 +172,14 @@ Since task 8 was divided into 5 separate tasks, for this task the id_task field 
 
 ### Data Splits
 
-Train set consists of 110 incomplete versions of exam tests. In total, it included 2631 tasks: 94 tasks of the **matching** type, 1819 tasks of the **multiple_choice** type, 718 tasks of the **text** type.
+Train set consists of 110 incomplete versions of exam tests. In total, it included `2622` tasks: 94 tasks of the **matching** type, 1815 tasks of the **multiple_choice** type, 713 tasks of the **text** type.
 
-Dev set consists of 30 complete versions of exam tests. In total, it included 900 tasks: 30 tasks of the **matching** type, 630 tasks of the **multiple_choice** type, 240 tasks of the **text** type.
+Dev set consists of 30 complete versions of exam tests. In total, it included `900` tasks: 30 tasks of the **matching** type, 630 tasks of the **multiple_choice** type, 240 tasks of the **text** type.
 
-Test set consists of 30 complete versions of exam tests. In total, it included 900 tasks: 30 tasks of the **matching** type, 630 tasks of the **multiple_choice** type, 240 tasks of the **text** type.
+Test set consists of 30 complete versions of exam tests. In total, it included `900` tasks: 30 tasks of the **matching** type, 630 tasks of the **multiple_choice** type, 240 tasks of the **text** type.
 
 ### Prompts
-
+Number of prompts per sub-tasks multiplied by the number of sub-tasks 5x3. Example for sub-task:
 ```json
 {
     "multiple_choice": {

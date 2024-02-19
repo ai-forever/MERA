@@ -6,6 +6,10 @@ The longest common subsequence is an algorithmic task from [BIG-Bench](https://g
 
 LCS is a prototypical dynamic programming problem and this task measures the model's ability to capture that approach.
 
+**Keywords:** algorithms, numerical response, context length
+
+**Authors:** Harsh Mehta, Behnam Neyshabur
+
 ### Motivation
 
 Recently, large language models have started to do well on simple algorithmic tasks like few-shot arithmetic, so we want to extend this evaluation to more complicated algorithms.
@@ -37,7 +41,7 @@ Below is an example from the dataset:
 
 ### Data Splits
 
-The train set includes 320 examples, and the test set includes 500 examples.
+The train set includes `320` examples, and the test set includes `500` examples.
 
 ### Prompts
 
@@ -57,4 +61,4 @@ The task is evaluated using Accuracy.
 
 ### Human Benchmark
 
-The human benchmark is measured on a subset of size 100 (sampled with the same original distribution). The accuracy for this task is `0.704`.
+The human benchmark is measured on a subset of size 100 (sampled with the same original distribution). The accuracy for this task is `0.56`.
