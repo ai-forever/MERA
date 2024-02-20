@@ -18,7 +18,7 @@ Question-answering has been an essential task in natural language processing and
 
 - `meta` is a dictionary containing meta-information about the example:
     - `id` is the task ID;
-    - `bridge answer` is a list of entities necessary to answer the question contained in the `outputs` field using two available texts;
+    - `bridge_answer` is a list of entities necessary to answer the question contained in the `outputs` field using two available texts;
 - `instruction` is an instructional prompt specified for the current task;
 - `inputs` is a dictionary containing the following information:
     - `text` is the main text line;
@@ -34,7 +34,7 @@ Question-answering has been an essential task in natural language processing and
 
 Each dataset sample consists of two texts (the main one and the supporting one), and a question based on these two texts. Below is an example from the dataset:
 
-```json
+```
 {
     "instruction": "Прочитайте два текста и ответьте на вопрос.\nТекст 1: {support_text}\nТекст 2: {text}\nВопрос: {question}\nОтвет:",
     "inputs": {

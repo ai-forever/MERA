@@ -28,13 +28,13 @@ The WorldTree design was initially proposed in [1]. The WorldTree dataset starts
     - `option_b` is the option B;
     - `option_c` is the option C;
     - `option_d` is the option D;
-- `outputs` is the results, can be the following string values: "A", "B", "C", "D".
+- `outputs` is the correct answer, which can be the following string values: "A", "B", "C", "D".
 
 ### Data Instances
 
 Below is an example from the dataset:
 
-```json
+```
 {
     "instruction": "{text}\nA. {option_a}\nB. {option_b}\nC. {option_c}\nD. {option_d}\nКакой ответ является правильным? В качестве ответа запишите только букву верного варианта: A, B, C или D без дополнительных объяснений.\nОтвет: ",
     "inputs": {
@@ -56,7 +56,7 @@ Below is an example from the dataset:
 
 ### Data Splits
 
-The number of training and the test examples is 115 and 525, respectively.
+The number of training and test examples is 115 and 525, respectively.
 
 ### Prompts
 
@@ -82,7 +82,7 @@ The dataset is evaluated using Average Macro F1 and Accuracy.
 
 Human Benchmark was measured on a test set with Yandex.Toloka project with overlap: 3 reviewers per task.
 
-Results for Average Macro F1 and Accuracy are `0.838` / `0.837`, respectively.
+Results for Average Macro F1 and Accuracy are `0.935` / `0.935`, respectively.
 
 ## References
 

@@ -2,9 +2,9 @@
 
 ## Task Description
 
-RuOpenBookQA is a QA dataset with multiple-choice elementary-level science questions, which probe understanding of 1k+ core science facts. The dataset is built with automatic translation of the original English dataset [1]. and manual validation by a few authors; a test set was created from scratch. The set is a part of the [TAPE](https://tape-benchmark.com/) benchmark [2] that was redesigned to an instruction-based format and filtered.
+RuOpenBookQA is a QA dataset with multiple-choice elementary-level science questions that probe understanding of 1k+ core science facts. The dataset is built with automatic translation of the original English dataset [1]. and manual validation by a few authors; a test set was created from scratch. The set is a part of the [TAPE](https://tape-benchmark.com/) benchmark [2] that was redesigned to an instruction-based format and filtered.
 
-**Keywords:** Logic, World knowledge, Common Sense
+**Keywords:** Logic, World Knowledge, Common Sense
 
 **Authors:** Ekaterina Taktasheva, Tatiana Shavrina, Alena Fenogenova, Denis Shevelev, Nadezhda Katricheva, Maria Tikhonova, Albina Akhmetgareeva, Oleg Zinkevich, Anastasiia Bashmakova, Svetlana Iordanskaia, Alena Spiridonova, Valentina Kurenshchikova, Ekaterina Artemova, Vladislav Mikhailov
 
@@ -16,8 +16,8 @@ RuOpenBookQA is mainly based on the work [1]. The original OpenBookQA is a new k
 
 ### Data Fields
 
-- `meta` is meta-information about the task:
-    - `id` is the original task id from the TAPE benchmark;
+- `meta` is a dictionary containing meta-information about the dataset:
+    - `id` is the unique number of a sample;
 - `instruction` is an instructional prompt specified for the current task;
 - `inputs` is a dictionary containing the following input information:
     - `text` is the question of the test;
@@ -31,7 +31,7 @@ RuOpenBookQA is mainly based on the work [1]. The original OpenBookQA is a new k
 
 Below is an example from the dataset:
 
-```json
+```
 {
     "instruction": "{text}\nA. {option_a}\nB. {option_b}\nC. {option_c}\nD. {option_d}\nКакой ответ является правильным? В качестве ответа запишите только букву верного варианта: A, B, C или D без дополнительных объяснений.\nОтвет: ",
     "inputs": {

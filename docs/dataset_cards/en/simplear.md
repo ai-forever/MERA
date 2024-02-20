@@ -26,7 +26,7 @@ Below is an example from the dataset:
 
 ```json
 {
-	"instruction": "Выполните арифметическую операцию.\n{inputs}",
+    "instruction": "Выполните арифметическую операцию.\n{inputs}",
     "inputs": "901 + 164 = ",
     "outputs": "1065",
     "meta": {
@@ -37,11 +37,11 @@ Below is an example from the dataset:
 
 ### Data Splits
 
-The train set consists of 1000 examples of arithmetic expressions. The test set consists of 1000 examples of arithmetic expressions.
+The train set consists of `1000` examples of arithmetic expressions. The test set consists of `1000` examples of arithmetic expressions.
 
 ### Prompts
 
-The following prompts for the task are used: 
+The number of prompts used for the task: 6. The following prompts for the task are used: 
 
 ```json
 [
@@ -66,4 +66,4 @@ Accuracy is used for evaluation.
 
 ### Human Benchmark
 
-The human benchmark is measured on a subset of size 200 (sampled with the same original distribution). The accuracy for this task is `1.0`.
+The human benchmark is measured on a subset of size `200` (sampled with the same original distribution). The accuracy for this task is `1.0`.

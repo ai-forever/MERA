@@ -57,11 +57,16 @@ Below is an example from the dataset:
 
 ### Data Splits
 
-The train set consists of 681 examples. The test set consists of 1143 examples. Train and test sets are balanced in class labels.
+The train set consists of  `680` examples. The test set consists of `1143` examples. Train and test sets are balanced in class labels.
+
+### Prompts
+10 prompts of varying difficulty were created for this task. Example:
+
+ `"Прочитайте математическую задачу и варианты ответа. Неизвестные переменные в задаче могут выражаться любыми латинскими буквами.\nЗадача: {text}\nВарианты ответа:\nA) {option_a}\nB) {option_b}\nC) {option_c}\nD) {option_d}\nРешите задачу и запишите в качестве ответа только букву верного варианта: A, B, C или D без дополнительных символов.\nОтвет:"`
 
 ### Dataset Creation
 
-The dataset includes two types of problems: logic and math.
+The dataset includes two types of problems: `logic` and `math`.
 
 **logic**
 
@@ -87,4 +92,4 @@ Models’ performance is evaluated using the Accuracy score. The choice of this 
 
 ### Human Benchmark
 
-Human-level score is measured on a test set with the Yandex.Toloka project with the overlap of 5 reviewers per task. The human accuracy score is `0.995`.
+Human-level score is measured on a test set with the Yandex.Toloka project with the overlap of 5 reviewers per task. The human accuracy score is `0.99`.
