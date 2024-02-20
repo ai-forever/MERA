@@ -40,7 +40,13 @@ Below is an example from the subtask three_digit_addition_plus_one:
 
 ### Data Splits
 
-The dataset consists of a training set (6000 samples) with labeled examples and a test set (6000 samples) for model evaluation.
+The dataset consists of a training set (`6000` samples) with labeled examples and a test set (`6000` samples) for model evaluation.
+
+### Prompts
+
+5 prompts of varying difficulty were created for this task. Example:
+
+`В следующих строках символ -> представляет собой одну простую математическую операцию. Вычисли последний пример с учетом результатов вычисленных выражений:\n{inputs}`
 
 ### Dataset creation
 

@@ -16,15 +16,6 @@ This problem is relatively simple for humans as it is solved step-by-step. There
 
 The task is a tree-like arithmetic expression with multiple levels and different content lengths inside the inner-most parenthesis.
 
-The arguments for the task are generated from [-9; 9]. The `random_seed` for the test was selected so that the samples did not overlap with the train as much as possible.
-
-Both sets were filtered in such a way that:
-
-- target values range from -1000 to 1000;
-- target values occurred no more than 10 times in the set split;
-- no duplicates occurred;
-- for samples with division: taken expressions with integer result.
-
 ### Data Fields
 
 - `instruction` is an instructional prompt specified for the current task;
@@ -48,35 +39,29 @@ Below are examples from the dataset:
 }
 ```
 
-```json
-{
-    "instruction": "Calculate considering parentheses and write the result as a single number:\n{inputs}",
-    "inputs": "(1 + (-3)) = ",
-    "outputs": "-2",
-    "meta": {
-        "id": 2
-    }
-}
-```
-
-```json
-{
-    "instruction": "Act like a calculator with the ability to calculate expressions with parentheses. Calculate the result of the following expression, observing the order of operations in parentheses:\n{inputs}",
-    "inputs": "((9 * (-7) + 6) * (0 + 0 + (-4))) = ",
-    "outputs": "228",
-    "meta": {
-        "id": 3
-    }
-}
-```
 
 ### Data Splits
 
-The dataset consists of a training set (1039 samples) with labeled examples and a test set (1024 samples) for model evaluation.
+The dataset consists of a training set (`1039` samples) with labeled examples and a test set (`1024` samples) for model evaluation.
+
+### Prompts
+
+6 prompts of varying difficulty were created for this task. Example:
+
+"Выполни следующие базовые арифметические операции в правильном порядке, в том числе учитывая порядок скобок, и напиши результат вычисления выражения в виде одного числа:\n{inputs}"
 
 ### Dataset creation
 
-The data in this task is generated using a Python script. The script generates examples by iterating through various configurations with different nesting depths and the number of arguments in parentheses. It filters the examples, considering the criteria described in the section dataset description.
+The data in this task is generated using a Python script. The script generates examples by iterating through various configurations with different nesting depths and the number of arguments in parentheses. It filters the examples, considering the following criteria.
+
+The arguments for the task are generated from [-9; 9]. The `random_seed` for the test was selected so that the samples did not overlap with the train as much as possible.
+
+Both sets were filtered in such a way that:
+
+- target values range from -1000 to 1000;
+- target values occurred no more than 10 times in the set split;
+- no duplicates occurred;
+- for samples with division: taken expressions with integer result.
 
 ## Evaluation
 
@@ -86,9 +71,9 @@ The task is evaluated using the Accuracy score. For each example, 1 is given for
 
 ### Human Benchmark
 
-It is measured on a subset of 600 examples, sampled with varying complexity of operations — ~50 per configuration. Evaluate on one pool (all subtasks) with overlap: 5 reviewers per task.
+It is measured on a subset of `600` examples, sampled with varying complexity of operations — ~50 per configuration. Evaluate on one pool (all subtasks) with overlap: 5 reviewers per task.
 
-The final human Accuracy is `1.0`.
+The final human Accuracy is `0.998`.
 
 ## Limitations
 

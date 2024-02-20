@@ -54,7 +54,7 @@ Below is an example from the dataset:
 
 ### Data Splits
 
-The training sample is 10033 examples. The test closed part contains 961 hand-written examples.
+The training sample is `10033` examples. The test closed part contains `961` hand-written examples.
 
 ### Prompts
 
@@ -77,6 +77,8 @@ The dataset is evaluated using Accuracy and, following the original methodology,
 
 According to the original article, for English test human-level accuracy varies:
 "Unspecialized humans from Amazon Mechanical Turk obtain 34.5% accuracy on English test. Meanwhile, expert-level performance can be far higher. For example, real-world test-taker human accuracy at the 95th percentile is around 87% for US Medical Licensing Examinations, and these questions make up our “Professional Medicine” task. If we take the 95th percentile human test-taker accuracy for exams that build up our test, and if we make an educated guess when such information is unavailable, we then estimate that expert-level accuracy is approximately 89.8%.".
+
+Accuracy of the annotation on the test set is `84.4%`.
 
 ## Limitations
 
