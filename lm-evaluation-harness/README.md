@@ -6,11 +6,11 @@ The LM-harness support for the MERA benchmark datasets.
 
 ## Overview
 
-This project provides a unified framework to test generative language models on MERA benchmark and its evaluation tasks.
+This project provides a unified framework to test generative language models on the MERA benchmark and its evaluation tasks.
 
 ## Install
 
-To install `lm-eval` from the repository main branch, run:
+To install `lm-eval` from the repository main branch, run the following command:
 
 ```bash
 pip install -e .
@@ -24,16 +24,16 @@ pip install -e ".[auto-gptq]"
 
 ## MERA Benchmark:
 
-### Run full benchmark with bash script
+### Run full benchmark with the bash script
 
-Sample command to run benchmark with `ai-forever/rugpt3large_based_on_gpt2` (`AutoModelForCausalLM` class compatible)
+Below is a sample command to run the benchmark with `ai-forever/rugpt3large_based_on_gpt2` (`AutoModelForCausalLM` class compatible)
 model from Huggingface Hub:
 
 ```linux
 CUDA_VISIBLE_DEVICES=0 MERA_FOLDER="$PWD/mera_results/rugpt3large_760m_defaults" MERA_MODEL_STRING="pretrained=ai-forever/rugpt3large_based_on_gpt2,dtype=auto" bash run_mera.sh
 ```
 
-Sample command to run benchmark with `ai-forever/FRED-T5-large` (`AutoModelForSeq2SeqLM` class compatible)
+Below is a sample command to run the benchmark with `ai-forever/FRED-T5-large` (`AutoModelForSeq2SeqLM` class compatible)
 model from Huggingface Hub:
 
 ```linux
@@ -44,14 +44,14 @@ Use `CUDA_VISIBLE_DEVICES` to set cuda device visibility, `MERA_FOLDER` for path
 `MERA_MODEL_STRING` to setup `model_args` parameter of `lm-evaluation-harness`'s `main.py`.
 Use `MERA_COMMON_SETUP` to change default parameters for model inferencing with `main.py` (defaults are
 `--model hf-causal-experimental --device cuda --max_batch_size=64 --batch_size=auto --inference`).
-See more on parameters in next section.
+See more on parameters in the next section.
 
 Notice two different bash scripts: `run_mera.sh` for models compatible with transformers' `AutoModelForCausalLM` class,
 and `run_mera_seq2seq.sh` for models compatible with transformers' `AutoModelForSeq2SeqLM` class.
 
-### Run specific bencmark manually (ruMMLU example)
+### Run specific benchmark tasks manually (ruMMLU example)
 
-Running specific benchmark available with `main.py` script.
+Running specific benchmark tasks is available with the `main.py` script.
 
 Example:
 ```shell
@@ -75,35 +75,35 @@ Avoiding this argument will run all tasks with same provided settings.
 * `--num_fewshot=4` with `chegeka`;
 * `--num_fewshot=5` with `mathlogicqa`, `ruworldtree`, `ruopenbookqa`, `simplear`, `rumultiar`, and `rummlu`.
 
-Use `CUDA_VISIBLE_DEVICES` to set cuda device visibility (setting `--device cuda:3` works inconsisitently).
+Use `CUDA_VISIBLE_DEVICES` to set cuda device visibility (setting `--device cuda:3` works inconsistently).
 
 `--model hf-causal-experimental` is used for models compatible with transformers' `AutoModelForCausalLM` class
 and `hf-seq2seq` is used for models compatible with transformers' `AutoModelForSeq2SeqLM` class.
 
 `--model_args` is for comma separated parameters of `from_pretrained` method of autoclass. One should be aware of
-hardware requirements to run big models and limit maximum input length of models with parameter `max_length`
-to avoid out-of-memory errors during run.
+hardware requirements to run big models and limit the maximum input length of models with the parameter `max_length`
+to avoid out-of-memory errors during a run.
 
-`--batch_size=1` is set to use batch size of 1 to maximize benchmark results reproducibility.
-`--batch_size=auto` may be set to determine batch size for run automatically based on tasks and inputs maximum value
-to start search down is set with `--max_batch_size`. Bigger batches may speed up running whole MERA benchmark,
-but results may become irreproducible, so it is not default suggestion.
+`--batch_size=1` is set to use a batch size of 1 to maximize benchmark results reproducibility.
+`--batch_size=auto` may be set to determine a batch size automatically based on the evaluated tasks and inputs maximum value
+to start to search down is set with `--max_batch_size`. Bigger batches may speed up running the whole MERA benchmark,
+but results may become irreproducible, so it is not the default suggestion.
 
-`--output_base_path` is path to dir (will be created) to store data for submission preparation and logs.
+`--output_base_path` is a path to dir (will be created) to store data for submission preparation and logs.
 
-`--inference` important to use this key always, it allows to run on datasets without proper replies provided
+`--inference` is important to use this key always. It allows to run on datasets without proper replies provided
 (score result 0 will be reported).
 
-`--write_out` turn on extra logging, should be always on if the submission may be made public.
+The `--write_out` command turns on extra logging necessary for public submissions. 
 
-`--no_cache` is used to turn off caching of tokenized inputs and model files (datasets are not cached).
+`--no_cache` is used to turn off the caching of tokenized inputs and model files (datasets are not cached).
 
-`--output_path` path to extra log file with parameters of run and results of task. It is preferred to be inside
+`--output_path` is a path to an extra log file with parameters of run and results of the task. It is preferred to be inside
 `output_base_path` directory.
 
 
 ### Convert lm-harness to submission
-Bash script above runs submission zip packing routine. Here is the way to run packing manually.
+The bash script above runs the submission zip-packing routine. Below is a way to run packing manually.
 
 For converting run
 
