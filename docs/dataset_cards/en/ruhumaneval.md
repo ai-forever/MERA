@@ -59,7 +59,7 @@ Below is an example from the dataset:
 
 ### Data Splits
 
-The training set contains `164` tasks with test cases and answers from the original dataset. The test set contains `164` tasks with closed answers specially collected by authors for this benchmark. For the test set, we provide only test cases without outputs and solutions.
+The public_test set contains `164` tasks with test cases and answers from the original dataset. The test set contains `164` tasks with closed answers specially collected by authors for this benchmark. For the test set, we provide only test cases without outputs and solutions.
 
 ### Prompts
 
@@ -69,7 +69,7 @@ For this task 10 prompts of varying difficulty were created. Example:
 
 ### Dataset Creation
 
-The training set was translated into Russian from the dataset [openai_humaneval](https://huggingface.co/datasets/openai_humaneval). We corrected typos in the docstring and canonical solutions and made the corrections described in [2]. The test set was manually collected from open source and filtered to avoid data leakage during training.
+The public_test set was translated into Russian from the dataset [openai_humaneval](https://huggingface.co/datasets/openai_humaneval). We corrected typos in the docstring and canonical solutions and made the corrections described in [2]. The test set was manually collected from open source and filtered to avoid data leakage during training.
 
 ## Evaluation
 

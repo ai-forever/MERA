@@ -54,7 +54,7 @@ Below is an example from the dataset:
 
 ### Data Splits
 
-The training sample is `10033` examples. The test closed part contains `961` hand-written examples.
+The public_test sample is `10033` examples. The test closed part contains `961` hand-written examples.
 
 ### Prompts
 
@@ -63,7 +63,7 @@ For this task 5 prompts of varying difficulty were created. Example:
 `"Ниже приведен вопрос на определенную профессиональную тематику {subject} и даны варианты ответа A, B, C, D. Гарантируется, что только один из ответов правильный.\nПравильно ответьте на вопрос, выбрав букву A, B, C или D:\n{text}\nA {option_a}\nB {option_b}\nC {option_c}\nD {option_d}\nОтвет:"`.
 
 ### Dataset Creation
-The train set is based on [the original MMLU dataset](https://github.com/hendrycks/test) and translated to the Russian language using the following pipeline: 1) it was translated into Russian using automatic translation; 2) the translations were verified on the Yandex.Toloka platform; 3) the data that did not pass verification was manually validated and Russified. The current version of the train set is not final, and the dataset set will be updated in the future.
+The public_test set is based on [the original MMLU dataset](https://github.com/hendrycks/test) and translated to the Russian language using the following pipeline: 1) it was translated into Russian using automatic translation; 2) the translations were verified on the Yandex.Toloka platform; 3) the data that did not pass verification was manually validated and Russified. The current version of the public_test set is not final, and the dataset set will be updated in the future.
 
 For the closed test set, the set was assembled manually according to the original format with domains as close as possible to the original set. The set is adapted for the Russian language and culture. The distribution of tasks across individual specific domains corresponds to the original set and is equal to an average of 150 examples.
 
@@ -82,7 +82,7 @@ Accuracy of the annotation on the test set is `84.4%`.
 
 ## Limitations
 
-The questions relate to human knowledge relevant on January 1, 2020, for the train part and on October 31, 2023, for the test part.
+The questions relate to human knowledge relevant on January 1, 2020, for the public_test part and on October 31, 2023, for the test part.
 
 ## References
 

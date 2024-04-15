@@ -40,7 +40,7 @@ Below is an example from the subtask three_digit_addition_plus_one:
 
 ### Data Splits
 
-The dataset consists of a training set (`6000` samples) with labeled examples and a test set (`6000` samples) for model evaluation.
+The dataset consists of a public_test set (`6000` samples) with labeled examples and a test set (`6000` samples) for model evaluation.
 
 ### Prompts
 

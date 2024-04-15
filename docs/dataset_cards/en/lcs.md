@@ -41,7 +41,7 @@ Below is an example from the dataset:
 
 ### Data Splits
 
-The train set includes `320` examples, and the test set includes `500` examples.
+The public_test set includes `320` examples, and the test set includes `500` examples.
 
 ### Prompts
 
@@ -51,7 +51,7 @@ The train set includes `320` examples, and the test set includes `500` examples.
 
 ### Dataset Creation
 
-Sequences of length in the range [4; 32) were generated with a Python script for train and test sets.
+Sequences of length in the range [4; 32) were generated with a Python script for public_test and test sets.
 
 ## Evaluation
 
