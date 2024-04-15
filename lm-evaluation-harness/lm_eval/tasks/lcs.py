@@ -29,7 +29,7 @@ class LCS(Task):
     def training_docs(self):
         if self.has_training_docs():
             if self._training_docs is None:
-                self._training_docs = list(self.dataset["train"])
+                self._training_docs = list(self.dataset["public_test"])
             return self._training_docs
 
     def test_docs(self):

@@ -92,7 +92,7 @@ class RuMMLU(MultipleChoiceTask):
 
     def training_docs(self):
         if self._training_docs is None:
-            self._training_docs = list(map(self._process_doc, self.dataset["train"]))
+            self._training_docs = list(map(self._process_doc, self.dataset["public_test"]))
         return self._training_docs
 
     def doc_to_target(self, doc):
