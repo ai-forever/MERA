@@ -50,7 +50,7 @@ Below is an example from the dataset:
 
 ### Data Splits
 
-The dataset includes 606 training, 204 validation, and 260 test examples.
+The dataset includes `606` training, `204` validation, and `260` test examples.
 
 ### Prompts
 

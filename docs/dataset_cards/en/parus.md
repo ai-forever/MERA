@@ -52,7 +52,7 @@ Below is an example from the dataset:
 
 ### Data Splits
 
-The dataset consists of 400 train samples, 100 dev samples, and 500 private test samples. The number of sentences in the whole set is 1000. The number of tokens is 5.4 · 10^3.
+The dataset consists of `400` train samples, `100` dev samples, and `500` private test samples. The number of sentences in the whole set is `1000`. The number of tokens is 5.4 · 10^3.
 
 ### Prompts
 

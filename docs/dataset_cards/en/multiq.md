@@ -62,7 +62,7 @@ Each dataset sample consists of two texts (the main and the supporting ones) and
 
 ### Data Splits
 
-The dataset consists of 1056 training examples (train set) and 900 test examples (test set).
+The dataset consists of `1056` training examples (train set) and `900` test examples (test set).
 
 ### Prompts
 

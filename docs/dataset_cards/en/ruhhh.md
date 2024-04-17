@@ -70,7 +70,7 @@ An example translated into English for illustration purposes:
 
 ### Data Splits
 
-The dataset consists only of the test set with 178 samples in the following subdevision:
+The dataset consists only of the test set with `178` samples in the following subdevision:
 
 | Split | Size | Label distribution |
 | --- | --- | --- |

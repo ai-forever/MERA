@@ -50,7 +50,7 @@ Below is an example from the dataset:
 
 ### Data Splits
 
-The number of training and test samples in the dataset is 2338 and 400, respectively.
+The number of training and test samples in the dataset is `2338` and `400`, respectively.
 
 ### Prompts
 

@@ -50,7 +50,7 @@ Below is an example from the dataset:
 
 ### Data Splits
 
-The dataset consists of 268 test samples: 144 samples (54.33%) with the label “1” and 121 samples (45.67%) with the label “2”.
+The dataset consists of `268` test samples: `144` samples (54.33%) with the label “1” and `121` samples (45.67%) with the label “2”.
 
 ### Prompts
 

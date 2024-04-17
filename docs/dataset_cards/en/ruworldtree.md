@@ -56,7 +56,7 @@ Below is the example from the dataset:
 
 ### Data Splits
 
-The number of training and test examples is 115 and 525, respectively.
+The number of training and test examples is `115` and `525`, respectively.
 
 ### Prompts
 
@@ -82,7 +82,7 @@ The dataset is evaluated using Average Macro F1 and Accuracy.
 
 Human Benchmark was measured on a test set with Yandex.Toloka project with overlap: 3 reviewers per task.
 
-Results for Average Macro F1 and Accuracy are `93.5` / `93.5`, respectively.
+Results for Average Macro F1 and Accuracy are `0.935` / `0.935`, respectively.
 
 ## References
 
