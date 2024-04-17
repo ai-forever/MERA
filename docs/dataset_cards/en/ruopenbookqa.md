@@ -25,7 +25,7 @@ RuOpenBookQA is mainly based on the work [1]. The original OpenBookQA is a new k
     - `option_b` is the option B;
     - `option_c` is the option C;
     - `option_d` is the option D;
-- `outputs` are the results, can be the following string values: "A", "B", "C", "D".
+- `outputs` is the correct answer, can be the following string values: "A", "B", "C", "D".
 
 ### Data Instances
 

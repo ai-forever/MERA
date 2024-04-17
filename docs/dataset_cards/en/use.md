@@ -94,11 +94,11 @@ Example from the dataset for *matching* task:
 	},
 	"outputs": "4,9,2,8",
 	"meta": {
-        "id_task": "26",
-        "variant": 3,
-        "score": 4,
-        "type": "matching",
-        "id": 866
+		"id_task": "26",
+		"variant": 3,
+		"score": 4,
+		"type": "matching",
+		"id": 866
 	}
 }
 ```
@@ -113,13 +113,13 @@ Example from the dataset for *multiple_choice_based_on_text* task:
 		"choices": "1. Принадлежащий кому-чему-н. по праву собственности.\n2. Свой, личный. Видеть собственными глазами. В собственные руки.\n3. Находящийся в непосредственном ведении, распоряжении, подчинении кого-чего-н. С. корреспондент.\n4. Буквальный, настоящий. В. собственном смысле слова\n5. Свойственный только чему-н., без посторонних добавлений",
 		"additional_text": ""
 	},
-    "outputs": "2",
-    "meta": {
-        "id_task": "3",
-        "variant": 23,
-        "score": 1,
-        "type": "multiple_choice_based_on_text",
-        "id": 53
+	"outputs": "2",
+	"meta": {
+		"id_task": "3",
+		"variant": 23,
+		"score": 1,
+		"type": "multiple_choice_based_on_text",
+		"id": 53
     }
 }
 ```
@@ -130,18 +130,18 @@ Example from the dataset for *multiple_choice_options_within_text* task:
 {
 	"instruction": "Прочитайте текст задания и выполните его указания. Ответом к заданию является число или последовательность чисел, перечисленных через запятую без пробелов.\nЗадание: {task}\nТекст: {text}\nОтвет: ",
 	"inputs": {
-        "task": "Укажите все цифры, на месте которых пишется НН.",
-        "text": "Пират, облитый серебря(1)ым лу(2)ым светом, долго стоял на пороге и напряжё(3)о слушал",
-        "choices": "",
-        "additional_text": ""
+		"task": "Укажите все цифры, на месте которых пишется НН.",
+		"text": "Пират, облитый серебря(1)ым лу(2)ым светом, долго стоял на пороге и напряжё(3)о слушал",
+		"choices": "",
+		"additional_text": ""
 	},
 	"outputs": "2,3",
 	"meta": {
-        "id_task": "15",
-        "variant": 17,
-        "score": 1,
-        "type": "multiple_choice_options_within_text",
-        "id": 137
+		"id_task": "15",
+		"variant": 17,
+		"score": 1,
+		"type": "multiple_choice_options_within_text",
+		"id": 137
 	}
 }
 ```
@@ -150,25 +150,25 @@ Example from the dataset for *multiple_choice_independent_options* task:
 
 ```json
 {
-    "instruction": "Прочитайте текст задания и выполните его указания. Ответом к заданию является число или последовательность чисел, перечисленных через запятую без пробелов.\nЗадание: {task}\nВарианты ответа:\n{choices}\nОтвет: ",
-    "inputs": {
-        "task": "Укажите варианты ответов, в которых в обоих словах одного ряда пропущена одна и та же буква.Запишите номера ответов.",
-        "choices": "1) невид..мый, разгон..шься\n2) отрасл..вой, мах..нький\n3) груш..вый, нищ..та\n4) леч..щий, молч..щий\n5) ткан..вый, лист..к",
-        "text": "",
-        "additional_text": ""
-    },
-    "outputs": "1,3",
-    "meta": {
-        "id_task": "12",
-        "variant": 26,
-        "score": 1,
-        "type": "multiple_choice_independent_options",
-        "id": 592
-    }
+	"instruction": "Прочитайте текст задания и выполните его указания. Ответом к заданию является число или последовательность чисел, перечисленных через запятую без пробелов.\nЗадание: {task}\nВарианты ответа:\n{choices}\nОтвет: ",
+	"inputs": {
+		"task": "Укажите варианты ответов, в которых в обоих словах одного ряда пропущена одна и та же буква.Запишите номера ответов.",
+		"choices": "1) невид..мый, разгон..шься\n2) отрасл..вой, мах..нький\n3) груш..вый, нищ..та\n4) леч..щий, молч..щий\n5) ткан..вый, лист..к",
+		"text": "",
+		"additional_text": ""
+	},
+	"outputs": "1,3",
+	"meta": {
+		"id_task": "12",
+		"variant": 26,
+		"score": 1,
+		"type": "multiple_choice_independent_options",
+		"id": 592
+	}
 }
 ```
 
-Since task 8 was divided into 5 separate tasks, for this task the id_task field also contains information about the number of the question within this task, for example, id_task contains the value '8_1'.
+Since task 8 was divided into 5 separate tasks, for this task the `id_task` field also contains information about the number of the question within this task, for example, `id_task` contains the value `8_1`.
 
 ### Data Splits
 
@@ -179,7 +179,7 @@ Dev set consists of 30 complete versions of exam tests. In total, it included `9
 Test set consists of 30 complete versions of exam tests. In total, it included `900` tasks: 30 tasks of the **matching** type, 630 tasks of the **multiple_choice** type, 240 tasks of the **text** type.
 
 ### Prompts
-Number of prompts per sub-tasks multiplied by the number of sub-tasks 5x3. Example for sub-task:
+Number of prompts per sub-tasks multiplied by the number of sub-tasks 3x5. Example for sub-task:
 ```json
 {
     "multiple_choice": {

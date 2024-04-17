@@ -5,6 +5,10 @@
 Russian HumanEval (ruHumanEval) is the Russian analogue of the original HumanEval dataset, created to evaluate the ability of language models to generate code in the Python programming language to solve simple problems.
 The dataset is aimed at measuring the functional correctness of code generation based on information from the function's documentation lines — a text description of the function's operation and several examples of results for different input data.
 
+**Warning:** to avoid data leakage for ruHumanEval, we created the NEW closed test set that follows the original HumanEval design. Thus, **results on the HumanEval and ruHumanEval datasets cannot be directly compared with each other.**
+
+**Warning:** open data is the public test set of the original ruHumanEval dataset. Do not use it in train purposes!
+
 **Keywords:** PLP, programming, Python
 
 ### Motivation
@@ -59,7 +63,7 @@ Below is an example from the dataset:
 
 ### Data Splits
 
-The public_test set contains `164` tasks with test cases and answers from the original dataset. The test set contains `164` tasks with closed answers specially collected by authors for this benchmark. For the test set, we provide only test cases without outputs and solutions.
+The public test (train split) contains `164` tasks with test cases and answers from the original dataset. The closed test set (test split) contains `164` tasks with closed answers specially collected by authors for this benchmark. For the test set, we provide only test cases without outputs and solutions.
 
 ### Prompts
 
@@ -69,7 +73,9 @@ For this task 10 prompts of varying difficulty were created. Example:
 
 ### Dataset Creation
 
-The public_test set was translated into Russian from the dataset [openai_humaneval](https://huggingface.co/datasets/openai_humaneval). We corrected typos in the docstring and canonical solutions and made the corrections described in [2]. The test set was manually collected from open source and filtered to avoid data leakage during training.
+The open set was translated into Russian from the dataset [openai_humaneval](https://huggingface.co/datasets/openai_humaneval). We corrected typos in the docstring and canonical solutions and made the corrections described in [2]. 
+
+The test set was manually collected from open sources according to the format of the original open set and also adjusted to avoid data leakage in training.
 
 ## Evaluation
 

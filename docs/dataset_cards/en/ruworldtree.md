@@ -17,7 +17,7 @@ The WorldTree design was initially proposed in [1]. The WorldTree dataset starts
 ### Data Fields
 
 - `meta` is meta-information about the task:
-    - `id` is the original task id from the TAPE benchmark;
+    - `id` is an integer containing the unique number of a sample;
     - `exam_name` is information about the source exam;
     - `school_grade` is the difficulty level;
     - `knowledge_type` is the type of knowledge one needs to solve the task;
@@ -32,7 +32,7 @@ The WorldTree design was initially proposed in [1]. The WorldTree dataset starts
 
 ### Data Instances
 
-Below is an example from the dataset:
+Below is the example from the dataset:
 
 ```
 {
@@ -82,7 +82,7 @@ The dataset is evaluated using Average Macro F1 and Accuracy.
 
 Human Benchmark was measured on a test set with Yandex.Toloka project with overlap: 3 reviewers per task.
 
-Results for Average Macro F1 and Accuracy are `0.935` / `0.935`, respectively.
+Results for Average Macro F1 and Accuracy are `93.5` / `93.5`, respectively.
 
 ## References
 

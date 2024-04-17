@@ -22,7 +22,7 @@ Question-answering has been an essential task in natural language processing and
 - `instruction` is an instructional prompt specified for the current task;
 - `inputs` is a dictionary containing the following information:
     - `text` is the main text line;
-    - `support text` is a line with additional text;
+    - `support_text` is a line with additional text;
     - `question` is the question, the answer to which is contained in these texts;
 - `outputs` is the answer information:
     - `label` is the answer label;
@@ -32,7 +32,7 @@ Question-answering has been an essential task in natural language processing and
 
 ### Data Instances
 
-Each dataset sample consists of two texts (the main one and the supporting one), and a question based on these two texts. Below is an example from the dataset:
+Each dataset sample consists of two texts (the main and the supporting ones) and a question based on these two texts. Below is an example from the dataset:
 
 ```
 {

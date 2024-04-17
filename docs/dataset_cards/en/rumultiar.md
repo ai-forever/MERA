@@ -54,7 +54,7 @@ The dataset consists of a training set (`1039` samples) with labeled examples an
 
 The data in this task is generated using a Python script. The script generates examples by iterating through various configurations with different nesting depths and the number of arguments in parentheses. It filters the examples, considering the following criteria.
 
-The arguments for the task are generated from [-9; 9]. The `random_seed` for the test was selected so that the samples did not overlap with the train as much as possible.
+The arguments for the task are generated from [-9; 9]. The `random_seed` for the test was selected so that the samples did not overlap with the open set as much as possible.
 
 Both sets were filtered in such a way that:
 

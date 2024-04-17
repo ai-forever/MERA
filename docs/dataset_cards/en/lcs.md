@@ -41,7 +41,7 @@ Below is an example from the dataset:
 
 ### Data Splits
 
-The public_test set includes `320` examples, and the test set includes `500` examples.
+The public test (train split) includes `320` examples, and the closed test (test split) set includes `500` examples.
 
 ### Prompts
 
@@ -51,7 +51,9 @@ The public_test set includes `320` examples, and the test set includes `500` exa
 
 ### Dataset Creation
 
-Sequences of length in the range [4; 32) were generated with a Python script for public_test and test sets.
+Sequences of length in the range [4; 32) were generated with a Python script for open public test and closed test sets.
+
+For the open public test set we use the same seed for generation as in the Big-Bench.
 
 ## Evaluation
 

@@ -13,6 +13,8 @@ Can large language models learn new skills and understand operations from a few 
 
 ## Dataset Description
 
+Each subtask (addition, subtraction, multiplication w/o adding `+1` to result) includes 1000 questions. The symbol -> is used instead of = because the last one already has a definite canonical meaning. The symbol -> can mean “=” or “+ 1 = ”. In the end, we got sets for 6 subtasks: addition_control, addition_plus_one, subtraction_control, subtraction_plus_one, multiplication_control, multiplication_plus_one. The arguments of the two-digit subtasks (multiplication_ prefix) are randomly generated from [0, 100), and arguments of the three-digit subtasks (addition_ and subtraction_ prefix) — [0, 1000).
+
 ### Data fields
 
 - `instruction` is an instructional prompt specified for the current task;
@@ -40,7 +42,7 @@ Below is an example from the subtask three_digit_addition_plus_one:
 
 ### Data Splits
 
-The dataset consists of a public_test set (`6000` samples) with labeled examples and a test set (`6000` samples) for model evaluation.
+The dataset consists of a public test (train split) (`6000` samples) with labeled examples and a closed test set (test split) (`6000` samples) for model evaluation.
 
 ### Prompts
 
@@ -50,7 +52,9 @@ The dataset consists of a public_test set (`6000` samples) with labeled examples
 
 ### Dataset creation
 
-Each subtask (addition, subtraction, multiplication w/o adding +1 to result) includes 1000 questions. The symbol `->` is used instead of `=` because the last one already has a definite canonical meaning. The symbol `->` can mean “=” or “+ 1 = ”. In the end, we got sets for 6 subtasks: addition_control, addition_plus_one, subtraction_control, subtraction_plus_one, multiplication_control, multiplication_plus_one. The arguments of the two-digit subtasks (multiplication_ prefix) are randomly generated from [0, 100), and arguments of the three-digit subtasks (addition_ and subtraction_ prefix) — [0, 1000).
+Public test set was taken from the Big-Bench.
+
+Closed test was generated from scratch based on the original methodology of Big-Bench.
 
 ## Evaluation
 

@@ -64,7 +64,7 @@ For effect: `"Дано описание ситуации:\n'{premise}'\nи дв�
 
 ### Dataset Creation
 
-The dataset was taken initially from the RussianSuperGLUE set and reformed in an instruction format. All examples for the original set from RussianSuperGLUE were collected from open news sources and literary magazines, then manually cross-checked and supplemented by human evaluation on Yandex.Toloka.
+The dataset was taken initially from the RussianSuperGLUE set and reformed in an instructions format. All examples for the original set from RussianSuperGLUE were collected from open news sources and literary magazines, then manually cross-checked and supplemented by human evaluation on Yandex.Toloka.
 
 Please, be careful! [PArsed RUssian Sentences](https://parus-proj.github.io/PaRuS/parus_pipe.html) is not the same dataset. It’s not a part of the Russian SuperGLUE.
 

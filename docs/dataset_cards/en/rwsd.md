@@ -2,7 +2,7 @@
 
 ## Task Description
 
-A Winograd schema is a task in which each example contains a sentence with two selected phrases. The task is to define whether they are used in the same sense or not. The schema takes its name from a well-known example by Terry Winograd.
+Russian Winograd Schema Dataset (RWSD), or the Winograd schema, is a task in which each example contains a sentence with two selected phrases. The task is to define whether they are used in the same sense or not. The schema takes its name from a well-known example by Terry Winograd.
 
 The set would then be presented as a challenge for AI programs like the Turing test. The strengths of the challenge are that it is clear-cut, in that the answer to each schema is a binary choice; vivid, in that it is evident to non-experts that a program that fails to get the correct answers has severe gaps in its understanding; and difficult, in that it is far beyond the current state of the art.
 
@@ -72,11 +72,11 @@ The metric used for the evaluation of this task is Accuracy.
 
 ### Human Benchmark
 
-Human assessment was carried out using the Yandex.Toloka platform with annotator overlap is equal to 5. The final human Accuracy is `0.835`.
+Human assessment was carried out using the Yandex.Toloka platform with annotator overlap equal to 5. The final human Accuracy is `0.835`.
 
 ## References
 
-[1] Levesque, H. J., Davis, E., & Morgenstern, L. (2012). The Winograd schema challenge. In 13th International Conference on the Principles of Knowledge Representation and Reasoning, KR 2012 (pp. 552-561). (Proceedings of the International Conference on Knowledge Representation and Reasoning). Institute of Electrical and Electronics Engineers Inc.
+[1] Levesque, H. J., Davis, E., & Morgenstern, L. (2012). The winograd schema challenge. In 13th International Conference on the Principles of Knowledge Representation and Reasoning, KR 2012 (pp. 552-561). (Proceedings of the International Conference on Knowledge Representation and Reasoning). Institute of Electrical and Electronics Engineers Inc.
 
 [2] Wang A. et al. Superglue: A stickier benchmark for general-purpose language understanding systems //Advances in Neural Information Processing Systems. – 2019. – С. 3261-3275.
 

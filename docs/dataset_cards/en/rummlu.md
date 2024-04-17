@@ -4,7 +4,9 @@
 
 **Russian Massive Multitask Language Understanding (ruMMLU)** is a dataset designed to measure model professional knowledge acquired during pretraining in various fields . The task covers 57 subjects (subdomains) across different topics (domains): HUMANITIES; SOCIAL SCIENCE; SCIENCE, TECHNOLOGY, ENGINEERING, AND MATHEMATICS (STEM); OTHER. The dataset was created based on the English MMLU dataset proposed in [1] and follows its methodology in the instruction formal. Each example contains a question from one of the categories with four possible answers, only one of which is correct.
 
-**Warning:** to avoid data leakage for ruMMLU, we created the NEW closed test set that follows the original MMLU design. Thus, results on the MMLU and ruMMLU datasets cannot be directly compared with each other.
+**Warning:** to avoid data leakage for ruMMLU, we created the NEW closed test set that follows the original MMLU design. Thus, **results on the MMLU and ruMMLU datasets cannot be directly compared with each other.**
+
+**Warning:** additional open data is the public test set of the original MMLU dataset. Do not use it in train purposes!
 
 **Keywords**: logic, world knowledge, factual, expert knowledge
 
@@ -54,7 +56,7 @@ Below is an example from the dataset:
 
 ### Data Splits
 
-The public_test sample is `10033` examples. The test closed part contains `961` hand-written examples.
+The public test (train split) set contains `10033` examples. The closed test set (test split) `961` hand-written examples.
 
 ### Prompts
 
@@ -63,7 +65,8 @@ For this task 5 prompts of varying difficulty were created. Example:
 `"Ниже приведен вопрос на определенную профессиональную тематику {subject} и даны варианты ответа A, B, C, D. Гарантируется, что только один из ответов правильный.\nПравильно ответьте на вопрос, выбрав букву A, B, C или D:\n{text}\nA {option_a}\nB {option_b}\nC {option_c}\nD {option_d}\nОтвет:"`.
 
 ### Dataset Creation
-The public_test set is based on [the original MMLU dataset](https://github.com/hendrycks/test) and translated to the Russian language using the following pipeline: 1) it was translated into Russian using automatic translation; 2) the translations were verified on the Yandex.Toloka platform; 3) the data that did not pass verification was manually validated and Russified. The current version of the public_test set is not final, and the dataset set will be updated in the future.
+
+The open set is based on the [the original MMLU dataset](https://github.com/hendrycks/test) and translated to the Russian language using the following pipeline: 1)  the public test was translated into Russian using automatic translation; 2) the translations were verified on the Yandex.Toloka platform; 3) the data that did not pass verification was manually validated and Russified. The current version of the open public set is not final, and the dataset set will be updated in the future.
 
 For the closed test set, the set was assembled manually according to the original format with domains as close as possible to the original set. The set is adapted for the Russian language and culture. The distribution of tasks across individual specific domains corresponds to the original set and is equal to an average of 150 examples.
 
@@ -82,7 +85,7 @@ Accuracy of the annotation on the test set is `84.4%`.
 
 ## Limitations
 
-The questions relate to human knowledge relevant on January 1, 2020, for the public_test part and on October 31, 2023, for the test part.
+The questions relate to human knowledge relevant on January 1, 2020, for the train part and on October 31, 2023, for the test part.
 
 ## References
 
@@ -92,6 +95,6 @@ The questions relate to human knowledge relevant on January 1, 2020, for the pub
 
 [3] Wang, Alex, et al. "Superglue: A stickier benchmark for general-purpose language understanding systems." *Advances in neural information processing systems* 32 (2019).
 
-[4] The original MMLU translated into Russian (without filtering) https://github.com/NLP-Core-Team/mmlu_ru
+[4] The original MMLU translated into Russian (without filtering) https://github.com/NLP-Core-Team/mmlu_ru.
 
-[5] The 🤗 Open LLM Leaderboard (содержит внутри MMLU, замеры происходят по 5-шотам) https://huggingface.co/spaces/HuggingFaceH4/open_llm_leaderboard
+[5] The 🤗 Open LLM Leaderboard (содержит внутри MMLU, замеры происходят по 5-шотам) https://huggingface.co/spaces/HuggingFaceH4/open_llm_leaderboard.

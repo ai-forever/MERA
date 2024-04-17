@@ -48,14 +48,14 @@ The dataset explores:
 
 - `instruction` is a string containing instructions for the task;
 - `inputs` is a dictionary that contains the following information:
-    - `question` is the question;
+    - `question` is a dictionary that contains the following information:
     - `choice1` is a possible answer `1`;
     - `choice2` is a possible answer `2`;
 - `outputs` is the answer information, possible options: `1` or `2`;
 - `meta` is a dictionary containing meta-information about the dataset:
     - `dialog_id` is the dialogue id (from zero);
     - `question_id` is the serial id of the question in the dialogue;
-    - `category` is the question category;
+    - `category` is a list of the the question categories;
     - `use_context` is `true` if one needs context to answer the question (else `false`);
     - `turing_imitation` is a list of the the simulation classes.
 
@@ -102,8 +102,6 @@ One complete example of a task is one dialogue. Formally, the dialogue looks lik
 
 To run the model on the dataset, you need to consistently submit replies by `question_id` one after another and add the model's response to the context in the `context` field of the instruction.
 
-For example:
-
 - Take the dialog `dialog_id=0`.
 - Submit questions to the model consistently by `question_id` and get the result.
 - The `context` field on the first question is an empty string, with each subsequent question of the dialog, `{question}\nОтвет:` is written in the `context` field, and the answer from the previous replies; the answer is written in the form of text, which is taken from the answer option from the fields `choice1` or `choice2`. So, the instruction for the second reply of the dialogue, if we answered the first question that a Person has four legs (choice 2), looks like this:
@@ -140,7 +138,7 @@ The first version of the dataset consists of only one long dialogue of length 43
 
 ### Prompts
 
-The instruction (prompt) is sent to the entire dataset, and not to each replica. Several different prompts were selected, such as:
+The instruction (prompt) is sent to the entire dataset, and not to each replica. We created 5 different prompts, such as:
 
 "Вам дан диалог, в котором необходимо продолжить реплики. Учитывая контекст диалога, и два варианта ответа на реплику (вопрос) ответьте на последний вопрос.\n{context}\n{question}\n1. {choice1}\n2. {choice2}\n
 Какой ответ наиболее правильный?".
