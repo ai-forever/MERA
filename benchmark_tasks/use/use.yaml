@@ -1,0 +1,2 @@
+task: use
+class: !function task.USE

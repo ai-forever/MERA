@@ -1,0 +1,2 @@
+task: lcs
+class: !function task.LCS

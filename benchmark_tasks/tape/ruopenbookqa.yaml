@@ -1,0 +1,4 @@
+group:
+  - tape
+task: ruopenbookqa
+class: !function task.RuOpenBookQA

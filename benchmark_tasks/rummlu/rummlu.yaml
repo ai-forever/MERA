@@ -1,0 +1,2 @@
+task: rummlu
+class: !function task.RuMMLU

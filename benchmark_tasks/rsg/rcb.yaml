@@ -1,0 +1,4 @@
+group:
+  - rsg
+task: rcb
+class: !function task.RCB

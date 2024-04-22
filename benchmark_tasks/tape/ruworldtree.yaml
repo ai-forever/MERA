@@ -1,0 +1,4 @@
+group:
+  - tape
+task: ruworldtree
+class: !function task.RuWorldTree

@@ -1,0 +1,4 @@
+group:
+  - rsg
+task: parus
+class: !function task.PARus

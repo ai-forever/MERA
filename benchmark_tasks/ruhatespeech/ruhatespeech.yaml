@@ -1,0 +1,2 @@
+task: ruhatespeech
+class: !function task.RuHateSpeech

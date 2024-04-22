@@ -1,0 +1,4 @@
+group:
+  - tape
+task: chegeka
+class: !function task.CheGeKa

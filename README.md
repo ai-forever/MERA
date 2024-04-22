@@ -23,12 +23,12 @@
 
 ## About MERA
 
-MERA benchmark brings together all industry and academic players in one place to study the capabilities of fundamental models, draw attention to AI problems, develop collaboration within the Russian Federation and in the international arena and create an independent unified system for measuring all current models. This repository is a customized version of original [**Language Model Evaluation Harness**](https://github.com/EleutherAI/lm-evaluation-harness/tree/v0.3.0) (**LM-Harness** `v0.3.0`).
+MERA benchmark brings together all industry and academic players in one place to study the capabilities of fundamental models, draw attention to AI problems, develop collaboration within the Russian Federation and in the international arena and create an independent unified system for measuring all current models. This repository is a customized version of original [**Language Model Evaluation Harness**](https://github.com/EleutherAI/lm-evaluation-harness) (**LM-Harness** `v0.4.2`).
 
 Our contributions to this project are:
 
 - Instruction-based tasks available on 🤗 HuggingFace [dataset card](https://huggingface.co/datasets/ai-forever/MERA).
-- Customized version of LM-Harness evaluation code for models (`v0.3.0`).
+- Customized version of LM-Harness evaluation code for models (`v0.4.2`).
 - Benchmark website with the [Leaderboard](https://mera.a-ai.ru/en/leaderboard) and the scoring submission system.
 - Baselines of the open models and Human Benchmark.
 
@@ -78,15 +78,28 @@ MERA is a collaborative project created in a union of industry and academia with
 
 The repository has the following structure:
 
+- [`benchmark_tasks`](benchmark_tasks) — the tasks for evaluation of language models.
 - [`examples`](examples/instruction.ipynb) — the examples of loading and using data.
 - [`humanbenchmarks`](humanbenchmarks/README.md) — materials and code for human evaluation.
 - [`modules`](modules/scoring/README.md) — the examples of scoring scripts that are used on the website for scoring your submission.
 - [`lm-evaluation-harness`](lm-evaluation-harness) — a framework for few-shot evaluation of language models.
+- [`scripts`](scripts) — the scripts used for evaluation of language models.
     
 
 ## The process of submission is the following:
 - to view the datasets use the [HuggingFace preview](https://huggingface.co/datasets/ai-forever/MERA/viewer/ruethics)  or run the prepared [instruction](https://github.com/ai-forever/MERA/blob/main/examples/instruction.ipynb);
-- clone MERA benchmark [repository](https://github.com/ai-forever/MERA);
+- clone MERA benchmark [repository](https://github.com/ai-forever/MERA) with submodules using the following code:
+
+```bash
+git clone --recurse-submodules -j8 https://github.com/ai-forever/MERA.git
+```
+
+If you have cloned the repository with no submodlues downloaded (empty directory), run this code to fix it from the root directory:
+
+```bash
+git pull --all --rebase --recurse-submodules
+```
+
 - to get submission files use [shell script](https://github.com/ai-forever/MERA/blob/main/lm-evaluation-harness/README.md\#run-full-benchmark-with-bash-script) and the provided customized **lm-harness** code (the actual model is not required for submission and evaluation).
 - run your model on the all datasets using the code of lm-harness: the result of the code is the archive in ZIP format for the submission;
 - register on the website;

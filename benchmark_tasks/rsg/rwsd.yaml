@@ -1,0 +1,4 @@
+group:
+  - rsg
+task: rwsd
+class: !function task.RWSD

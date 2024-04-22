@@ -1,0 +1,2 @@
+task: rudetox
+class: !function task.ruDetox

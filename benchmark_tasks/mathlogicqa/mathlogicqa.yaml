@@ -1,0 +1,2 @@
+task: mathlogicqa
+class: !function task.MathLogicQA
