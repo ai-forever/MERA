@@ -82,7 +82,7 @@ The repository has the following structure:
 - [`examples`](examples/instruction.ipynb) — the examples of loading and using data.
 - [`humanbenchmarks`](humanbenchmarks/README.md) — materials and code for human evaluation.
 - [`modules`](modules/scoring/README.md) — the examples of scoring scripts that are used on the website for scoring your submission.
-- [`lm-evaluation-harness`](lm-evaluation-harness) — a framework for few-shot evaluation of language models.
+- [`lm-evaluation-harness`](https://github.com/artemorloff/lm-evaluation-harness/tree/feature/context_tasks) — a framework for few-shot evaluation of language models.
 - [`scripts`](scripts) — the scripts used for evaluation of language models.
     
 
