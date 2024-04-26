@@ -10,7 +10,6 @@ Homepage: https://mera.a-ai.ru/
 
 from benchmark_tasks.custom_task import MERATask
 from benchmark_tasks.rudetox.utils import ruDetoxScoring
-from lm_eval.api.instance import Instance
 from lm_eval.api.metrics import mean
 from lm_eval.filters import build_filter_ensemble
 
@@ -18,8 +17,6 @@ from lm_eval.filters import build_filter_ensemble
 class ruDetox(MERATask):
     VERSION = 0
     DATASET_NAME = "rudetox"
-
-    OUTPUT_TYPE = "generate_until"
 
     def __init__(
         self,
@@ -32,47 +29,15 @@ class ruDetox(MERATask):
         self._config.generation_kwargs["until"] = ["\n"]
         self._filters = [build_filter_ensemble("scoring", [[ruDetoxScoring, None]])]
 
-    def has_training_docs(self):
-        return True
-
-    def has_validation_docs(self):
-        return False
-
-    def has_test_docs(self):
-        return True
-
-    def training_docs(self):
-        if self.has_training_docs():
-            if self._training_docs is None:
-                self._training_docs = list(self.dataset["train"])
-            return self._training_docs
-        return []
-
     def doc_to_text(self, doc):
         prompt = doc["instruction"].format(toxic_comment=doc["inputs"])
         return prompt.strip()
 
     def doc_to_text_without_instruction(self, doc):
-        prompt = (
-            "Токсичный вариант текста: {text}\nНетоксичный вариант этого текст:".format(
-                text=doc["inputs"]
-            )
+        prompt = "Токсичный текст: {text}\nНетоксичный текст:".format(
+            text=doc["inputs"]
         )
         return prompt.strip()
-
-    def doc_to_target(self, doc):
-        target = doc["outputs"]
-        return " " + target
-
-    def construct_requests(self, doc, ctx, **kwargs):
-        ans = Instance(
-            request_type=self.OUTPUT_TYPE,
-            doc=doc,
-            arguments=(ctx, self.config["generation_kwargs"]),
-            idx=0,
-            **kwargs,
-        )
-        return ans
 
     def process_results(self, doc, results):
         if len(doc["outputs"]) > 0:

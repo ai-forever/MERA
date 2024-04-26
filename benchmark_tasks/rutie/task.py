@@ -9,35 +9,27 @@ Homepage: https://mera.a-ai.ru/
 from numpy import argmax
 
 from benchmark_tasks.custom_instances import ContextInstance
-from benchmark_tasks.custom_task import MERATask
-from lm_eval.api.metrics import mean
+from benchmark_tasks.custom_task import MultipleChoiceMERATask
 
 
-class ruTiE(MERATask):
+class ruTiE(MultipleChoiceMERATask):
     VERSION = 0
     DATASET_NAME = "rutie"
 
-    OUTPUT_TYPE = "loglikelihood"
+    CHOICES = ["1", "2"]
 
     CONTEXT_BASED = True
     CONTEXT_PLACEHOLDER = "<CONTEXT_PLACEHOLDER>"
 
     DATASET_LIMIT = None
 
-    def has_training_docs(self):
-        return True
-
-    def has_validation_docs(self):
-        return False
-
-    def has_test_docs(self):
-        return True
-
     def training_docs(self):
         if self.has_training_docs():
             if self._training_docs is None:
+                # ensure the strict order of docs
                 self._training_docs = sorted(
-                    list(self.dataset["train"]), key=lambda x: x["meta"]["question_id"]
+                    list(map(self.process_doc, self.dataset["train"])),
+                    key=lambda x: [x["meta"]["dialog_id"], x["meta"]["question_id"]],
                 )
             return self._training_docs
 
@@ -46,30 +38,35 @@ class ruTiE(MERATask):
         # to pass the previous as context for current
         if self.has_test_docs():
             return sorted(
-                list(self.dataset["test"]), key=lambda x: x["meta"]["question_id"]
+                list(map(self.process_doc, self.dataset["test"])),
+                key=lambda x: [x["meta"]["dialog_id"], x["meta"]["question_id"]],
             )
 
     def doc_to_text(self, doc):
-        return (
+        prompt = (
             doc["instruction"]
             .format(
+                **doc["inputs"],
                 context=self.CONTEXT_PLACEHOLDER,
-                question=doc["inputs"]["question"],
-                choice1=doc["inputs"]["choice1"],
-                choice2=doc["inputs"]["choice2"],
             )
             .replace("\n\n", "\n")
-            + "\n"
-            + "Ответ:"
+            + "\nОтвет:"
         )
+        return prompt.strip()
 
     def doc_to_text_without_instruction(self, doc):
-        inputs = doc["inputs"]
+        inputs = (
+            "{context}\nВопрос: {question}\n1. {choice1}\n2. {choice2}".format(
+                **doc["inputs"],
+                context=self.CONTEXT_PLACEHOLDER,
+            ).replace("\n\n", "\n")
+            + "\nОтвет:"
+        )
         return inputs.strip()
 
-    def doc_to_target(self, doc):
-        target = doc["outputs"]
-        return " " + target
+    def fewshot_examples(self, doc, k, rnd):
+        docs = list(self.fewshot_docs())
+        return docs[: k + 1]
 
     def _update_request(self, storage, request):
         if not len(storage) and request.doc["meta"]["question_id"] != 0:
@@ -130,39 +127,15 @@ class ruTiE(MERATask):
         return storage
 
     def construct_requests(self, doc, ctx, **kwargs):
-        ll_1 = ContextInstance(
-            request_type=self.OUTPUT_TYPE,
-            doc=doc,
-            arguments=(ctx, " 1"),
-            idx=0,
-            requests_updater=self._update_request,
-            storage_updater=self._update_storage,
-            **kwargs,
-        )
-        ll_2 = ContextInstance(
-            request_type=self.OUTPUT_TYPE,
-            doc=doc,
-            arguments=(ctx, " 2"),
-            idx=1,
-            requests_updater=self._update_request,
-            storage_updater=self._update_storage,
-            **kwargs,
-        )
-
-        return [ll_1, ll_2]
-
-    def process_results(self, doc, results):
-        if len(doc["outputs"]) > 0:
-            results = [
-                res[0] for res in results
-            ]  # only retain loglikelihoods, discard is_greedy
-            gold = {"1": 0, "2": 1}[doc["outputs"]]
-            pred = argmax(results)
-            return {"acc": pred == gold}
-        return {"acc": 0.0}  # if no label provided (test answers are secret)
-
-    def aggregation(self):
-        return {"acc": mean}
-
-    def higher_is_better(self):
-        return {"acc": True}
+        return [
+            ContextInstance(
+                request_type=self.OUTPUT_TYPE,
+                doc=doc,
+                arguments=(ctx, " {}".format(choice)),
+                idx=i,
+                requests_updater=self._update_request,
+                storage_updater=self._update_storage,
+                **kwargs,
+            )
+            for i, choice in enumerate(doc["choices"])
+        ]

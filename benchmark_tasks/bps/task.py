@@ -10,38 +10,34 @@ Homepage: https://mera.a-ai.ru/
 
 import re
 
-from numpy import argmax
-
-from benchmark_tasks.custom_task import MERATask
-from lm_eval.api.instance import Instance
-from lm_eval.api.metrics import mean
+from benchmark_tasks.custom_task import MultipleChoiceMERATask
 
 
-class BPS(MERATask):
+class BPS(MultipleChoiceMERATask):
     VERSION = 0
     DATASET_NAME = "bps"
+    CHOICES = ["0", "1"]
+    PATTERN = re.compile(r"\{([^}]*)\}")
 
-    OUTPUT_TYPE = "loglikelihood"
+    def __init__(
+        self,
+        data_dir=None,
+        cache_dir=None,
+        download_mode=None,
+        config=None,
+    ) -> None:
+        super().__init__(data_dir, cache_dir, download_mode, config)
 
-    def has_training_docs(self):
-        return True
-
-    def has_validation_docs(self):
-        return False
-
-    def has_test_docs(self):
-        return True
-
-    def training_docs(self):
-        if self.has_training_docs():
-            if self._training_docs is None:
-                self._training_docs = list(self.dataset["train"])
-            return self._training_docs
-        return []
+        # fix default number of few-shots
+        self._config.num_fewshot = 2
 
     def _custom_format(self, input_str, **kwargs):
-        pattern = r"\{([^}]*)\}"
-        matches = re.finditer(pattern, input_str)
+        """
+        Fills only fields mentioned in kwargs of instruction.
+        Ignore any other rooms created by {} brackets that are
+        part of some instructions and not supposed to be filled.
+        """
+        matches = self.PATTERN.finditer(input_str)
         for match in matches:
             placeholder = match.group(0)
             key = match.group(1)
@@ -54,39 +50,5 @@ class BPS(MERATask):
         return prompt
 
     def doc_to_text_without_instruction(self, doc):
-        inputs = doc["inputs"]
-        return inputs.strip()
-
-    def doc_to_target(self, doc):
-        return " " + doc["outputs"]
-
-    def construct_requests(self, doc, ctx, **kwargs):
-        choices = [0, 1]
-        return [
-            Instance(
-                request_type=self.OUTPUT_TYPE,
-                doc=doc,
-                arguments=(ctx, " {}".format(choice)),
-                idx=idx,
-                **kwargs,
-            )
-            for idx, choice in enumerate(choices)
-        ]
-
-    def process_results(self, doc, results):
-        if len(doc["outputs"]) > 0:
-            results = [
-                res[0] for res in results
-            ]  # only retain loglikelihoods, discard is_greedy
-            gold = int(doc["outputs"])
-
-            acc = 1.0 if argmax(results) == gold else 0.0
-
-            return {"acc": acc}
-        return {"acc": 0.0}  # if no label provided (test answers are secret)
-
-    def aggregation(self):
-        return {"acc": mean}
-
-    def higher_is_better(self):
-        return {"acc": True}
+        prompt = "Последовательность: {inputs}\nОтвет:".format(inputs=doc["inputs"])
+        return prompt

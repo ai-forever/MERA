@@ -11,8 +11,8 @@ def save_for_mera_submit(
         f"lm_harness_logs_{task_name}"
     )  # path to save logs of task
     task_log_dir.mkdir(exist_ok=False)  # create dir if not exist
-    reverted_ans_queue = defaultdict(dict)
-    reverted_docs = defaultdict(dict)
+    reverted_ans_queue: Dict[str, dict] = defaultdict(dict)
+    reverted_docs: Dict[str, dict] = defaultdict(dict)
     for sample in samples[task_name]:
         idx = sample["doc"]["meta"]["id"]
         answers = [
