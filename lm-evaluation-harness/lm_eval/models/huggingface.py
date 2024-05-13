@@ -640,7 +640,7 @@ class AutoCausalLM(HuggingFaceAutoLM):
                     **generation_kwargs,
                 )
                 # need to make it 1-d tensor and remove prompt ids
-                generations.extend([gen.squeeze(0)[inputs["input_ids"].size(1) :]])
+                generations.extend([gen.squeeze(0)[input_ids.size(1) :]])
             return generations
         else:
             generations = self.model.generate(
@@ -651,7 +651,7 @@ class AutoCausalLM(HuggingFaceAutoLM):
                 **generation_kwargs,
             )
             res = utils.select_continuation_from_batch_left_padding(
-                generations, max_context_size=inputs["input_ids"].size(1)
+                generations, max_context_size=input_ids.size(1)
             )
             return res
 
