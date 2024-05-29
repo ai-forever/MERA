@@ -62,7 +62,7 @@ N-digit addition was created for n in the range [1;5] for both train and test se
 
 ### Metrics
 
-Accuracy is used for evaluation.
+The task is evaluated using the Exact Match (EM). For each example, 1.0 is given for the target sequence that EXACTLY matches the predicted sequence. Else, 0.0.
 
 ### Human Benchmark
 
