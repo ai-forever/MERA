@@ -30,6 +30,8 @@ This commands are to be run from `lm-evaluation-harness` directory of this repos
 
 ### Run full benchmark with bash script
 
+#### Running HF models
+
 Sample command to run benchmark with `ai-forever/rugpt3large_based_on_gpt2` (`AutoModelForCausalLM` class compatible)
 model from Huggingface Hub:
 
@@ -50,10 +52,14 @@ Use `MERA_COMMON_SETUP` to change default parameters for model inferencing with 
 `--model hf --device cuda --batch_size=1 --predict_only --log_samples --seed 1234,1234,None`).
 See more on parameters in the next section.
 
+If you want to select only generative versions of tasks (all originaly generative tasks and generative versions of loglikelihood tasks), use `scripts/run_benchmark_gen.sh` script. To run all existing tasks execute `scripts/run_benchmark_all.sh`. This way two separate submissions will be created: one for regular MERA tasks (loglikelihood and generative tasks), one for generative MERA tasks only.
+
+#### Running OpenAI models
+
 Sample command for running benchmark with OpenAI API GPT-3 based models with `run_benchmark_openai_api.sh` script:
 
 ```linux
-MERA_FOLDER="./davinci-002_defaults" MERA_MODEL_STRING="model=davinci-002" OPENAI_API_KEY=*YOUR API KEY* bash scripts/run_benchmark_openai_api.sh
+MERA_FOLDER="$PWD/mera_results/davinci-002_defaults" MERA_MODEL_STRING="model=davinci-002" OPENAI_API_KEY=*YOUR API KEY* bash scripts/run_benchmark_openai_api.sh
 ```
 
 Paste your OpenAI API key instead of `*YOUR API KEY*`. Script runs only GPT-3 based models like `davinci-002` or `babbage-002`.
@@ -103,7 +109,13 @@ but results may become irreproducible, so it is not default suggestion.
 `--predict_only` important to use this key always, it allows to run on datasets without proper replies provided
 (score result 0 may still be reported).
 
-`--log_samples` turn on samples logging, should be always to make the submission.
+`--log_samples` turns on samples logging, should be always to make the submission.
+
+`--apply_chat_template` turns on applying chat templates of your model to all requests (see more in [**documentation**](https://huggingface.co/docs/transformers/main/chat_templating)).
+
+`--fewshot_as_multiturn` is used to turn fewshots in multi-turn conversation (currently cannot be used for zero-shot tasks and requires using `--apply_chat_template`).
+
+`--system_instruction` contains a string that will be used as system prompt for one or more passed tasks (if the chat template of the model does not take into account system prompt, it will be omitted, so that no system prompt is passed to the model; without `--apply_chat_template` system prompt is added to the beginning of each request to the model).
 
 
 ### Convert lm-harness to submission
@@ -112,7 +124,7 @@ Bash script above runs submission zip packing routine. Here is the way to run pa
 For converting run
 
 ```shell
-python scripts/log_to_submission.py
+python scripts/log_to_submission.py --outputs_dir="$PWD/mera_results/rugpt3large_760m_defaults" --dst_dir="$PWD/mera_results/rugpt3large_760m_defaults_submission" --model_args="pretrained=ai-forever/rugpt3large_based_on_gpt2,dtype=auto"
 ```
 
 Cmd arguments:
@@ -120,3 +132,11 @@ Cmd arguments:
 * `--outputs_dir` — path to directory with outputs (`MERA_FOLDER` from bash script above)
 * `--dst_dir` — directory for store submission zip
 * `--logs_public_submit` (`--no-logs_public_submit`) — pack logs for public submission in separate file (true by default)
+* `--model_args` — string containing the same info that was passed in `MERA_MODEL_STRING`
+* `--gen` — indicates that only generative tasks are to be packed in archive (false by default)
+
+Be careful! After running the model the results will be stored in subdirectory of `MERA_FOLDER`. Do not use the same `MERA_FOLDER` for running the same model twice (this way only the latest results will be packed) or different models (this way two or more subdirectories will be created and you will have to pass `--model_args` to determine which subfolder is to be packed). If you are not using `--model_args` argument, make sure you provided the full path (including the subdirectory) in `--outputs_dir` argument. For example above it will be as follows: 
+
+```shell
+python scripts/log_to_submission.py --outputs_dir="$PWD/mera_results/rugpt3large_760m_defaults/ai-forever__rugpt3large_based_on_gpt2/" --dst_dir="$PWD/mera_results/rugpt3large_760m_defaults_submission"
+```

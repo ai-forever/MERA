@@ -1,6 +1,0 @@
-group: tape
-task:
-  - task: chegeka
-  - task: multiq
-  - task: ruworldtree
-  - task: ruopenbookqa

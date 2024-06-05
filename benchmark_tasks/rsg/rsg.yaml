@@ -1,5 +1,0 @@
-group: rsg
-task:
-  - task: parus
-  - task: rcb
-  - task: rwsd

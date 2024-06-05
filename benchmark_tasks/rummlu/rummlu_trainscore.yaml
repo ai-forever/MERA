@@ -1,0 +1,6 @@
+include: rummlu.yaml
+group:
+  - mera_all_train
+  - mera_train
+task: rummlu_trainscore
+test_split: public_test

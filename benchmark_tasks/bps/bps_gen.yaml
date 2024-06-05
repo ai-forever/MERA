@@ -1,0 +1,7 @@
+# inherit from right to left
+include: [../digit_choice_gen_task.yaml, bps.yaml]
+group:
+  - mera_gen
+  - mera_all
+task: bps_gen
+doc_to_text: "{{instruction.replace('фигурные {}', 'фигурные {empty}').format(inputs=inputs, empty='{}')}}"

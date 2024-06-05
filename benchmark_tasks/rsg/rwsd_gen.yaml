@@ -1,0 +1,13 @@
+# inherit from right to left
+include: [../custom_generate_task.yaml, rwsd.yaml]
+group:
+  - mera_gen
+  - mera_all
+task: rwsd_gen
+filter_list:
+  - name: "scoring"
+    filter:
+      - function: "regex"
+        regex_pattern: "(\\b(Да|Нет)\\b)"
+        fallback: '-1'
+      - function: "take_first"

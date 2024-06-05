@@ -1,0 +1,20 @@
+output_type: multiple_choice
+# for future external datasets loading
+dataset_path: ai-forever/mera
+training_split: train
+test_split: test
+fewshot_delimiter: "\n\n"
+# overriden if fewshots, but need for zeroshot
+doc_to_text: "{{instruction.format(**inputs).strip() if inputs is mapping else instruction.format(inputs=inputs).strip()}}"
+# needed to avoid casting to int if string contains digits only
+doc_to_target: "outputs"
+target_delimiter: " "
+should_decontaminate: false
+metric_list:
+  - metric: acc
+    aggregation: mean
+    higher_is_better: true
+filter_list:
+  - name: "scoring"  # change name of default filter
+    filter:
+      - function: "take_first"

@@ -1,0 +1,8 @@
+include: ./custom_generate_task.yaml
+filter_list:
+  - name: "scoring"
+    filter:
+      - function: "regex"
+        regex_pattern: "(\\b([ABCD])\\b)"
+        fallback: '-1'
+      - function: "take_first"

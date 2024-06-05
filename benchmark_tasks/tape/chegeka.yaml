@@ -1,4 +1,27 @@
+include: ../custom_generate_task.yaml
 group:
+  - mera
+  - mera_gen
+  - mera_all
   - tape
 task: chegeka
-class: !function task.CheGeKa
+dataset_name: chegeka
+fewshot_config:
+  sampler: !function ../custom_samplers.FewshotSampler  # processes no instruction doc and changes doc_to_text
+  doc_to_text_without_instruction: "{{'Категория \"{topic}\"\nВопрос: {text}\nОтвет:'.format(**inputs)}}"
+  query: "{{instruction.format(**inputs).strip()}}"
+generation_kwargs:
+  do_sample: false
+  until:
+    - "."
+num_fewshot: 4
+process_results: !function utils.process_results_chegeka
+metric_list:
+  - metric: em
+    aggregation: mean
+    higher_is_better: true
+  - metric: f1
+    aggregation: mean
+    higher_is_better: true
+metadata:
+  version: 1.0

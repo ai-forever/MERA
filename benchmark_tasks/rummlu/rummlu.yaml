@@ -1,2 +1,191 @@
+include: ../custom_loglikelihood_task.yaml
+group:
+  - mera
+  - mera_all
 task: rummlu
-class: !function task.RuMMLU
+dataset_name: rummlu
+training_split: public_test
+fewshot_config:
+  sampler: !function ../custom_samplers.FewshotSampler  # processes no instruction doc and changes doc_to_text
+  doc_to_text_without_instruction: "{{'{text}\nA) {option_a}\nB) {option_b}\nC) {option_c}\nD) {option_d}\nОтвет:'.format(**inputs).lstrip()}}"
+  query: "{{instruction.format(**inputs).strip()}}"
+doc_to_choice: ["A", "B", "C", "D"]
+num_fewshot: 5
+process_results: !function utils.process_results
+metric_list:
+  - metric: acc
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.anatomy
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.virology
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.astronomy
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.marketing
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.nutrition
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.sociology
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.management
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.philosophy
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.prehistory
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.human_aging
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.econometrics
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.formal_logic
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.global_facts
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.jurisprudence
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.miscellaneous
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.moral_disputes
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.business_ethics
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.college_biology
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.college_physics
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.human_sexuality
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.moral_scenarios
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.world_religions
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.abstract_algebra
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.college_medicine
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.machine_learning
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.medical_genetics
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.professional_law
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.public_relations
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.security_studies
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.college_chemistry
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.computer_security
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.international_law
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.logical_fallacies
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.us_foreign_policy
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.clinical_knowledge
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.conceptual_physics
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.college_mathematics
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.high_school_biology
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.high_school_physics
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.high_school_chemistry
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.high_school_geography
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.professional_medicine
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.electrical_engineering
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.elementary_mathematics
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.high_school_psychology
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.high_school_statistics
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.high_school_us_history
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.high_school_mathematics
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.professional_accounting
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.professional_psychology
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.college_computer_science
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.high_school_world_history
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.high_school_macroeconomics
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.high_school_microeconomics
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.high_school_computer_science
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.high_school_european_history
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc.high_school_government_and_politics
+    aggregation: mean
+    higher_is_better: true
+metadata:
+  version: 1.0

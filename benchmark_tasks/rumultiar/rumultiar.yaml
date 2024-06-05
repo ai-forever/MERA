@@ -1,2 +1,14 @@
+include: ../custom_generate_task.yaml
+group:
+  - mera
+  - mera_gen
+  - mera_all
 task: rumultiar
-class: !function task.RuMultiAr
+dataset_name: rumultiar
+fewshot_config:
+  sampler: !function ../custom_samplers.FewshotSampler  # processes no instruction doc and changes doc_to_text
+  doc_to_text_without_instruction: "{{inputs.strip()}}"
+  query: "{{instruction.format(inputs=inputs).strip()}}"
+num_fewshot: 5
+metadata:
+  version: 1.0

@@ -1,2 +1,15 @@
+include: ../custom_loglikelihood_task.yaml
+group:
+  - mera
+  - mera_all
 task: lcs
-class: !function task.LCS
+dataset_name: lcs
+training_split: public_test
+fewshot_config:
+  sampler: !function ../custom_samplers.FewshotSampler  # processes no instruction doc and changes doc_to_text
+  doc_to_text_without_instruction: "Строки: {{inputs}}\nОтвет:"
+  query: "{{instruction.format(inputs=inputs).strip()}}"
+doc_to_choice: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+num_fewshot: 2
+metadata:
+  version: 1.0

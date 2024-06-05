@@ -1,2 +1,42 @@
+include: ../custom_generate_task.yaml
+group:
+  - mera
+  - mera_gen
+  - mera_all
 task: ruhumaneval
-class: !function task.ruHumanEval
+dataset_name: ruhumaneval
+repeats: 10
+training_split: public_test
+fewshot_config:
+  sampler: !function ../custom_samplers.FewshotSampler  # processes no instruction doc and changes doc_to_text
+  doc_to_text_without_instruction: "Функция:\n{{inputs.function.rstrip()}}"
+  query: "{{instruction.format(**inputs).strip()}}"
+# ruHumanEval does not use targets in shots
+# LM is required to generate func continuation
+doc_to_target: "{{meta['canonical_solution']}}"
+num_fewshot: null
+generation_kwargs:
+  do_sample: false
+  until:
+    - "\nclass"
+    - "\ndef"
+    - "\n#"
+    - "\nif"
+    - "\nprint"
+process_results: !function utils.process_results
+filter_list:
+  - name: "scoring"
+    filter:
+      - function: ruhumanevalscoring
+metric_list:
+  - metric: pass@1
+    aggregation: mean
+    higher_is_better: true
+  - metric: pass@5
+    aggregation: mean
+    higher_is_better: true
+  - metric: pass@10
+    aggregation: mean
+    higher_is_better: true
+metadata:
+  version: 1.0

@@ -7,13 +7,45 @@ import platform
 import signal
 import tempfile
 from concurrent.futures import ThreadPoolExecutor
+from typing import Dict, List
 
 import multiprocess as mp
 import numpy as np
 
 from lm_eval.api.filter import Filter
+from lm_eval.api.registry import register_filter
 
 
+def _process_results(doc, results):
+    if len(doc["outputs"]) > 0:
+        output_results = []
+        code_outputs = results[0]
+        for generation in code_outputs:
+            score = check_solution(doc["outputs"], generation)
+            if score:
+                output_results.extend([1])
+            else:
+                output_results.extend([0])
+
+        total, correct = len(output_results), sum(output_results)
+
+        pass_1 = compute_pass_k(total, correct, 1)
+        pass_5 = compute_pass_k(total, correct, 5)
+        pass_10 = compute_pass_k(total, correct, 10)
+        return {"pass@1": pass_1, "pass@5": pass_5, "pass@10": pass_10}
+    return {
+        "pass@1": 0.0,
+        "pass@5": 0.0,
+        "pass@10": 0.0,
+    }  # if no label provided (test answers are secret)
+
+
+def process_results(doc: dict, results: List[str]) -> Dict[str, int]:
+    processed_results = _process_results(doc, results)
+    return processed_results
+
+
+@register_filter("ruhumanevalscoring")
 class ruHumanEvalScoring(Filter):
     def __init__(self) -> None:
         """
@@ -71,9 +103,7 @@ def check_correctness(check_program, test_cases, entry_point, timeout):
     if not result:
         result.append("timed out")
 
-    return dict(
-        result=result[0],
-    )
+    return {"result": result[0]}
 
 
 def unsafe_execute(check_program, test_cases, entry_point, result, timeout):
@@ -176,8 +206,6 @@ def chdir(root):
     os.chdir(root)
     try:
         yield
-    except BaseException as exc:
-        raise exc
     finally:
         os.chdir(cwd)
 
@@ -277,7 +305,7 @@ def compute_pass_k(n, c, k):
 
 def check_solution(true, pred):
     # if pred is empty, fail
-    if not len(pred):
+    if len(pred) == 0:
         return 0
     # pred should have len(true) items or fail
     if len(true) != len(pred):

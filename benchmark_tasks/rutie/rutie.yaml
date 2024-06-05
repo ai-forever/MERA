@@ -1,2 +1,15 @@
+include: ../custom_loglikelihood_task.yaml
+group:
+  - mera
+  - mera_all
 task: rutie
-class: !function task.ruTiE
+dataset_name: rutie
+context_based: true
+request_updater: !function utils._update_request
+storage_updater: !function utils._update_storage
+process_docs: !function utils.process_docs
+doc_to_text: "{{query}}"
+doc_to_choice: ["1", "2"]
+num_fewshot: null
+metadata:
+  version: 1.0

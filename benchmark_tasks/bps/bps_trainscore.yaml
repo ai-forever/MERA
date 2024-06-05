@@ -1,0 +1,6 @@
+include: bps.yaml
+group:
+  - mera_all_train
+  - mera_train
+task: bps_trainscore
+test_split: train

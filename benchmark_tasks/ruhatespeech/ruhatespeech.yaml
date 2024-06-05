@@ -1,2 +1,38 @@
+include: ../custom_loglikelihood_task.yaml
+group:
+  - mera
+  - mera_all
 task: ruhatespeech
-class: !function task.RuHateSpeech
+dataset_name: ruhatespeech
+training_split: null
+fewshot_config:
+  sampler: !function ../custom_samplers.FewshotSampler  # processes no instruction doc and changes doc_to_text
+  doc_to_text_without_instruction: "{{'Реплика: {replica}\nОтвет 1: {reply_1}\nОтвет 2: {reply_2}\nЦелевая группа: {target_group}\nОтвет:'.format(**inputs)}}"
+  query: "{{instruction.format(**inputs)}}"
+doc_to_choice: ["1", "2"]
+process_results: !function utils.process_results
+num_fewshot: null
+metric_list:
+  - metric: acc
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc_men
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc_women
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc_nationalities
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc_migrants
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc_lgbt
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc_other
+    aggregation: mean
+    higher_is_better: true
+metadata:
+  version: 1.0

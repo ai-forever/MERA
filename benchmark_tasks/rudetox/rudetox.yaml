@@ -1,2 +1,33 @@
+include: ../custom_generate_task.yaml
+group:
+  - mera
+  - mera_gen
+  - mera_all
 task: rudetox
-class: !function task.ruDetox
+dataset_name: rudetox
+fewshot_config:
+  sampler: !function ../custom_samplers.FewshotSampler  # processes no instruction doc and changes doc_to_text
+  doc_to_text_without_instruction: "Токсичный текст: {{inputs}}\nНетоксичный текст:"
+  query: "{{instruction.format(toxic_comment=inputs).strip()}}"
+doc_to_text: "{{instruction.format(toxic_comment=inputs).strip()}}"  # overriden if fewshots, but need for zeroshot
+process_results: !function utils.process_results
+num_fewshot: null
+filter_list:
+  - name: "scoring"
+    filter:
+      - function: rudetoxscoring
+metric_list:
+  - metric: j
+    aggregation: mean
+    higher_is_better: true
+  - metric: sta
+    aggregation: mean
+    higher_is_better: true
+  - metric: sim
+    aggregation: mean
+    higher_is_better: true
+  - metric: fl
+    aggregation: mean
+    higher_is_better: true
+metadata:
+  version: 1.0

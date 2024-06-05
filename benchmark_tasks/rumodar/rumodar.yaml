@@ -1,2 +1,15 @@
+include: ../custom_generate_task.yaml
+group:
+  - mera
+  - mera_gen
+  - mera_all
 task: rumodar
-class: !function task.ruModAr
+dataset_name: rumodar
+training_split: public_test
+fewshot_config:
+  sampler: !function ../custom_samplers.FewshotSampler  # processes no instruction doc and changes doc_to_text
+  doc_to_text_without_instruction: "{{inputs}}"
+  query: "{{instruction.format(inputs=inputs).strip()}}"
+num_fewshot: null
+metadata:
+  version: 1.0

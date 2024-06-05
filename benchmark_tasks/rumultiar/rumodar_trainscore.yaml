@@ -1,0 +1,7 @@
+include: rumultiar.yaml
+group:
+  - mera_all_train
+  - mera_gen_train
+  - mera_train
+task: rumultiar_trainscore
+test_split: train

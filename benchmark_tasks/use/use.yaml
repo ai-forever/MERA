@@ -1,2 +1,25 @@
+include: ../custom_generate_task.yaml
+group:
+  - mera
+  - mera_gen
+  - mera_all
 task: use
-class: !function task.USE
+dataset_name: use
+process_docs: !function utils.process_docs
+fewshot_config:
+  sampler: !function ../custom_samplers.FewshotSampler  # processes no instruction doc and changes doc_to_text
+  doc_to_text_without_instruction: "{{doc_to_text_without_instruction}}"
+  query: "{{instruction.format(**inputs)}}"
+num_fewshot: null
+generation_kwargs:
+  do_sample: false
+  until:
+    - "\n"
+    - "."
+process_results: !function utils.process_results
+metric_list:
+  - metric: grade_norm
+    aggregation: !function utils.overall_score
+    higher_is_better: true
+metadata:
+  version: 1.0

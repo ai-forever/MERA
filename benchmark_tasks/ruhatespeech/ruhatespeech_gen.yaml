@@ -1,0 +1,30 @@
+# inherit from right to left
+include: [../digit_choice_gen_task.yaml, ruhatespeech.yaml]
+group:
+  - mera_gen
+  - mera_all
+task: ruhatespeech_gen
+training_split: null
+process_results: !function utils.process_results
+metric_list:
+  - metric: em
+    aggregation: mean
+    higher_is_better: true
+  - metric: em_men
+    aggregation: mean
+    higher_is_better: true
+  - metric: em_women
+    aggregation: mean
+    higher_is_better: true
+  - metric: em_nationalities
+    aggregation: mean
+    higher_is_better: true
+  - metric: em_migrants
+    aggregation: mean
+    higher_is_better: true
+  - metric: em_lgbt
+    aggregation: mean
+    higher_is_better: true
+  - metric: em_other
+    aggregation: mean
+    higher_is_better: true

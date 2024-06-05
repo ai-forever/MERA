@@ -1,4 +1,22 @@
+include: ../custom_loglikelihood_task.yaml
 group:
+  - mera
+  - mera_all
   - rsg
 task: rcb
-class: !function task.RCB
+dataset_name: rcb
+fewshot_config:
+  sampler: !function ../custom_samplers.FewshotSampler  # processes no instruction doc and changes doc_to_text
+  doc_to_text_without_instruction: "{{'Ситуация: {premise}\nГипотеза: {hypothesis}\nОтвет:'.format(**inputs)}}"
+  query: "{{instruction.format(**inputs)}}\nОтвет:"
+doc_to_choice: ["1", "2", "3"]
+num_fewshot: null
+metric_list:
+  - metric: acc
+    aggregation: mean
+    higher_is_better: true
+  - metric: f1
+    aggregation: !function ../custom_metrics.f1_score_multiclass_macro
+    higher_is_better: true
+metadata:
+  version: 1.0

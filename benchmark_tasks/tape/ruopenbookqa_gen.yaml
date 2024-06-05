@@ -1,0 +1,14 @@
+# inherit from right to left
+include: [../letter_choice_gen_task.yaml, ruopenbookqa.yaml]
+group:
+  - mera_gen
+  - mera_all
+task: ruopenbookqa_gen
+metric_list:
+  - metric: exact_match
+    aggregation: mean
+    higher_is_better: true
+    ignore_punctuation: false
+  - metric: f1
+    aggregation: !function ../custom_metrics.f1_score_multiclass_macro
+    higher_is_better: True

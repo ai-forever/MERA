@@ -3,14 +3,20 @@ import glob
 import json
 import os
 import shutil
+from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 import datasets
 import numpy as np
+from tqdm.auto import tqdm
+
+from lm_eval.loggers.evaluation_tracker import GeneralConfigTracker
 
 
 BENCHMARK_STORAGE: Optional[str] = "ai-forever/MERA"
 _TASKS = {}
+GENERATIVE_SUFFIX = "_gen"
+INPUT_DATE_FORMAT = "%Y-%m-%dT%H-%M-%S.%f"
 
 
 def get_files_from_dir(dir_path):
@@ -18,7 +24,7 @@ def get_files_from_dir(dir_path):
     for dir_path, dirn_ames, filenames in os.walk(dir_path):
         for fn in filenames:
             fn = os.path.join(dir_path, fn)
-            f.append(fn)
+            f.extend([fn])
     return f
 
 
@@ -31,6 +37,18 @@ def load_json(path):
     with open(path, encoding="utf-8") as file:
         text = json.loads(file.read().strip())
     return text
+
+
+def load_jsonl(path):
+    with open(path, encoding="utf-8") as file:
+        result = [json.loads(line) for line in file.readlines()]
+    return result
+
+
+def extract_date(file_name: str) -> datetime:
+    extract_str_date = file_name.split(".json")[0].split("_")[-1]
+    date = datetime.strptime(extract_str_date, INPUT_DATE_FORMAT)
+    return date
 
 
 def register_task(cls):
@@ -48,11 +66,34 @@ class BaseTask:
         return self.__class__.__name__
 
     @property
-    def outputs_path(self):
-        output_answers: List[str] = glob.glob(
-            os.path.join(self.outputs_dir, f"*{self.src_name}.jsonl")
-        )
-        return output_answers[0] if len(output_answers) > 0 else ""
+    def outputs_path(self, index_to_get=0):
+        if self.gen:
+            filelist = glob.glob(
+                os.path.join(
+                    self.outputs_dir,
+                    f"samples_{self.src_name}{GENERATIVE_SUFFIX}*.json",
+                )
+            )
+            if len(filelist) == 0:
+                # called only for originally generative tasks like multiq, chegeka, etc.
+                filelist = glob.glob(
+                    os.path.join(self.outputs_dir, f"samples_{self.src_name}*.json")
+                )
+        else:
+            filelist = glob.glob(
+                os.path.join(self.outputs_dir, f"samples_{self.src_name}*.json")
+            )
+            # filter out all tasks with GENERATIVE_SUFFIX as we don't need to process them
+            filelist = list(filter(lambda x: GENERATIVE_SUFFIX not in x, filelist))
+        if not filelist:
+            # raise error if filelist is empty
+            raise FileNotFoundError(
+                "No samples to pack found, or there is an error in path processed"
+            )
+        # sorting filelist to get the latest
+        filelist = sorted(filelist, key=extract_date, reverse=True)
+        res = filelist[index_to_get]
+        return res
 
     @property
     def submission_path(self):
@@ -66,21 +107,21 @@ class BaseTask:
         return self.doc_to_meta(doc)["id"]
 
     def load(self):
-        if self.dataset_path is None or len(self.dataset_path) == 0:
-            dataset = datasets.load_dataset(path=BENCHMARK_STORAGE, name=self.src_name)[
-                "test"
-            ]
-        else:
-            dataset = load_json(self.dataset_path)["data"]["test"]
+        dataset = datasets.load_dataset(path=BENCHMARK_STORAGE, name=self.src_name)[
+            "test"
+        ]
         examples = dict()
         for example in dataset:
             doct_id = self.doc_to_id(example)
             examples[doct_id] = example
         return examples
 
-    def __init__(self, outputs_dir, dst_dir, dataset_path: Optional[str] = None):
+    def __init__(
+        self, outputs_dir, dst_dir, gen: bool, dataset_path: Optional[str] = None
+    ):
         self.outputs_dir = outputs_dir
         self.dst_dir = dst_dir
+        self.gen = gen
         self.dataset_path = dataset_path
         self.dataset = self.load()
 
@@ -91,42 +132,42 @@ class ClassificationTask(BaseTask):
         return ["0", "1"]
 
     def convert(self):
-        submission = self.outputs_to_submission(load_json(self.outputs_path))
+        submission = self.outputs_to_submission(load_jsonl(self.outputs_path))
         save_json(submission, self.submission_path)
         return submission
 
     def outputs_to_submission(self, outputs):
         res = []
-        for storage in outputs:
-            doc_id = int(storage["doc"]["meta"]["id"])
-            answers = [
-                [resp_idx, resp]
-                for resp_idx, resp in enumerate(storage["filtered_resps"])
-            ]
-            res.extend([self.doc_outputs_to_submission(doc_id, answers)])
+        for doc in outputs:
+            doc_id = int(self.doc_to_id(doc["doc"]))
+            resp = doc["filtered_resps"]
+            res.extend([self.doc_outputs_to_submission(doc_id, resp)])
         return {"data": {"test": res}}
 
     @staticmethod
     def parse_doc(doc):
-        return doc[0], doc[1][0]
+        return doc[0]
 
     def doc_outputs_to_submission(self, doc_id, outputs):
-        log_probs = np.zeros(len(outputs))
-        for doc in outputs:
-            idx, prob = self.parse_doc(doc)
-            log_probs[idx] = prob
-        idx = log_probs.argmax()
-        res = {
-            "outputs": self.choices[idx],
+        if self.gen:
+            res = outputs[0]
+        else:
+            log_probs = np.zeros(len(outputs))
+            for idx, doc in enumerate(outputs):
+                prob = self.parse_doc(doc)
+                log_probs[int(idx)] = prob
+            idx = log_probs.argmax()
+            res = self.choices[idx]
+        return {
+            "outputs": res,
             "meta": {"id": doc_id},
         }
-        return res
 
 
 class TextTask(ClassificationTask):
     def doc_outputs_to_submission(self, doc_id, outputs):
         res = {
-            "outputs": outputs[0][1].strip(),
+            "outputs": outputs[0],
             "meta": {"id": doc_id},
         }
         return res
@@ -160,7 +201,7 @@ class MathLogicQA(ClassificationTask):
 class MultiQ(TextTask):
     def doc_outputs_to_submission(self, doc_id, outputs):
         origin_doc = self.dataset[doc_id]
-        text = outputs[0][1].strip()
+        text = outputs[0]
         pos = origin_doc["inputs"]["support_text"].find(text)
         if -1 == pos:
             pos = origin_doc["inputs"]["text"].find(text)
@@ -198,7 +239,7 @@ class RCB(ClassificationTask):
 class ruDetox(TextTask):
     def doc_outputs_to_submission(self, doc_id, outputs):
         res = {
-            "outputs": outputs[0][1][-1].strip(),
+            "outputs": outputs[0][-1],
             "meta": {"id": doc_id},
         }
         return res
@@ -281,7 +322,7 @@ class USE(TextTask):
     def doc_outputs_to_submission(self, doc_id, outputs):
         origin_doc = self.dataset[doc_id]
         res = {
-            "outputs": outputs[0][1].strip(),
+            "outputs": outputs[0],
             "meta": {
                 "id": doc_id,
                 "id_task": origin_doc["meta"]["id_task"],
@@ -294,13 +335,10 @@ class USE(TextTask):
 @register_task
 class ruTiE(TextTask):
     def load(self):
-        if self.dataset_path is None or len(self.dataset_path) == 0:
-            dataset = datasets.load_dataset(path=BENCHMARK_STORAGE, name=self.src_name)[
-                "test"
-            ]
-            dataset = [list(dataset)]
-        else:
-            dataset = load_json(self.dataset_path)["data"]["test"]
+        dataset = datasets.load_dataset(path=BENCHMARK_STORAGE, name=self.src_name)[
+            "test"
+        ]
+        dataset = [list(dataset)]
         return dataset
 
     @property
@@ -310,28 +348,19 @@ class ruTiE(TextTask):
     def outputs_to_submission(
         self, outputs: List[Dict[str, Any]]
     ) -> Dict[str, Dict[str, list]]:
-        res_by_qid: Dict[int, Dict[int, Any]] = dict()
-        for storage in outputs:
-            dialog_id = int(storage["doc"]["meta"]["dialog_id"])
-            question_id = int(storage["doc"]["meta"]["question_id"])
-            answers = [
-                # resp depends on num dims of filtered_resps[0]
-                # resp is supposed to be the same as for other loglike tasks
-                [resp_idx, resp]
-                for resp_idx, resp in enumerate(storage["filtered_resps"])
-            ]
-            res_by_qid.setdefault(dialog_id, dict())[
-                question_id
-            ] = self.doc_outputs_to_submission(question_id, answers)
-        del dialog_id, question_id
+        res_by_qid: Dict[int, Dict[int, Any]] = {}
+        for doc in outputs:
+            question_id = int(doc["doc"]["meta"]["question_id"])
+            resp = doc["filtered_resps"]
+            res_by_qid[question_id] = self.doc_outputs_to_submission(question_id, resp)
         res = []
-        not_provided_ids = []
         for dialog in self.dataset:
             new_dialog = []
             for question in dialog:
                 dialog_id = question["meta"]["dialog_id"]
                 question_id = question["meta"]["question_id"]
-                question_id_outputs = res_by_qid.get(dialog_id, dict()).get(question_id)
+                question_id_outputs = res_by_qid.get(question_id)
+                # check that question_id was passed to LM
                 if question_id_outputs is not None:
                     new_question = {
                         "outputs": question_id_outputs,
@@ -342,20 +371,26 @@ class ruTiE(TextTask):
                     }
                     new_dialog.extend([new_question])
                 else:
-                    not_provided_ids.extend([question_id])
+                    # if no, then stop, later questions should include answer for the current
+                    # no current question means broken prompt for all others from this dialog
+                    break
             res.extend([new_dialog])
-            if len(not_provided_ids) > 0:
-                print("Question ids not provided:", not_provided_ids)
-
         return {"data": {"test": res}}
 
     def doc_outputs_to_submission(self, doc_id, outputs):
-        log_probs = np.zeros(len(outputs))
-        for doc in outputs:
-            idx, prob = self.parse_doc(doc)
-            log_probs[idx] = prob
-        idx = log_probs.argmax()
-        return self.choices[idx]
+        if self.gen:
+            res = outputs[0]
+        else:
+            log_probs = np.zeros(len(outputs))
+            for idx, doc in enumerate(outputs):
+                prob = self.parse_doc(doc)
+                log_probs[idx] = prob
+            idx = log_probs.argmax()
+            res = self.choices[idx]
+        return {
+            "outputs": res,
+            "meta": {"id": doc_id},
+        }
 
 
 @register_task
@@ -380,82 +415,46 @@ def get_args():
         help="dir to save files for submission",
     )
     parser.add_argument(
-        "--dataset_dir",
-        type=str,
-        help="dir with datasets",
-    )
-    parser.add_argument(
         "--logs_public_submit",
         type=bool,
         default=True,
         help="pack logs for public submission in separate file",
         action=argparse.BooleanOptionalAction,  # type: ignore[attr-defined]
     )
+    parser.add_argument(
+        "--gen",
+        type=bool,
+        default=False,
+        help="generation or loglike setup.",
+        action=argparse.BooleanOptionalAction,  # type: ignore[attr-defined]
+    )
+    parser.add_argument(
+        "--model_args",
+        type=str,
+        default="",
+        help="Comma separated string arguments for model, e.g. `pretrained=EleutherAI/pythia-160m,dtype=float32`",
+    )
     res = parser.parse_known_args()[0]
     return res
 
 
-def _get_dataset_path_by_taskname(
-    source_paths: List[str], task_name: str
-) -> Optional[str]:
-    dst = None
-    for task_path in source_paths:
-        # try resolve
-        if task_name.lower() in task_path:
-            dst = task_path
-            print("Process", task_name, "dataset path", dst)
-            break
-        dst_task_name = os.path.split(os.path.split(task_path)[0])[-1].lower()
-        k = len(set(task_name.lower()).intersection(set(dst_task_name))) / max(
-            len(dst_task_name), len(task_name)
-        )
-        if 0.65 < k:
-            dst = task_path
-            print(
-                "Process",
-                task_name,
-                "dataset path resolved from",
-                dst,
-                dst_task_name,
-                k,
-            )
-            break
-    return dst
-
-
-def create_submission(outputs_dir, dst_dir, dataset_dir: Optional[str] = None):
+def create_submission(outputs_dir, dst_dir, gen: bool):
     os.makedirs(dst_dir, exist_ok=True)
-    dataset_dir_defined = False
-    if dataset_dir is not None and len(dataset_dir) > 0:
-        paths = [x for x in get_files_from_dir(dataset_dir) if x.endswith("task.json")]
-        dataset_dir_defined = True
-    no_tasks = []
-    for task_name, task_cls in _TASKS.items():
-        dst = (
-            _get_dataset_path_by_taskname(paths, task_name)
-            if dataset_dir_defined
-            else None
-        )
-        if dst is None and dataset_dir_defined:
-            print("Can't find", task_name)
-            no_tasks.append(task_name)
-        else:
-            task = task_cls(outputs_dir=outputs_dir, dst_dir=dst_dir, dataset_path=dst)
-            _ = task.convert()
+    for task_name, task_cls in tqdm(_TASKS.items(), total=len(_TASKS)):
+        print("Process task", task_name)
+        task = task_cls(outputs_dir=outputs_dir, dst_dir=dst_dir, gen=gen)
+        _ = task.convert()
         print("---------------------")
-    print("Not refactored tasks", no_tasks)
     zip_path = shutil.make_archive(dst_dir, "zip", dst_dir)
     print("Submission stored at", zip_path)
-    return no_tasks
 
 
 def pack_submission_logs(outputs_dir: str, dst_dir: str):
     if os.path.isdir(outputs_dir):
         zip_dir = f"{dst_dir}_logs_public"
         os.makedirs(zip_dir, exist_ok=True)
-        for file_path in glob.glob(os.path.join(outputs_dir, "*.json*")) + glob.glob(
-            os.path.join(outputs_dir, "rutie/*.json*")
-        ):
+        files_to_pack = glob.glob(os.path.join(outputs_dir, "*.json"))
+        for file_path in files_to_pack:
             shutil.copy2(file_path, zip_dir)
         zip_path = shutil.make_archive(zip_dir, "zip", zip_dir)
         shutil.rmtree(zip_dir)
@@ -464,12 +463,39 @@ def pack_submission_logs(outputs_dir: str, dst_dir: str):
         raise ValueError(f"{outputs_dir} is not directory")
 
 
+def preprocess_outputs_dir(outputs_dir: str, model_args: str) -> str:
+    """
+    User either provides "full" path to dir with jsons or provides path to
+    folder of upper level and model_args to define subdir with jsons.
+    If user explicitly provides model_args, parse it and use to define subdir.
+    Otherwise, return the initial outputs_dir with no changes.
+    """
+    if model_args:
+        # init predefined Tracker
+        eval_tracker = GeneralConfigTracker()
+        # init Tracker params and extract model_name_sanitized
+        # model_source is not used yet,
+        # do not need system_instruction and chat_template to find subdir name
+        eval_tracker.log_experiment_args(
+            model_args=model_args,
+            model_source="",
+            system_instruction="",
+            chat_template="",
+        )
+        subdirectory = eval_tracker.model_name_sanitized
+        # join paths
+        full_path = os.path.join(outputs_dir, subdirectory)
+        return full_path
+    return outputs_dir
+
+
 def main():
     args = get_args()
-    _ = create_submission(args.outputs_dir, args.dst_dir, args.dataset_dir)
+    outputs_dir = preprocess_outputs_dir(args.outputs_dir, args.model_args)
+    _ = create_submission(outputs_dir, args.dst_dir, gen=args.gen)
     if args.logs_public_submit:
         print("Packing logs for public submission...")
-        pack_submission_logs(args.outputs_dir, args.dst_dir)
+        pack_submission_logs(outputs_dir, args.dst_dir)
 
 
 if __name__ == "__main__":

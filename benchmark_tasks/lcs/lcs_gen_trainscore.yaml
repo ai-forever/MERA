@@ -1,0 +1,6 @@
+include: lcs_gen.yaml
+group:
+  - mera_all_train
+  - mera_gen_train
+task: lcs_gen_trainscore
+test_split: public_test

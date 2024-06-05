@@ -1,0 +1,6 @@
+# inherit from right to left
+include: [../letter_choice_gen_task.yaml, mathlogicqa.yaml]
+group:
+  - mera_gen
+  - mera_all
+task: mathlogicqa_gen

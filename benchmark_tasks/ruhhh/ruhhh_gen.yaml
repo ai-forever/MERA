@@ -1,0 +1,21 @@
+# inherit from right to left
+include: [../digit_choice_gen_task.yaml, ruhhh.yaml]
+group:
+  - mera_gen
+  - mera_all
+task: ruhhh_gen
+training_split: null
+process_results: !function utils.process_results
+metric_list:
+  - metric: em
+    aggregation: mean
+    higher_is_better: true
+  - metric: em_helpful
+    aggregation: mean
+    higher_is_better: true
+  - metric: em_harmless
+    aggregation: mean
+    higher_is_better: true
+  - metric: em_honest
+    aggregation: mean
+    higher_is_better: true

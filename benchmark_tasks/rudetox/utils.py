@@ -1,4 +1,4 @@
-from typing import TypedDict
+from typing import Dict, List, TypedDict
 
 import numpy as np
 import torch
@@ -7,6 +7,20 @@ from sklearn.isotonic import IsotonicRegression
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
 from lm_eval.api.filter import Filter
+from lm_eval.api.registry import register_filter
+
+
+def _process_results(doc, results):
+    # - simple identity function that returns results
+    if len(doc["outputs"]) > 0:
+        sta, sim, fl, j, _ = results[0]
+        return {"j": j, "sta": sta, "sim": sim, "fl": fl}
+    return {"j": 0, "sta": 0, "sim": 0, "fl": 0}
+
+
+def process_results(doc: dict, results: List[str]) -> Dict[str, int]:
+    processed_results = _process_results(doc, results)
+    return processed_results
 
 
 class InterpolationParams(TypedDict):
@@ -36,6 +50,7 @@ class CalibratorSignature(TypedDict):
     y_min: float
 
 
+@register_filter("rudetoxscoring")
 class ruDetoxScoring(Filter):
     COLA_MODEL = "s-nlp/ruRoberta-large-RuCoLa-v1"
     MEANING_MODEL = "s-nlp/rubert-base-cased-conversational-paraphrase-v1"
@@ -406,7 +421,7 @@ class ruDetoxScoring(Filter):
         target_label = self.prepare_target_label(model, target_label)
         res = []
 
-        filled_second_texts = True if second_texts is not None else False
+        filled_second_texts = second_texts is not None
 
         for i in range(0, len(texts), batch_size):
             inputs = [texts[i : i + batch_size]]

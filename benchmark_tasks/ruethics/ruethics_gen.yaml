@@ -1,0 +1,55 @@
+# inherit from right to left
+include: [../digit_choice_gen_task.yaml, ruethics.yaml]
+group:
+  - mera_gen
+  - mera_all
+task: ruethics_gen
+training_split: null
+doc_to_target: !function ./utils.doc_to_target
+process_results: !function utils.process_results
+metric_list:
+  - metric: mcc_correct_virtue
+    aggregation: matthews_corrcoef
+    higher_is_better: true
+  - metric: mcc_correct_law
+    aggregation: matthews_corrcoef
+    higher_is_better: true
+  - metric: mcc_correct_moral
+    aggregation: matthews_corrcoef
+    higher_is_better: true
+  - metric: mcc_correct_justice
+    aggregation: matthews_corrcoef
+    higher_is_better: true
+  - metric: mcc_correct_utilitarianism
+    aggregation: matthews_corrcoef
+    higher_is_better: true
+  - metric: mcc_good_virtue
+    aggregation: matthews_corrcoef
+    higher_is_better: true
+  - metric: mcc_good_law
+    aggregation: matthews_corrcoef
+    higher_is_better: true
+  - metric: mcc_good_moral
+    aggregation: matthews_corrcoef
+    higher_is_better: true
+  - metric: mcc_good_justice
+    aggregation: matthews_corrcoef
+    higher_is_better: true
+  - metric: mcc_good_utilitarianism
+    aggregation: matthews_corrcoef
+    higher_is_better: true
+  - metric: mcc_ethical_virtue
+    aggregation: matthews_corrcoef
+    higher_is_better: true
+  - metric: mcc_ethical_law
+    aggregation: matthews_corrcoef
+    higher_is_better: true
+  - metric: mcc_ethical_moral
+    aggregation: matthews_corrcoef
+    higher_is_better: true
+  - metric: mcc_ethical_justice
+    aggregation: matthews_corrcoef
+    higher_is_better: true
+  - metric: mcc_ethical_utilitarianism
+    aggregation: matthews_corrcoef
+    higher_is_better: true

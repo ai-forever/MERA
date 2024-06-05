@@ -1,0 +1,7 @@
+# inherit from right to left
+include: [../digit_choice_gen_task.yaml, rutie.yaml]
+group:
+  - mera_gen
+  - mera_all
+task: rutie_gen
+doc_to_text: "{{query}}"

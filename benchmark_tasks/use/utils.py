@@ -1,6 +1,49 @@
 import re
+from typing import Dict, List
 
+import datasets
 from numpy import mean
+
+
+def _process_doc(doc: dict) -> dict:
+    task_type = doc["meta"]["type"]
+    if task_type in {"text", "multiple_choice_options_within_text"}:
+        no_instruction = "Задание: {task}\n{text}\nОтвет:".format(**doc["inputs"])
+    elif task_type == "matching":
+        no_instruction = "Задание: {task}\nТекст: {text}\nРецензии: {additional_text}\nСписок терминов:\n{choices}\nОтвет:".format(
+            **doc["inputs"]
+        )
+    elif task_type == "multiple_choice_based_on_text":
+        no_instruction = "Задание: {task}\nТекст: {text}\nВарианты ответа:\n{choices}\nОтвет:".format(
+            **doc["inputs"]
+        )
+    elif task_type == "multiple_choice_independent_options":
+        no_instruction = "Задание: {task}\nВарианты ответа:\n{choices}\nОтвет:".format(
+            **doc["inputs"]
+        )
+    doc["doc_to_text_without_instruction"] = no_instruction
+    return doc
+
+
+def process_docs(dataset: datasets.Dataset) -> datasets.Dataset:
+    return dataset.map(_process_doc)
+
+
+def _process_results(doc, results):
+    variant = doc["meta"]["variant"]
+    if len(doc["outputs"]) > 0:
+        id_task = doc["meta"]["id_task"]
+        task_type = doc["meta"]["type"]
+        answer = doc["outputs"]
+        prediction = results[0]
+        score = get_scores(task_type, id_task, answer, prediction)
+        return {"grade_norm": (score, variant)}
+    return {"grade_norm": (0.0, variant)}
+
+
+def process_results(doc: dict, results: List[str]) -> Dict[str, int]:
+    processed_results = _process_results(doc, results)
+    return processed_results
 
 
 def multiple_choice_score(answer: str, prediction: str, is_task16=False) -> int:
@@ -13,12 +56,11 @@ def multiple_choice_score(answer: str, prediction: str, is_task16=False) -> int:
             0,
             len(set.intersection(set(ans), set(pred))) - len(pred) + len(ans),
         )
-    else:
-        ans_set = set(ans)
-        pred_set = set(pred)
-        return int(
-            len(set.intersection(ans_set, pred_set)) == len(ans_set) == len(pred_set)
-        )
+    ans_set = set(ans)
+    pred_set = set(pred)
+    return int(
+        len(set.intersection(ans_set, pred_set)) == len(ans_set) == len(pred_set)
+    )
 
 
 def matching_score(answer: str, prediction: str) -> int:
@@ -34,7 +76,7 @@ def matching_score(answer: str, prediction: str) -> int:
 
 
 def text_score(answer: str, prediction: str) -> int:
-    pred = re.sub(r"[\d+\W+]", "", prediction).lower()
+    pred = re.sub(r"[\d\W]+", "", prediction).lower()
     ans = answer.split(",")
     if pred in ans:
         return 1

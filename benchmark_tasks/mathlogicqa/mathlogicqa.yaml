@@ -1,2 +1,14 @@
+include: ../custom_loglikelihood_task.yaml
+group:
+  - mera
+  - mera_all
 task: mathlogicqa
-class: !function task.MathLogicQA
+dataset_name: mathlogicqa
+fewshot_config:
+  sampler: !function ../custom_samplers.FewshotSampler  # processes no instruction doc and changes doc_to_text
+  doc_to_text_without_instruction: "{{'{text}\nA) {option_a}\nB) {option_b}\nC) {option_c}\nD) {option_d}\nОтвет:'.format(**inputs)}}"
+  query: "{{instruction.format(**inputs).strip()}}"
+doc_to_choice: ["A", "B", "C", "D"]
+num_fewshot: 5
+metadata:
+  version: 1.0

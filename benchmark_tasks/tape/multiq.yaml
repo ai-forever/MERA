@@ -1,4 +1,28 @@
+include: ../custom_generate_task.yaml
 group:
+  - mera
+  - mera_gen
+  - mera_all
   - tape
 task: multiq
-class: !function task.MultiQ
+dataset_name: multiq
+fewshot_config:
+  sampler: !function ../custom_samplers.FewshotSampler  # processes no instruction doc and changes doc_to_text
+  doc_to_text_without_instruction: "{{'Вопрос: {question}\nТекст 1: {support_text}\nТекст 2: {text}\nОтвет:'.format(**inputs)}}"
+  query: "{{instruction.format(**inputs).strip()}}"
+doc_to_target: "{{outputs[0]['segment']}}"
+num_fewshot: null
+generation_kwargs:
+  do_sample: false
+  until:
+    - "."
+process_results: !function utils.process_results_multiq
+metric_list:
+  - metric: em
+    aggregation: mean
+    higher_is_better: true
+  - metric: f1
+    aggregation: mean
+    higher_is_better: true
+metadata:
+  version: 1.0

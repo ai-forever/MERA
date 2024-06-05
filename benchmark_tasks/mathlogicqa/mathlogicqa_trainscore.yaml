@@ -1,0 +1,6 @@
+include: mathlogicqa.yaml
+group:
+  - mera_all_train
+  - mera_train
+task: mathlogicqa_trainscore
+test_split: train

@@ -1,0 +1,6 @@
+# inherit from right to left
+include: [../digit_choice_gen_task.yaml, parus.yaml]
+group:
+  - mera_gen
+  - mera_all
+task: parus_gen

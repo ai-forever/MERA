@@ -1,2 +1,15 @@
+include: ../custom_loglikelihood_task.yaml
+group:
+  - mera
+  - mera_all
 task: bps
-class: !function task.BPS
+dataset_name: bps
+fewshot_config:
+  sampler: !function ../custom_samplers.FewshotSampler  # processes no instruction doc and changes doc_to_text
+  doc_to_text_without_instruction: "Последовательность: {{inputs}}\nОтвет:"
+  query: "{{instruction.replace('фигурные {}', 'фигурные {empty}').format(inputs=inputs, empty='{}')}}"
+doc_to_text: "{{instruction.replace('фигурные {}', 'фигурные {empty}').format(inputs=inputs, empty='{}')}}"
+doc_to_choice: ["0", "1"]
+num_fewshot: 2
+metadata:
+  version: 1.0
