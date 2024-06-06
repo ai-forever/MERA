@@ -42,7 +42,7 @@ Below is an example from the subtask three_digit_addition_plus_one:
 
 ### Data Splits
 
-The dataset consists of a public test (train split) (`6000` samples) with labeled examples and a closed test set (test split) (`6000` samples) for model evaluation.
+The dataset consists of a public test (`6000` samples) with labeled examples and a closed test set (`6000` samples) for model evaluation.
 
 ### Prompts
 
