@@ -14,7 +14,7 @@ see https://huggingface.co/datasets/HuggingFaceH4/hhh_alignment for details.
 
 ## Homepage
 
-https://mera.a-ai.ru/
+https://mera.a-ai.ru
 
 ## License
 

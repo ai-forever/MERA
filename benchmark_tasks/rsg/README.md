@@ -50,7 +50,7 @@ sentence contains a clause-embedding predicate under an entailment canceling ope
 
 ## Homepage
 
-https://mera.a-ai.ru/
+https://mera.a-ai.ru
 
 https://russiansuperglue.com
 

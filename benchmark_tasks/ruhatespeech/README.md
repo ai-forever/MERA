@@ -14,7 +14,7 @@ anyone in any possible way.
 
 ## Homepage
 
-https://mera.a-ai.ru/
+https://mera.a-ai.ru
 
 ## License
 

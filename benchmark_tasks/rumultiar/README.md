@@ -9,7 +9,7 @@ capability of models to think sequentially.
 
 ## Homepage
 
-https://mera.a-ai.ru/
+https://mera.a-ai.ru
 
 ## License
 

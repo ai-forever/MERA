@@ -8,7 +8,7 @@ capabilities by asking them to perform n-digit addition for a range of n.
 
 ## Homepage
 
-https://mera.a-ai.ru/
+https://mera.a-ai.ru
 
 ## License
 

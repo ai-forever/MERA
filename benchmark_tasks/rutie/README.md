@@ -12,7 +12,7 @@ context and memory of the models is a special focus of the dataset.
 
 ## Homepage
 
-https://mera.a-ai.ru/
+https://mera.a-ai.ru
 
 ## License
 
