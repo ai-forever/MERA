@@ -1,4 +1,4 @@
-# mathlogicqa
+# MathLogicQA
 
 ## Описание задачи
 
