@@ -73,7 +73,7 @@ The task is evaluated using the Exact Match (EM) For each example, 1 is given fo
 
 It is measured on a subset of `600` examples, sampled with varying complexity of operations — ~50 per configuration. Evaluate on one pool (all subtasks) with overlap: 5 reviewers per task.
 
-The final human Accuracy is `0.998`.
+The final human score is `0.998`.
 
 ## Limitations
 
