@@ -1,4 +1,4 @@
-# ruhumaneval
+# ruHumanEval
 
 ## Описание задачи
 
