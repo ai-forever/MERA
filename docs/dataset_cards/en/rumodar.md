@@ -66,7 +66,7 @@ The task is evaluated using the Exact Match (EM). For each example, 1.0 is given
 
 The human benchmark is measured on a subset of size 1800 (300 samples per subtask from test set with the original target distribution). Evaluate on one pool (all subtasks) with an overlap of 5 reviewers per task.
 
-The final human Accuracy is `0.999`.
+The final score is `0.999`.
 
 ## References
 
