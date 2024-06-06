@@ -1,4 +1,4 @@
-# ruethics
+# ruEthics
 
 ## Описание задачи
 
