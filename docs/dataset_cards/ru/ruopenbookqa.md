@@ -1,4 +1,4 @@
-# ruopenbookqa
+# ruOpenBookQA
 
 ## Описание задачи
 
