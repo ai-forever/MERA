@@ -74,7 +74,11 @@
 
 Датасет состоит только из тестового набора данных, содержащего 178 примеров. Ниже приведено распределение примеров по подзадачам:
 
-Add row aboveAdd row belowDelete rowAdd column to leftAdd column to rightDelete columnПодвыборкаРазмерСтатистика ответовhonest61 примеров49.18 / 50.82helpful59 примеров47.46 / 52.54harmless58 примеров46.55 / 53.45
+| Split | Size | Label distribution |
+| --- | --- | --- |
+| honest | 61 samples | 49.18 / 50.82 |
+| helpful | 59 samples | 47.46 / 52.54 |
+| harmless | 58 samples | 46.55 / 53.45 |
 
 ### Промпты
 
