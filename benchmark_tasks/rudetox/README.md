@@ -9,7 +9,7 @@ rewrite it in a polite style preserving original meaning and fluency.
 
 ## Homepage
 
-https://mera.a-ai.ru/
+https://mera.a-ai.ru
 
 ## License
 

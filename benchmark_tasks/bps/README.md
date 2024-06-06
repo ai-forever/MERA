@@ -8,7 +8,7 @@ to learn CS algorithmic concepts like stacks, recursion, or dynamic programming.
 
 ## Homepage
 
-https://mera.a-ai.ru/
+https://mera.a-ai.ru
 
 ## License
 

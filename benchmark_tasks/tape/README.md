@@ -50,9 +50,9 @@ attached to the output of each answer to a question (Jansen et al., 2018).
 
 ## Homepage
 
-https://mera.a-ai.ru/
+https://mera.a-ai.ru
 
-https://tape-benchmark.com/
+https://tape-benchmark.com
 
 https://arxiv.org/pdf/2210.12813.pdf
 

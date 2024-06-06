@@ -7,7 +7,7 @@ consisting of systems of equations, proportional relationships, and comparisons.
 
 ## Homepage
 
-https://mera.a-ai.ru/
+https://mera.a-ai.ru
 
 ## License
 

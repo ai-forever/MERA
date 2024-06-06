@@ -13,7 +13,7 @@ Abstract_algebra, anatomy, astronomy, business_ethics, clinical_knowledge, colle
 
 ## Homepage
 
-https://mera.a-ai.ru/
+https://mera.a-ai.ru
 
 ## License
 

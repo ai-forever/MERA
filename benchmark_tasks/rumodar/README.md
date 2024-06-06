@@ -9,7 +9,7 @@ is to finish it correctly.
 
 ## Homepage
 
-https://mera.a-ai.ru/
+https://mera.a-ai.ru
 
 ## License
 

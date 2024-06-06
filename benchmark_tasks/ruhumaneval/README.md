@@ -7,7 +7,7 @@ generate code in the Python programming language for solving simple tasks.
 
 ## Homepage
 
-https://mera.a-ai.ru/
+https://mera.a-ai.ru
 
 ## License
 
