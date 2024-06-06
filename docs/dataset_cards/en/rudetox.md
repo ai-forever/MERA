@@ -15,7 +15,7 @@ This dataset is diagnostic and is not used in the overall assessment of the mode
 
 **Authors:** Varvara Logacheva, Daryna Dementieva, Daniil Moskovskiy 
 
-- First introduced in [Dialogue Evaluation](https://www.dialog-21.ru/evaluation/2022/russe/) 
+First introduced in [Dialogue Evaluation](https://www.dialog-21.ru/evaluation/2022/russe/).
 
 ### Motivation
 
