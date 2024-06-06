@@ -1,8 +1,8 @@
-# The Turing-test Interview Emulation (RuTie) dataset
+# The Turing-test Interview Emulation (ruTiE) dataset
 
 ## Description
 
-Turing-test Interview Emulation (RuTie) is a Russian-language
+Turing-test Interview Emulation (ruTiE) is a Russian-language
 test for the simulation of the Turing test. The dataset imitates a coherent
 dialogue with the subject, where a set of questions on various topics is asked,
 and it is necessary to choose the most correct of two answer options for each
