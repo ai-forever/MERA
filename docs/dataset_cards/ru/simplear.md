@@ -1,4 +1,4 @@
-# simplear
+# SimpleAr
 
 ## Описание задачи
 
