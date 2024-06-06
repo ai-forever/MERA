@@ -87,7 +87,7 @@ The repository has the following structure:
     
 
 ## The process of submission is the following:
-- to view the datasets use the [HuggingFace preview](https://huggingface.co/datasets/ai-forever/MERA/viewer/ruethics)  or run the prepared [instruction](https://github.com/ai-forever/MERA/blob/main/examples/instruction.ipynb);
+- to view the datasets use the [HuggingFace preview](https://huggingface.co/datasets/ai-forever/MERA/viewer/ruethics)  or run the prepared [instruction](./examples/instruction.ipynb);
 - clone MERA benchmark [repository](https://github.com/ai-forever/MERA) with submodules using the following code:
 
 ```bash
@@ -100,7 +100,7 @@ If you have cloned the repository with no submodlues downloaded (empty directory
 git pull --all --rebase --recurse-submodules
 ```
 
-- to get submission files use [shell script](https://github.com/ai-forever/MERA/blob/main/lm-evaluation-harness/README.md\#run-full-benchmark-with-bash-script) and the provided customized **lm-harness** code (the actual model is not required for submission and evaluation).
+- to get submission files use [shell script](MODEL_SCORING.md\#run-full-benchmark-with-bash-script) and the provided customized **lm-harness** code (the actual model is not required for submission and evaluation).
 - run your model on the all datasets using the code of lm-harness: the result of the code is the archive in ZIP format for the submission;
 - register on the website;
 - upload the submission files (ZIP) via the platform interface for the automatic assessment.

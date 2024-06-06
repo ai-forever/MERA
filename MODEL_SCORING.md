@@ -48,8 +48,8 @@ CUDA_VISIBLE_DEVICES=0 MERA_FOLDER="$PWD/mera_results/FRED-T5-large_defaults" ME
 
 Use `CUDA_VISIBLE_DEVICES` to set cuda device visibility, `MERA_FOLDER` for path to store outputs,
 `MERA_MODEL_STRING` to setup `model_args` parameter of `lm-evaluation-harness`'s `lm_eval` module.
-Use `MERA_COMMON_SETUP` to change default parameters for model inferencing with `main.py` (defaults are
-`--model hf --device cuda --batch_size=1 --predict_only --log_samples --seed 1234,1234,None`).
+Use `MERA_COMMON_SETUP` to change default parameters for model inferencing with `lm_eval` (defaults are
+`--model hf --device cuda --batch_size=1 --predict_only --log_samples --seed 1234 --verbosity ERROR`).
 See more on parameters in the next section.
 
 If you want to select only generative versions of tasks (all originaly generative tasks and generative versions of loglikelihood tasks), use `scripts/run_benchmark_gen.sh` script. To run all existing tasks execute `scripts/run_benchmark_all.sh`. This way two separate submissions will be created: one for regular MERA tasks (loglikelihood and generative tasks), one for generative MERA tasks only.
@@ -77,7 +77,7 @@ CUDA_VISIBLE_DEVICES=3 lm_eval --model hf --model_args pretrained=mistralai/Mist
 --output_path="$PWD/mera_results/Mistral-7B-v0.1_defaults/rummlu_result.json"
 ```
 
-#### Notes on `main.py` settings
+#### Notes on `lm_eval` settings
 
 Use `--tasks` to provide comma separated list of tasks to run (available options are: `bps`, `chegeka`, `lcs`,
 `mathlogicqa`, `multiq`, `parus`, `rcb`, `rudetox`, `ruethics`, `ruhatespeech`, `ruhhh`, `ruhumaneval`, `rummlu`,
@@ -118,7 +118,7 @@ but results may become irreproducible, so it is not default suggestion.
 `--system_instruction` contains a string that will be used as system prompt for one or more passed tasks (if the chat template of the model does not take into account system prompt, it will be omitted, so that no system prompt is passed to the model; without `--apply_chat_template` system prompt is added to the beginning of each request to the model).
 
 
-### Convert lm-harness to submission
+### Convert lm-eval logs to submission
 Bash script above runs submission zip packing routine. Here is the way to run packing manually.
 
 For converting run
@@ -135,7 +135,12 @@ Cmd arguments:
 * `--model_args` — string containing the same info that was passed in `MERA_MODEL_STRING`
 * `--gen` — indicates that only generative tasks are to be packed in archive (false by default)
 
-Be careful! After running the model the results will be stored in subdirectory of `MERA_FOLDER`. Do not use the same `MERA_FOLDER` for running the same model twice (this way only the latest results will be packed) or different models (this way two or more subdirectories will be created and you will have to pass `--model_args` to determine which subfolder is to be packed). If you are not using `--model_args` argument, make sure you provided the full path (including the subdirectory) in `--outputs_dir` argument. For example above it will be as follows: 
+Be careful! After running the model the results will be stored in subdirectory of `MERA_FOLDER`.
+Do not use the same `MERA_FOLDER` for running the same model twice (this way only the latest results
+will be packed) or different models (this way two or more subdirectories will be created and you will
+have to pass `--model_args` to determine which subfolder is to be packed). If you are not using `--model_args`
+argument, make sure you provided the full path (including the subdirectory) in `--outputs_dir` argument.
+For example above it will be as follows: 
 
 ```shell
 python scripts/log_to_submission.py --outputs_dir="$PWD/mera_results/rugpt3large_760m_defaults/ai-forever__rugpt3large_based_on_gpt2/" --dst_dir="$PWD/mera_results/rugpt3large_760m_defaults_submission"
