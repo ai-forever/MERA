@@ -1,4 +1,4 @@
-# ruhatespeech
+# ruHateSpeech
 
 ## Описание задачи
 
