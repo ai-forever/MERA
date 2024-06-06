@@ -66,4 +66,4 @@ The task is evaluated using the Exact Match (EM). For each example, 1.0 is given
 
 ### Human Benchmark
 
-The human benchmark is measured on a subset of size `200` (sampled with the same original distribution). The accuracy for this task is `1.0`.
+The human benchmark is measured on a subset of size `200` (sampled with the same original distribution). The final score equals `1.0`.
