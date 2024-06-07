@@ -41,13 +41,13 @@ The MERA benchmark includes 21 text tasks (17 base tasks + 4 diagnostic tasks). 
 | MultiQ | multiq | Reasoning | 900 | 0 | EM / F1 |
 | PARus | parus | Common Sense | 500 | 0 | Acc |
 | RCB | rcb | NLI | 438 | 0 | Acc / F1_macro |
-| ruModAr | rumodar | Math, Logic | 6000 | 0 | Acc |
-| ruMultiAr | rumultiar | Math | 1024 | 5 | Acc |
+| ruModAr | rumodar | Math, Logic | 6000 | 0 | EM |
+| ruMultiAr | rumultiar | Math | 1024 | 5 | EM |
 | ruOpenBookQA | ruopenbookqa | World Knowledge | 400 | 5 | Acc / F1_macro |
 | ruTiE | rutie | Reasoning, Dialogue Context, Memory | 430 | 0 | Acc |
 | ruWorldTree | ruworldtree | World Knowledge | 525 | 5 | Acc / F1_macro |
 | RWSD | rwsd | Reasoning | 260 | 0 | Acc |
-| SimpleAr | simplear | Math | 1000 | 5 | Acc |
+| SimpleAr | simplear | Math | 1000 | 5 | EM |
 | BPS | bps | Code, Math | 1000 | 2 | Acc |
 | CheGeKa | chegeka | World Knowledge | 416 | 4 | EM / F1 |
 | LCS | lcs | Code, Math | 500 | 2 | Acc |
@@ -72,7 +72,7 @@ MERA is a collaborative project created in a union of industry and academia with
 
 *SberDevices, Sber AI, Yandex, Skoltech AI, MTS AI, NRU HSE, Russian Academy of Sciences, etc.*
 
-*Powered by [Aliance AI](https://a-ai.ru/)*
+*Powered by [Aliance AI](https://a-ai.ru)*
 
 ## Contents
 
