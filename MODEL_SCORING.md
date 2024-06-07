@@ -140,7 +140,7 @@ Do not use the same `MERA_FOLDER` for running the same model twice (this way onl
 will be packed) or different models (this way two or more subdirectories will be created and you will
 have to pass `--model_args` to determine which subfolder is to be packed). If you are not using `--model_args`
 argument, make sure you provided the full path (including the subdirectory) in `--outputs_dir` argument.
-For example above it will be as follows: 
+For example above it will be as follows:
 
 ```shell
 python scripts/log_to_submission.py --outputs_dir="$PWD/mera_results/rugpt3large_760m_defaults/ai-forever__rugpt3large_based_on_gpt2/" --dst_dir="$PWD/mera_results/rugpt3large_760m_defaults_submission"

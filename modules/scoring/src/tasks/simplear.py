@@ -7,7 +7,6 @@ import random
 
 @register_task
 class SimpleAr(Task):
-
     def aggregation(self) -> Dict:
         return {"acc": mean}
 
@@ -20,8 +19,8 @@ class SimpleAr(Task):
         res = []
         for doc_id in self.gold.doc_ids():
             doc = {
-                "outputs": str(int(random.randint(-10 ** 6, 10 ** 6))),
-                "meta": {"id": doc_id}
+                "outputs": str(int(random.randint(-(10**6), 10**6))),
+                "meta": {"id": doc_id},
             }
             res.append(doc)
         return {"data": {self.split: res}}

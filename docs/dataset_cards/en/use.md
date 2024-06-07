@@ -10,7 +10,7 @@ Analyze the ability of the model to solve the tasks from the exam on the subject
 
 ## Dataset Description
 
-The exam consists of two parts. Part 1 contains 26 tasks with a short answer. Part 2 consists of essay writing. In this article, the tasks of Part 1 will be analyzed. 
+The exam consists of two parts. Part 1 contains 26 tasks with a short answer. Part 2 consists of essay writing. In this article, the tasks of Part 1 will be analyzed.
 
 Each task is designed to measure proficiency in the specific elements of the Russian language. Thus, the elements of the Russian language tested in the Unified State Exam are:
 

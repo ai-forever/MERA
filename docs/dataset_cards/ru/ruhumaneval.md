@@ -50,7 +50,7 @@
 	},
 	"outputs": ["1", "5", "7", "12"]
 	"meta": {
-		"id": 666, 
+		"id": 666,
 		"canonical_solution": "
 			def query_gcd(a: int, b: int) -> int:
 				return a if b == 0 else query_gcd(b, a % b)

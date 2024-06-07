@@ -73,7 +73,7 @@ For this task 10 prompts of varying difficulty were created. Example:
 
 ### Dataset Creation
 
-The open set was translated into Russian from the dataset [openai_humaneval](https://huggingface.co/datasets/openai_humaneval). We corrected typos in the docstring and canonical solutions and made the corrections described in [2]. 
+The open set was translated into Russian from the dataset [openai_humaneval](https://huggingface.co/datasets/openai_humaneval). We corrected typos in the docstring and canonical solutions and made the corrections described in [2].
 
 The test set was manually collected from open sources according to the format of the original open set and also adjusted to avoid data leakage in training.
 

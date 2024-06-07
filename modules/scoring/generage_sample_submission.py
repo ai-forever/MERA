@@ -11,9 +11,7 @@ def generate_submissions(args):
         worker.log(errors)
     else:
         _, zip_path = worker.generate_random_baseline(
-            args.submission_path[:-4],
-            make_zip=True,
-            produce_errors=args.produce_errors
+            args.submission_path[:-4], make_zip=True, produce_errors=args.produce_errors
         )
         shutil.rmtree(args.submission_path[:-4])
         worker.log(f"Submission stored at: {zip_path}")
@@ -21,9 +19,21 @@ def generate_submissions(args):
 
 def get_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--config_path", type=str, default="configs/main.yaml", help="path to auth config")
-    parser.add_argument("--submission_path", type=str, default="submission.zip", help="path to submission")
-    parser.add_argument("--produce_errors", action="store_true", help="is delete prev deploy.")
+    parser.add_argument(
+        "--config_path",
+        type=str,
+        default="configs/main.yaml",
+        help="path to auth config",
+    )
+    parser.add_argument(
+        "--submission_path",
+        type=str,
+        default="submission.zip",
+        help="path to submission",
+    )
+    parser.add_argument(
+        "--produce_errors", action="store_true", help="is delete prev deploy."
+    )
     res = parser.parse_known_args()[0]
     return res
 

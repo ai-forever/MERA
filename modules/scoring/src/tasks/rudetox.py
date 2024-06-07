@@ -3,14 +3,17 @@ from src.tasks.task import Task
 from src.metrics import mean
 from src.utils import load_pickle
 from typing import Dict, List, Optional, Union
-from transformers import AutoModelForSequenceClassification, AutoTokenizer, PreTrainedTokenizer
+from transformers import (
+    AutoModelForSequenceClassification,
+    AutoTokenizer,
+    PreTrainedTokenizer,
+)
 import numpy as np
 import torch
-import os
 
 
 def prepare_target_label(
-        model: torch.nn.Module, target_label: Union[str, int]
+    model: torch.nn.Module, target_label: Union[str, int]
 ) -> Union[str, int]:
     if target_label in model.config.id2label:
         pass
@@ -26,11 +29,11 @@ def prepare_target_label(
 
 
 def classify_texts(
-        model: torch.nn.Module,
-        tokenizer: PreTrainedTokenizer,
-        texts: List[str],
-        second_texts: Optional[List[str]] = None,
-        target_label: Optional[Union[str, int]] = None
+    model: torch.nn.Module,
+    tokenizer: PreTrainedTokenizer,
+    texts: List[str],
+    second_texts: Optional[List[str]] = None,
+    target_label: Optional[Union[str, int]] = None,
 ) -> float:
     target_label = prepare_target_label(model, target_label)
     inputs = [texts]
@@ -56,7 +59,6 @@ def classify_texts(
 
 @register_task
 class ruDetox(Task):
-
     def __init__(self, conf):
         super().__init__(conf)
         no_load_models = False
@@ -66,26 +68,42 @@ class ruDetox(Task):
             self.__load_models()
 
     def __load_models(self):
-        self.style_model = AutoModelForSequenceClassification.from_pretrained(self.task_conf.style_model_path)
+        self.style_model = AutoModelForSequenceClassification.from_pretrained(
+            self.task_conf.style_model_path
+        )
         self.style_model.to(self.task_conf.device)
-        self.style_tokenizer = AutoTokenizer.from_pretrained(self.task_conf.style_model_path)
+        self.style_tokenizer = AutoTokenizer.from_pretrained(
+            self.task_conf.style_model_path
+        )
 
         style_calibration = load_pickle(self.task_conf.calibrations_ru_path)
         self.style_calibration = lambda x: style_calibration.predict(x[:, np.newaxis])
 
-        self.meaning_model = AutoModelForSequenceClassification.from_pretrained(self.task_conf.meaning_model_path)
+        self.meaning_model = AutoModelForSequenceClassification.from_pretrained(
+            self.task_conf.meaning_model_path
+        )
         self.meaning_model.to(self.task_conf.device)
-        self.meaning_tokenizer = AutoTokenizer.from_pretrained(self.task_conf.meaning_model_path)
+        self.meaning_tokenizer = AutoTokenizer.from_pretrained(
+            self.task_conf.meaning_model_path
+        )
 
         meaning_calibration = load_pickle(self.task_conf.calibrations_ru_path)
-        self.meaning_calibration = lambda x: meaning_calibration.predict(x[:, np.newaxis])
+        self.meaning_calibration = lambda x: meaning_calibration.predict(
+            x[:, np.newaxis]
+        )
 
-        self.cola_model = AutoModelForSequenceClassification.from_pretrained(self.task_conf.cola_model_path)
+        self.cola_model = AutoModelForSequenceClassification.from_pretrained(
+            self.task_conf.cola_model_path
+        )
         self.cola_model.to(self.task_conf.device)
-        self.cola_tokenizer = AutoTokenizer.from_pretrained(self.task_conf.cola_model_path)
+        self.cola_tokenizer = AutoTokenizer.from_pretrained(
+            self.task_conf.cola_model_path
+        )
 
         fluency_calibration = load_pickle(self.task_conf.calibrations_ru_path)
-        self.fluency_calibration = lambda x: fluency_calibration.predict(x[:, np.newaxis])
+        self.fluency_calibration = lambda x: fluency_calibration.predict(
+            x[:, np.newaxis]
+        )
 
     def evaluate_style(self, texts):
         target_label = prepare_target_label(self.style_model, 1)
@@ -133,9 +151,6 @@ class ruDetox(Task):
     def sample_submission(self):
         res = []
         for doc_id in self.gold.doc_ids():
-            doc = {
-                "outputs": self.gold[doc_id]["inputs"],
-                "meta": {"id": doc_id}
-            }
+            doc = {"outputs": self.gold[doc_id]["inputs"], "meta": {"id": doc_id}}
             res.append(doc)
         return {"data": {self.split: res}}

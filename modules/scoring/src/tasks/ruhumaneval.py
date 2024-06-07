@@ -1,13 +1,11 @@
 from src.registry import register_task
 from src.tasks.task import Task
 from src.metrics import mean
-from src.utils import load_json, random_choice
 import numpy as np
 
 
 @register_task
 class ruHumanEval(Task):
-
     def aggregation(self):
         return {f"pass@{k}": mean for k in self.task_conf.ks}
 
@@ -50,16 +48,21 @@ class ruHumanEval(Task):
         correct = sum(arr)
         total = len(results)
 
-        return {f"pass@{k}": self.compute_pass_k(total, correct, k) for k in self.task_conf.ks}
+        return {
+            f"pass@{k}": self.compute_pass_k(total, correct, k)
+            for k in self.task_conf.ks
+        }
 
     def sample_submission(self):
         res = []
         for doc_id in self.gold.doc_ids():
             tests = self.gold[doc_id]["outputs"]
             doc = {
-                "outputs":
-                    [np.random.choice(tests, size=len(tests), replace=True).tolist() for _ in range(max(self.task_conf.ks))],
-                "meta": {"id": doc_id}
+                "outputs": [
+                    np.random.choice(tests, size=len(tests), replace=True).tolist()
+                    for _ in range(max(self.task_conf.ks))
+                ],
+                "meta": {"id": doc_id},
             }
             res.append(doc)
         return {"data": {self.split: res}}

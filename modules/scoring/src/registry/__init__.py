@@ -18,9 +18,9 @@ def register_all(services_dir):
     for path in files:
         path, file = os.path.split(path)
         if (
-            not file.startswith('_')
-            and not file.startswith('.')
-            and file.endswith('.py')
+            not file.startswith("_")
+            and not file.startswith(".")
+            and file.endswith(".py")
         ):
             module_name = file[:-3]
             module = f"src.tasks.{module_name}"

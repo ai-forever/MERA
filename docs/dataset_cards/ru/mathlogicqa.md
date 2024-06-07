@@ -47,7 +47,7 @@
 	},
 	'outputs': 'D',
 	'meta': {
-		'id': 4, 
+		'id': 4,
 		'task': 'math'
 	}
 }

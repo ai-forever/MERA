@@ -253,7 +253,12 @@ def sigmoid(x: float) -> float:
 
 
 def rotation_calibration(
-    data, coef: float = 1.0, px: int = 1, py: int = 1, minimum: int = 0, maximum: int = 1
+    data,
+    coef: float = 1.0,
+    px: int = 1,
+    py: int = 1,
+    minimum: int = 0,
+    maximum: int = 1,
 ):
     result = (data - px) * coef + py
     if minimum is not None:
@@ -338,7 +343,9 @@ def evaluate_style_transfer(
         print(f"Joint fluency:        {np.mean(fluency)}")
         print(f"Joint score:          {np.mean(joint)}")
 
-    result = dict(accuracy=accuracy, similarity=similarity, fluency=fluency, joint=joint)
+    result = dict(
+        accuracy=accuracy, similarity=similarity, fluency=fluency, joint=joint
+    )
 
     if aggregate:
         return {k: float(np.mean(v)) for k, v in result.items()}
@@ -351,7 +358,9 @@ with open("score_calibrations_ru.pkl", "rb") as f:
     fluency_calibrator = pickle.load(f)
 
 
-def evaluate(original: List[str], rewritten: List[str], references: Optional[List[str]]):
+def evaluate(
+    original: List[str], rewritten: List[str], references: Optional[List[str]]
+):
     return evaluate_style_transfer(
         original_texts=original,
         rewritten_texts=rewritten,
@@ -395,7 +404,7 @@ def run_evaluation(args, inputs, refs, evaluator, input_filename):
 
     if not os.path.exists(f"{args.output_dir}/{args.result_filename}.md"):
         with open(f"{args.output_dir}/{args.result_filename}.md", "w") as file:
-            file.write(f"| Model name | STA | SIM | FL | J | Ref-ChrF\n")
+            file.write("| Model name | STA | SIM | FL | J | Ref-ChrF\n")
 
     with open(f"{args.input_dir}/{input_filename}", "r") as file:
         preds = file.readlines()

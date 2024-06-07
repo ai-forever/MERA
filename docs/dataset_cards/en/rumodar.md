@@ -60,7 +60,7 @@ Closed test was generated from scratch based on the original methodology of Big-
 
 ### Metrics
 
-The task is evaluated using the Exact Match (EM). For each example, 1.0 is given for the target sequence that EXACTLY matches the predicted sequence. Else, 0.0. 
+The task is evaluated using the Exact Match (EM). For each example, 1.0 is given for the target sequence that EXACTLY matches the predicted sequence. Else, 0.0.
 
 ### Human Benchmark
 

@@ -3,13 +3,11 @@ from src.tasks.task import Task
 from src.metrics import mean, metric_max_over_ground_truths
 import transformers.data.metrics.squad_metrics as squad_metrics
 from typing import Dict
-from copy import deepcopy
 import numpy as np
 
 
 @register_task
 class CheGeKa(Task):
-
     def aggregation(self) -> Dict:
         return {"f1": mean, "em": mean}
 
@@ -28,8 +26,12 @@ class CheGeKa(Task):
         res = []
         for doc_id in self.gold.doc_ids():
             doc = {
-                "outputs": " ".join(np.random.choice(self.gold[doc_id]["inputs"]["text"].split(), size=2)).lower(),
-                "meta": {"id": doc_id}
+                "outputs": " ".join(
+                    np.random.choice(
+                        self.gold[doc_id]["inputs"]["text"].split(), size=2
+                    )
+                ).lower(),
+                "meta": {"id": doc_id},
             }
             res.append(doc)
         return {"data": {self.split: res}}

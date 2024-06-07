@@ -18,10 +18,24 @@ def evaluate_submissions(args):
 
 def get_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--config_path", type=str, default="configs/main.yaml", help="path to auth config")
-    parser.add_argument("--submission_path", type=str, default="submission.zip", help="path to submission")
     parser.add_argument(
-        "--results_path", type=str, default="submission_results.json", help="path to submission results")
+        "--config_path",
+        type=str,
+        default="configs/main.yaml",
+        help="path to auth config",
+    )
+    parser.add_argument(
+        "--submission_path",
+        type=str,
+        default="submission.zip",
+        help="path to submission",
+    )
+    parser.add_argument(
+        "--results_path",
+        type=str,
+        default="submission_results.json",
+        help="path to submission results",
+    )
     res = parser.parse_known_args()[0]
     return res
 

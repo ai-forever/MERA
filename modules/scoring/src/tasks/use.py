@@ -9,7 +9,6 @@ import re
 
 @register_task
 class USE(Task):
-
     def process_results(self, doc_true, doc_pred) -> Dict:
         id_task = doc_true["meta"]["id_task"]
         task_type = doc_true["meta"]["type"]
@@ -19,9 +18,7 @@ class USE(Task):
 
         score = self.get_scores(task_type, id_task, answer, prediction)
 
-        return {
-            "grade_norm": (score, variant)
-        }
+        return {"grade_norm": (score, variant)}
 
     @staticmethod
     def multiple_choice_score(answer: str, prediction: str, is_task16=False) -> int:
@@ -78,7 +75,12 @@ class USE(Task):
             score, variant = item[0], item[1]
             overall_scores[variant] += score
 
-        average_overall_score = np.mean([score / self.task_conf.max_grade_point for score in overall_scores.values()])
+        average_overall_score = np.mean(
+            [
+                score / self.task_conf.max_grade_point
+                for score in overall_scores.values()
+            ]
+        )
         return average_overall_score
 
     def aggregation(self):
@@ -94,11 +96,13 @@ class USE(Task):
                 "meta": {
                     "id": doc_id,
                     "id_task": origin_doc["meta"]["id_task"],
-                    "variant": origin_doc["meta"]["variant"]
+                    "variant": origin_doc["meta"]["variant"],
                 }
             }
             if origin_doc["meta"]["type"] == "text":
-                doc["outputs"] = str(np.random.choice(origin_doc["inputs"]["text"].split()))
+                doc["outputs"] = str(
+                    np.random.choice(origin_doc["inputs"]["text"].split())
+                )
             else:
                 doc["outputs"] = str(random.randint(1, 4))
                 if random.random() < 0.5:

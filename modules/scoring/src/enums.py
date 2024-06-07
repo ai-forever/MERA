@@ -3,7 +3,7 @@ from enum import Enum
 
 class EnumBase(Enum):
     def __str__(self):
-        return f'{self.value}'
+        return f"{self.value}"
 
     def __eq__(self, other):
         return str(self) == str(other)

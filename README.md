@@ -34,7 +34,7 @@ Our contributions to this project are:
 
 
 The MERA benchmark includes 21 text tasks (17 base tasks + 4 diagnostic tasks). See the task-table for a complete list.
-        
+
 | Name | Task Name | Task Type | Test Size | N-shots | Metrics |
 | --- | --- | --- | --- | --- | --- |
 | MathLogicQA | mathlogicqa | Math, Logic | 1143 | 5 | Acc |
@@ -63,12 +63,12 @@ Our aim is to evaluate all the models:
 
 - in the same scenarios;
 - using the same metrics;
-- with the same adaptation strategy (e.g., prompting); 
+- with the same adaptation strategy (e.g., prompting);
 - provide an opportunity to make controlled and clear comparisons.
 
-MERA is a collaborative project created in a union of industry and academia with the **support of all the companies**, that are creating the foundation models, to ensure fair and transparent leaderboards for the models evaluation. 
+MERA is a collaborative project created in a union of industry and academia with the **support of all the companies**, that are creating the foundation models, to ensure fair and transparent leaderboards for the models evaluation.
 
-*We express our gratitude to our team and partners:* 
+*We express our gratitude to our team and partners:*
 
 *SberDevices, Sber AI, Yandex, Skoltech AI, MTS AI, NRU HSE, Russian Academy of Sciences, etc.*
 
@@ -84,7 +84,7 @@ The repository has the following structure:
 - [`modules`](modules/scoring/README.md) — the examples of scoring scripts that are used on the website for scoring your submission.
 - [`lm-evaluation-harness`](https://github.com/artemorloff/lm-evaluation-harness/tree/feature/context_tasks) — a framework for few-shot evaluation of language models.
 - [`scripts`](scripts) — the scripts used for evaluation of language models.
-    
+
 
 ## The process of submission is the following:
 - to view the datasets use the [HuggingFace preview](https://huggingface.co/datasets/ai-forever/MERA/viewer/ruethics)  or run the prepared [instruction](./examples/instruction.ipynb);
@@ -125,7 +125,7 @@ Feel free to ask any questions regarding our work, write on email mera@a-ai.ru. 
 
 ```
 @misc{fenogenova2024mera,
-    title={{MERA}: A Comprehensive {LLM} Evaluation in {Russian}}, 
+    title={{MERA}: A Comprehensive {LLM} Evaluation in {Russian}},
     author={Alena Fenogenova and Artem Chervyakov and Nikita Martynov and Anastasia Kozlova and Maria Tikhonova and Albina Akhmetgareeva and Anton Emelyanov and Denis Shevelev and Pavel Lebedev and Leonid Sinev and Ulyana Isaeva and Katerina Kolomeytseva and Daniil Moskovskiy and Elizaveta Goncharova and Nikita Savushkin and Polina Mikhailova and Denis Dimitrov and Alexander Panchenko and Sergei Markov},
     year={2024},
     eprint={2401.04531},

@@ -86,7 +86,7 @@ Each sample in the dataset contains meta-information, text, an ordered pair of a
 
 ### Data Splits
 
-The dataset is presented as a public diagnostic test containing `645` samples, where one sample is a text with an ordered pair of actants. 
+The dataset is presented as a public diagnostic test containing `645` samples, where one sample is a text with an ordered pair of actants.
 
 ### Prompts
 

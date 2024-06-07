@@ -10,7 +10,6 @@ import random
 
 @register_task
 class MultiQ(Task):
-
     def aggregation(self) -> Dict:
         return {"f1": mean, "em": mean}
 
@@ -28,18 +27,26 @@ class MultiQ(Task):
     def sample_submission(self):
         res = []
         for doc_id in self.gold.doc_ids():
-            text = np.random.choice([self.gold[doc_id]["inputs"]["text"], self.gold[doc_id]["inputs"]["support_text"]])
+            text = np.random.choice(
+                [
+                    self.gold[doc_id]["inputs"]["text"],
+                    self.gold[doc_id]["inputs"]["support_text"],
+                ]
+            )
             words = text.split()
             pos = np.random.choice(list(range(len(words))))
-            word = words[pos: pos + random.randint(1, 3)]
+            word = words[pos : pos + random.randint(1, 3)]
             offset = text.find(word[0])
-            segment = text[offset: text.find(word[-1]) + len(word[-1])]
+            segment = text[offset : text.find(word[-1]) + len(word[-1])]
             doc = {
-                "outputs": [{
-                    "label": "passage",
-                    "length": len(segment),
-                    "offset": offset,
-                    "segment": segment}],
+                "outputs": [
+                    {
+                        "label": "passage",
+                        "length": len(segment),
+                        "offset": offset,
+                        "segment": segment,
+                    }
+                ],
                 "meta": {
                     "id": doc_id,
                     "bridge_answers": [
@@ -47,26 +54,21 @@ class MultiQ(Task):
                             "label": "passage",
                             "offset": offset,
                             "length": len(segment),
-                            "segment": segment
+                            "segment": segment,
                         }
-                    ]
-                }
+                    ],
+                },
             }
             res.append(doc)
         return {"data": {self.split: res}}
-    
+
     def remove_outputs(self):
         task = load_json(self.task_conf.origin_repo_path)
         for idx in range(len(task["data"]["test"])):
-            task["data"]["test"][idx]["outputs"] = [{
-                "label": "",
-                "length": 0,
-                "offset": 0,
-                "segment": ""}]
-            task["data"]["test"][idx]["meta"]["bridge_answers"] = [{
-                "label": "",
-                "length": 0,
-                "offset": 0,
-                "segment": ""
-            }]
+            task["data"]["test"][idx]["outputs"] = [
+                {"label": "", "length": 0, "offset": 0, "segment": ""}
+            ]
+            task["data"]["test"][idx]["meta"]["bridge_answers"] = [
+                {"label": "", "length": 0, "offset": 0, "segment": ""}
+            ]
         return task

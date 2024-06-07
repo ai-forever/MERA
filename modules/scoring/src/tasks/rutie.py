@@ -43,22 +43,21 @@ class ruTiE(Task):
                     "meta": {
                         "dialog_id": origin_doc["meta"]["dialog_id"],
                         "question_id": origin_doc["meta"]["question_id"],
-                    }
+                    },
                 }
                 docs.append(doc)
             res.append(docs)
         return {"data": {self.split: res}}
 
     def load_gold(self):
-        ds = datasets.load_dataset(path="ai-forever/MERA", name=self.name.lower())["test"]
+        ds = datasets.load_dataset(path="ai-forever/MERA", name=self.name.lower())[
+            "test"
+        ]
         examples = dict()
         for example in [list(ds)]:
             doct_id = self.doc_to_id(example)
             examples[doct_id] = example
         self.gold = Dataset(
-            local_path="",
-            name=self.name,
-            log=self.log,
-            examples=examples
+            local_path="", name=self.name, log=self.log, examples=examples
         )
         return []

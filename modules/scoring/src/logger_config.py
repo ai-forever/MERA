@@ -9,10 +9,10 @@ def get_logger(log_dir, logger_name="logs"):
         "disable_existing_loggers": False,
         "handlers": {
             "default": {
-                'level': 'INFO',
-                'formatter': 'myFormatter',
-                'class': 'logging.StreamHandler',
-                'stream': 'ext://sys.stdout',
+                "level": "INFO",
+                "formatter": "myFormatter",
+                "class": "logging.StreamHandler",
+                "stream": "ext://sys.stdout",
             }
         },
         "loggers": {
@@ -25,7 +25,7 @@ def get_logger(log_dir, logger_name="logs"):
             "myFormatter": {
                 "format": f"{logger_name}: %(asctime)s - %(levelname)s - %(message)s"
             }
-        }
+        },
     }
     logging.config.dictConfig(dict_log_config)
     return logging.getLogger(logger_name)

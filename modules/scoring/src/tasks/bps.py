@@ -6,7 +6,6 @@ from typing import Dict
 
 @register_task
 class BPS(Task):
-
     def aggregation(self) -> Dict:
         return {"acc": mean}
 

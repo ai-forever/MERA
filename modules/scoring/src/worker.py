@@ -35,7 +35,12 @@ class Worker(Base):
                     tasks[task_name] = task
             except:
                 self.log(f"System error while loading task {task_name}")
-                errors[task_name].append({"type": str(Errors.task_system_error), "trace": traceback.format_exc()})
+                errors[task_name].append(
+                    {
+                        "type": str(Errors.task_system_error),
+                        "trace": traceback.format_exc(),
+                    }
+                )
         self.tasks = tasks
         return errors
 
@@ -48,7 +53,7 @@ class Worker(Base):
             if local_path.endswith(".zip"):
                 dst_dir = local_path[:-4]
                 os.makedirs(dst_dir, exist_ok=True)
-                with zipfile.ZipFile(local_path, 'r') as zip_ref:
+                with zipfile.ZipFile(local_path, "r") as zip_ref:
                     zip_ref.extractall(dst_dir)
                 for x in get_files_from_dir(dst_dir):
                     task_name = os.path.splitext(os.path.split(x)[-1])[0]
@@ -60,7 +65,9 @@ class Worker(Base):
         except:
             task_name = os.path.splitext(os.path.split(local_path)[-1])[0]
             error_key = "_all" if local_path.endswith(".zip") else task_name
-            errors[error_key].append({"type": str(Errors.unreadable_zip), "trace": traceback.format_exc()})
+            errors[error_key].append(
+                {"type": str(Errors.unreadable_zip), "trace": traceback.format_exc()}
+            )
         return files, errors
 
     def total_score(self, metrics):
@@ -86,7 +93,6 @@ class Worker(Base):
                 else:
                     results[task_name] = task_res
         else:
-
             for task_name, task in self.tasks.items():
                 if task_name not in files:
                     errors[task_name].append({"type": str(Errors.no_task)})
@@ -97,7 +103,11 @@ class Worker(Base):
                     else:
                         results[task_name] = task_res
         if len(errors):
-            _errors_reason, errors_for_user, global_error_reason = self.postprocess_errors(errors)
+            (
+                _errors_reason,
+                errors_for_user,
+                global_error_reason,
+            ) = self.postprocess_errors(errors)
             _global_errors_reason = _errors_reason.pop("_all", {})
             res = {
                 "status": str(SubmissionStatus.failed),
@@ -105,7 +115,7 @@ class Worker(Base):
                 "global_error_reason": dict(global_error_reason),
                 "_errors_reason": dict(_errors_reason),
                 "_global_errors_reason": dict(_global_errors_reason),
-                "errors": dict(errors)
+                "errors": dict(errors),
             }
         else:
             res = {"status": str(SubmissionStatus.ok)}
@@ -132,9 +142,13 @@ class Worker(Base):
             old[k].extend(v)
         return old
 
-    def generate_random_baseline(self, sample_submission_dir=None, make_zip=False, produce_errors=False):
+    def generate_random_baseline(
+        self, sample_submission_dir=None, make_zip=False, produce_errors=False
+    ):
         if sample_submission_dir is None:
-            sample_submission_dir = os.path.join(self.working_dir, self.conf.args.sample_submission_dir_name)
+            sample_submission_dir = os.path.join(
+                self.working_dir, self.conf.args.sample_submission_dir_name
+            )
         os.makedirs(sample_submission_dir, exist_ok=True)
         result = {}
         iters = list(self.tasks.items())
@@ -154,7 +168,9 @@ class Worker(Base):
             try:
                 submission = task.sample_submission()
             except:
-                self.log(f"Error while sample_submission for task {task_name}. Trace:\n{traceback.format_exc()}")
+                self.log(
+                    f"Error while sample_submission for task {task_name}. Trace:\n{traceback.format_exc()}"
+                )
                 continue
             extension = task.task_conf.extension
             if produce_errors:
@@ -163,32 +179,54 @@ class Worker(Base):
                     submission = {}
                 # Errors.no_split
                 if idx == no_split:
-                    submission = {"data": {task.task_conf.split + "_": submission["data"][task.task_conf.split]}}
+                    submission = {
+                        "data": {
+                            task.task_conf.split + "_": submission["data"][
+                                task.task_conf.split
+                            ]
+                        }
+                    }
                 # Errors.extension
                 if idx == extension_error_task:
                     extension = extension[:-1]
                 # Errors.no_outputs_field_for_doc
                 if idx == no_outputs_field_for_doc:
-                    corrupt_idx = random.randint(0, len(submission["data"][task.task_conf.split]) - 1)
+                    corrupt_idx = random.randint(
+                        0, len(submission["data"][task.task_conf.split]) - 1
+                    )
                     submission["data"][task.task_conf.split][corrupt_idx].pop("outputs")
                 # Errors.no_outputs_field_for_doc
                 if idx == no_meta_field_for_doc:
-                    corrupt_idx = random.randint(0, len(submission["data"][task.task_conf.split]) - 1)
+                    corrupt_idx = random.randint(
+                        0, len(submission["data"][task.task_conf.split]) - 1
+                    )
                     submission["data"][task.task_conf.split][corrupt_idx].pop("meta")
                 # Errors.no_id_field_for_doc
                 if idx == no_id_field_for_doc:
-                    corrupt_idx = random.randint(0, len(submission["data"][task.task_conf.split]) - 1)
-                    submission["data"][task.task_conf.split][corrupt_idx]["meta"].pop("id")
+                    corrupt_idx = random.randint(
+                        0, len(submission["data"][task.task_conf.split]) - 1
+                    )
+                    submission["data"][task.task_conf.split][corrupt_idx]["meta"].pop(
+                        "id"
+                    )
                 # Errors.doc_output_type_error
                 if idx == doc_output_type_error:
-                    corrupt_idx = random.randint(0, len(submission["data"][task.task_conf.split]) - 1)
-                    submission["data"][task.task_conf.split][corrupt_idx]["outputs"] = -777
+                    corrupt_idx = random.randint(
+                        0, len(submission["data"][task.task_conf.split]) - 1
+                    )
+                    submission["data"][task.task_conf.split][corrupt_idx][
+                        "outputs"
+                    ] = -777
                 # Errors.no_id
                 if idx == no_id:
-                    corrupt_idx = random.randint(0, len(submission["data"][task.task_conf.split]) - 1)
+                    corrupt_idx = random.randint(
+                        0, len(submission["data"][task.task_conf.split]) - 1
+                    )
                     submission["data"][task.task_conf.split].pop(corrupt_idx)
 
-            submission_path = os.path.join(sample_submission_dir, f"{task_name}{extension}")
+            submission_path = os.path.join(
+                sample_submission_dir, f"{task_name}{extension}"
+            )
             try:
                 save_json(submission, submission_path)
             except:
@@ -196,5 +234,7 @@ class Worker(Base):
             result[task_name] = submission_path
         zip_submission_path = None
         if make_zip:
-            zip_submission_path = shutil.make_archive(sample_submission_dir, "zip", sample_submission_dir)
+            zip_submission_path = shutil.make_archive(
+                sample_submission_dir, "zip", sample_submission_dir
+            )
         return result, zip_submission_path
