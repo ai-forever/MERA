@@ -52,7 +52,10 @@ Use `MERA_COMMON_SETUP` to change default parameters for model inferencing with 
 `--model hf --device cuda --batch_size=1 --predict_only --log_samples --seed 1234 --verbosity ERROR`).
 See more on parameters in the next section.
 
-If you want to select only generative versions of tasks (all originaly generative tasks and generative versions of loglikelihood tasks), use `scripts/run_benchmark_gen.sh` script. To run all existing tasks execute `scripts/run_benchmark_all.sh`. This way two separate submissions will be created: one for regular MERA tasks (loglikelihood and generative tasks), one for generative MERA tasks only.
+If you want to select only generative versions of tasks (all originally generative tasks and generative versions
+of loglikelihood tasks), use `scripts/run_benchmark_gen.sh` script. To run all existing tasks
+execute `scripts/run_benchmark_all.sh`. This way two separate submissions will be created: one for regular
+MERA tasks (loglikelihood and generative tasks), one for generative MERA tasks only.
 
 #### Running OpenAI models
 
