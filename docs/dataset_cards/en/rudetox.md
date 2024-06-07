@@ -2,7 +2,7 @@
 
 ## Task Description
 
-Russian Detoxification Diagnostic (ruDetox) is a parallel text detoxification corpus based on the RuSSE-Detox competition. Text detoxification is the task of text style transfer - changing the style of the text while maintaining the original meaning and fluency. Here are some examples of ideal detoxification:
+Russian Detoxification Diagnostic (ruDetox) is a parallel text detoxification corpus based on the [RuSSE-Detox competition](https://russe.nlpub.org/2022/tox/). Text detoxification is the task of text style transfer - changing the style of the text while maintaining the original meaning and fluency. Here are some examples of ideal detoxification:
 
 | Original proposal | Detoxified proposal |
 | --- | --- |
@@ -15,8 +15,7 @@ This dataset is diagnostic and is not used in the overall assessment of the mode
 
 **Authors:** Varvara Logacheva, Daryna Dementieva, Daniil Moskovskiy 
 
-- First introduced in Dialogue Evaluation: https://www.dialog-21.ru/evaluation/2022/russe/
-- Project page: https://russe.nlpub.org/2022/tox/
+First introduced in [Dialogue Evaluation](https://www.dialog-21.ru/evaluation/2022/russe/).
 
 ### Motivation
 

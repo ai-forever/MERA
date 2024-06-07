@@ -63,7 +63,7 @@ Below is an example from the dataset:
 
 ### Data Splits
 
-The public test (train split) contains `164` tasks with test cases and answers from the original dataset. The closed test set (test split) contains `164` tasks with closed answers specially collected by authors for this benchmark. For the test set, we provide only test cases without outputs and solutions.
+The public test contains `164` tasks with test cases and answers from the original dataset. The closed test set contains `164` tasks with closed answers specially collected by authors for this benchmark. For the test set, we provide only test cases without outputs and solutions.
 
 ### Prompts
 

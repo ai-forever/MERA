@@ -42,7 +42,7 @@ Below is an example from the subtask three_digit_addition_plus_one:
 
 ### Data Splits
 
-The dataset consists of a public test (train split) (`6000` samples) with labeled examples and a closed test set (test split) (`6000` samples) for model evaluation.
+The dataset consists of a public test (`6000` samples) with labeled examples and a closed test set (`6000` samples) for model evaluation.
 
 ### Prompts
 
@@ -60,13 +60,13 @@ Closed test was generated from scratch based on the original methodology of Big-
 
 ### Metrics
 
-The task is evaluated using the Accuracy score. For each example, 1.0 is given for the target sequence that EXACTLY matches the predicted sequence. Else, 0.0. The total score is equal to the average sequence-level accuracy.
+The task is evaluated using the Exact Match (EM). For each example, 1.0 is given for the target sequence that EXACTLY matches the predicted sequence. Else, 0.0. 
 
 ### Human Benchmark
 
 The human benchmark is measured on a subset of size 1800 (300 samples per subtask from test set with the original target distribution). Evaluate on one pool (all subtasks) with an overlap of 5 reviewers per task.
 
-The final human Accuracy is `0.999`.
+The final score is `0.999`.
 
 ## References
 

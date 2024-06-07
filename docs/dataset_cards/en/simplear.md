@@ -62,8 +62,8 @@ N-digit addition was created for n in the range [1;5] for both train and test se
 
 ### Metrics
 
-Accuracy is used for evaluation.
+The task is evaluated using the Exact Match (EM). For each example, 1.0 is given for the target sequence that EXACTLY matches the predicted sequence. Else, 0.0.
 
 ### Human Benchmark
 
-The human benchmark is measured on a subset of size `200` (sampled with the same original distribution). The accuracy for this task is `1.0`.
+The human benchmark is measured on a subset of size `200` (sampled with the same original distribution). The final score equals `1.0`.

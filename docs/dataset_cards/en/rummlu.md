@@ -56,7 +56,7 @@ Below is an example from the dataset:
 
 ### Data Splits
 
-The public test (train split) set contains `10033` examples. The closed test set (test split) `961` hand-written examples.
+The public test set contains `10033` examples. The closed test set `961` hand-written examples.
 
 ### Prompts
 
