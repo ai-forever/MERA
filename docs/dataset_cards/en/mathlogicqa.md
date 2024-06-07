@@ -68,17 +68,17 @@ The train set consists of  `680` examples. The test set consists of `1143` examp
 
 The dataset includes two types of problems: `logic` and `math`.
 
-**logic**
+#### logic
 
 Logic problems are mathematical problems formulated in natural language. To solve this type of problem, it is necessary to construct a system of equations (or one equation) and solve it by comparing the objects described in the problem with the variables in the equation. Problems of this type were formed using open sources containing databases of mathematical problems.
 
-**math**
+#### math
 
 Math problems consist of a mathematical expression (a linear equation or a system of linear equations) and a question about that expression. One must solve a linear equation or system of linear equations to answer the question. For some tasks, it is also necessary to perform a comparison operation. Mathematical expressions are synthetic data generated using an open-source library using the linear_1d and linear_2d modules. The resulting generated expressions were manually rewritten by experts from mathematical language into natural Russian. Next, the experts formulated a question in natural language and the correct answer for each expression.
 
 When creating the dataset, experts added instructions in natural language to some tasks. The experts also formulated 3 incorrect answer options for each task from the dataset.
 
-**Validation**
+### Validation
 
 All examples from the dataset have been validated on the Yandex.Toloka platform. Tolokers checked the correctness of the problem conditions and the answer. The dataset included 2000 examples of type `math` and 570 examples of type `logic`. Each example had a 3-person overlap, which could increase to 5 if the agreement on the task answer was below 70%. The responses of the Toloka annotators who showed labeling accuracy of less than 50% on control tasks were excluded.
 
