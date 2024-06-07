@@ -14,5 +14,5 @@ metric_list:
 filter_list:
   - name: "scoring"
     filter:
-      - function: "remove_whitespace"  # truncate leading witespace
+      - function: "remove_whitespace"  # truncate leading whitespace
       - function: "take_first"
