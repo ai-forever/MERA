@@ -2,7 +2,7 @@
 
 ## Description
 
-RuDetox Diagnostic is a part of RuDetox - a parallel corpus for text
+RuDetox Diagnostic is a part of RuDetox is a parallel corpus for text
 detoxification. Given a sentence written in a toxic style, the model is asked to
 rewrite it in a polite style preserving original meaning and fluency.
 
