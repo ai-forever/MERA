@@ -7,8 +7,7 @@ This folder conttains two datasets from [Russian SuperGLUE](https://arxiv.org/ab
 A Russian Winograd Schema Dataset (RWSD) is a task in which each example contains
 a sentence with two selected phrases. The task is to define whether they are used
 in the same sense or not. The schema takes its name from a well-known example by
-Terry Winograd. See the https://russiansuperglue.com/tasks/task_info/RWSD
-for the details.
+Terry Winograd. 
 
 ## PARus
 
