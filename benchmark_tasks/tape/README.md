@@ -3,13 +3,6 @@
 
 This folder contains four datasets based on the [TAPE benchmark](https://arxiv.org/pdf/2210.12813.pdf): CheGeKa, MultiQ, ruOpenBookQA, ruWorldTree.
 
-
-## Original TAPE description
-
-The original [TAPE (Text Attack and Perturbation Evaluation)](https://tape-benchmark.com/) is a benchmark for few-shot
-Russian language understanding evaluation that includes NLU tasks, covering
-multi-hop reasoning, ethical concepts, logic and commonsense knowledge.
-
 ## CheGeKa
 
 The CheGeKa game setup is similar to Jeopardy. The player should come up with
