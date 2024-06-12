@@ -3,7 +3,7 @@
 ## Description
 
 Simple Arithmetic (SimpleAr) is a mathematical task
-based on the set from Bigbench. The task itself tests language models' basic arithmetic
+based on the set from BIG-bench. The task itself tests language models' basic arithmetic
 capabilities by asking them to perform n-digit addition.
 
 ## Homepage
