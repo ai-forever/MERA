@@ -6,7 +6,7 @@ This folder contains four datasets based on the [TAPE benchmark](https://arxiv.o
 
 ## Original TAPE description
 
-The original TAPE (Text Attack and Perturbation Evaluation) is a benchmark for few-shot
+The original [TAPE (Text Attack and Perturbation Evaluation)](https://tape-benchmark.com/) is a benchmark for few-shot
 Russian language understanding evaluation that includes NLU tasks, covering
 multi-hop reasoning, ethical concepts, logic and commonsense knowledge.
 
