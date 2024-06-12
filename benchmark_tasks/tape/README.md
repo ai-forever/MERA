@@ -1,13 +1,13 @@
 # TAPE (Text Attack and Perturbation Evaluation)
 
-TAPE: Assessing Few-shot Russian Language Understanding
 
-https://arxiv.org/pdf/2210.12813.pdf
+This folder contains four datasets based on the [TAPE benchmark](https://arxiv.org/pdf/2210.12813.pdf): CheGeKa, MultiQ, ruOpenBookQA, ruWorldTree.
 
-## Description
 
-TAPE (Text Attack and Perturbation Evaluation) is a novel benchmark for few-shot
-Russian language understanding evaluation that includes six complex NLU tasks, covering
+## Original TAPE description
+
+The original TAPE (Text Attack and Perturbation Evaluation) is a benchmark for few-shot
+Russian language understanding evaluation that includes NLU tasks, covering
 multi-hop reasoning, ethical concepts, logic and commonsense knowledge.
 
 ## CheGeKa
