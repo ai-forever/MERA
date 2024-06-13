@@ -134,8 +134,8 @@ class ClassificationTask(BaseTask):
     def convert(self):
         submission = None
         try:
-        submission = self.outputs_to_submission(load_jsonl(self.outputs_path))
-        save_json(submission, self.submission_path)
+            submission = self.outputs_to_submission(load_jsonl(self.outputs_path))
+            save_json(submission, self.submission_path)
         except FileNotFoundError:
             print(
                 "No samples to pack found, or there is an error in path processed. Src:",

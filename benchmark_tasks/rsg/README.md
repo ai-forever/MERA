@@ -7,11 +7,11 @@ This folder conttains two datasets from [Russian SuperGLUE](https://arxiv.org/ab
 A Russian Winograd Schema Dataset (RWSD) is a task in which each example contains
 a sentence with two selected phrases. The task is to define whether they are used
 in the same sense or not. The schema takes its name from a well-known example by
-Terry Winograd. 
+Terry Winograd.
 
 ## PARus
 
-The choice of Plausible Alternatives for the Russian language (PARus) evaluation provides researchers with a tool for assessing progress in open-domain commonsense causal reasoning. Each question in PARus is composed of a premise and two alternatives, where the task is to select the alternative that more plausibly has a causal relation with the premise. 
+The choice of Plausible Alternatives for the Russian language (PARus) evaluation provides researchers with a tool for assessing progress in open-domain commonsense causal reasoning. Each question in PARus is composed of a premise and two alternatives, where the task is to select the alternative that more plausibly has a causal relation with the premise.
 
 ## RCB
 
