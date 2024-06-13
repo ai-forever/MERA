@@ -2,7 +2,7 @@
 
 MERA: Multimodal Evaluation for Russian-language Architectures
 
-The LM-harness support for the MERA benchmark datasets.
+The Language Model Evaluation Harness support for the MERA benchmark datasets.
 
 ## Overview
 
@@ -24,7 +24,7 @@ cd lm-evaluation-harness
 pip install -e ".[auto-gptq]"
 ```
 
-This commands are to be run from `lm-evaluation-harness` directory of this repository.
+These commands are to be run from `lm-evaluation-harness` directory of this repository.
 
 ## MERA Benchmark:
 

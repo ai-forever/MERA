@@ -101,12 +101,12 @@ git pull --all --rebase --recurse-submodules
 ```
 
 - to get submission files use [shell script](MODEL_SCORING.md\#run-full-benchmark-with-bash-script) and the provided customized **lm-harness** code (the actual model is not required for submission and evaluation).
-- run your model on the all datasets using the code of lm-harness: the result of the code is the archive in ZIP format for the submission;
+- run your model on the all datasets using the code of lm-eval: the result of the code is the archive in ZIP format for the submission;
 - register on the website;
-- upload the submission files (ZIP) via the platform interface for the automatic assessment.
+- upload the submission file (ZIP) via the platform interface for the automatic assessment.
 
 *Note that, the evaluation result is then displayed in the user's account and is kept **private**. Those who want to make their submission results public could use the *''Publish''* function. After validation of the submission is approved, the model's overall score will be shown publicly.*
-*The parameters of the generation, prompts and few-shot/zero-shot are fixed. You can vary them for your own purposes. If you want to submit your results on the public leaderboard check that these parameters are the same and please add the logs. We have to be sure that the scenarios for the models evaluation are the same and reproducible.*
+*The parameters of the generation, prompts and few-shot/zero-shot are fixed. You can vary them for your own purposes. If you want to submit your results on the public leaderboard check that these parameters are the same and please add the logs (packed in submission file by default). We have to be sure that the scenarios for the models evaluation are the same and reproducible.*
 
 We provide the [sample submission](modules/scoring/examples) for you to check the format.
 

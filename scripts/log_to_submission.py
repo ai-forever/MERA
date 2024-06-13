@@ -132,8 +132,15 @@ class ClassificationTask(BaseTask):
         return ["0", "1"]
 
     def convert(self):
+        submission = None
+        try:
         submission = self.outputs_to_submission(load_jsonl(self.outputs_path))
         save_json(submission, self.submission_path)
+        except FileNotFoundError:
+            print(
+                "No samples to pack found, or there is an error in path processed. Src:",
+                self.src_name,
+            )
         return submission
 
     def outputs_to_submission(self, outputs):
@@ -407,19 +414,12 @@ class ruHumanEval(TextTask):
 
 def get_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--outputs_dir", type=str, help="lm harness outputs")
+    parser.add_argument("--outputs_dir", type=str, help="lm-evaluation-harness outputs")
     parser.add_argument(
         "--dst_dir",
         type=str,
         default="submission/",
         help="dir to save files for submission",
-    )
-    parser.add_argument(
-        "--logs_public_submit",
-        type=bool,
-        default=True,
-        help="pack logs for public submission in separate file",
-        action=argparse.BooleanOptionalAction,  # type: ignore[attr-defined]
     )
     parser.add_argument(
         "--gen",
@@ -438,20 +438,9 @@ def get_args():
     return res
 
 
-def create_submission(outputs_dir, dst_dir, gen: bool):
-    os.makedirs(dst_dir, exist_ok=True)
-    for task_name, task_cls in tqdm(_TASKS.items(), total=len(_TASKS)):
-        print("Process task", task_name)
-        task = task_cls(outputs_dir=outputs_dir, dst_dir=dst_dir, gen=gen)
-        _ = task.convert()
-        print("---------------------")
-    zip_path = shutil.make_archive(dst_dir, "zip", dst_dir)
-    print("Submission stored at", zip_path)
-
-
 def pack_submission_logs(outputs_dir: str, dst_dir: str):
     if os.path.isdir(outputs_dir):
-        zip_dir = f"{dst_dir}_logs_public"
+        zip_dir = os.path.join(dst_dir, "logs_public")
         os.makedirs(zip_dir, exist_ok=True)
         files_to_pack = glob.glob(os.path.join(outputs_dir, "*.json"))
         for file_path in files_to_pack:
@@ -461,6 +450,19 @@ def pack_submission_logs(outputs_dir: str, dst_dir: str):
         print("Logs to add with public submission stored at", zip_path)
     else:
         raise ValueError(f"{outputs_dir} is not directory")
+
+
+def create_submission(outputs_dir, dst_dir, gen: bool):
+    os.makedirs(dst_dir, exist_ok=True)
+    for task_name, task_cls in tqdm(_TASKS.items(), total=len(_TASKS)):
+        print("Process task", task_name)
+        task = task_cls(outputs_dir=outputs_dir, dst_dir=dst_dir, gen=gen)
+        _ = task.convert()
+        print("---------------------")
+    print("Packing logs for public submission...")
+    pack_submission_logs(outputs_dir, dst_dir)
+    zip_path = shutil.make_archive(dst_dir, "zip", dst_dir)
+    print("Submission stored at", zip_path)
 
 
 def preprocess_outputs_dir(outputs_dir: str, model_args: str) -> str:
@@ -492,10 +494,7 @@ def preprocess_outputs_dir(outputs_dir: str, model_args: str) -> str:
 def main():
     args = get_args()
     outputs_dir = preprocess_outputs_dir(args.outputs_dir, args.model_args)
-    _ = create_submission(outputs_dir, args.dst_dir, gen=args.gen)
-    if args.logs_public_submit:
-        print("Packing logs for public submission...")
-        pack_submission_logs(outputs_dir, args.dst_dir)
+    create_submission(outputs_dir, args.dst_dir, gen=args.gen)
 
 
 if __name__ == "__main__":
