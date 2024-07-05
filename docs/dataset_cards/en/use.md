@@ -39,6 +39,194 @@ The benchmark defines the following requirements for the model response format:
 - for tasks of the **multiple_choice** and **matching** types, the response is a string containing a number or sequence of numbers, separated by commas without spaces;
 - for tasks of the **text** type, the answer is a string containing a word or several words without spaces, commas or other additional characters.
 
+### Task Descriptions
+
+**Task 1**
+
+Select one or more sentences containing the general information on the task text with 5 choices provided.
+
+- Task type: *multiple_choice*
+- Maximum number of points: *1*
+- Theme: *semantics*
+
+**Task 2**
+
+Fill in a gap between sentences or text parts with the most relevant logical connector or a conjunction without choices provided.
+
+- Task type: *text*
+- Maximum number of points: *1*
+- Theme: *logic*
+
+**Task 3**
+
+Select the most relevant word meaning in the given context with 5 choices provided.
+
+- Task type: *multiple_choice*
+- Maximum number of points: *1*
+- Theme: *semantics*
+
+**Task 4**
+
+Select one word with correct or incorrect stress out of 5 marked words.
+
+- Task type: *text*
+- Maximum number of points: *1*
+- Theme: *orthoepy*
+
+**Task**
+
+Select and replace an incorrect word with a paronym (i. e. a word of similar spelling and pronunciation but different meaning) within 5 sentences.
+
+- Task type: *text*
+- Maximum number of points: *1*
+- Theme: *grammar*
+
+**Task 6**
+
+Select and exclude (typically, a redundant word) or replace a grammatically incorrect word with a correct word form.
+
+- Task type: *text*
+- Maximum number of points: *1*
+- Theme: *grammar*
+
+**Task 7**
+
+Select and replace a grammatically incorrect word with a relevant word form within the given context from 5 word phrases.
+
+- Task type: *text*
+- Maximum number of points: *1*
+- Theme: *grammar*
+
+**Task 8**
+
+Task 8 consists of 5 subtasks: 8_0, 8_1, 8_2, 8_3, 8_4.
+
+Select one sentence corresponding to the grammatical error with 9 choices provided. 
+
+- Task type: *multiple_choice*
+- Maximum number of points for each subtask: *1*
+- Theme: *grammar*
+
+**Task 9**
+
+Select one or more word sets; there is a gap in each word root corresponding to vowels in easily misspelled positions.
+
+- Task type: *multiple_choice*
+- Maximum number of points: *1*
+- Theme: *spelling*
+
+**Task 10**
+
+Select one or more word rows in which all the words should have the same letter instead of a gap; the gap is within a prefix or morpheme boundary.
+
+- Task type: *multiple_choice*
+- Maximum number of points: *1*
+- Theme: *spelling*
+
+**Task 11**
+
+Select one or more word rows in which all the words (typically, nouns and adjectives) should be completed with the same letter; the open gap is placed within a prefix or morpheme boundary.
+
+- Task type: *multiple_choice*
+- Maximum number of points: *1*
+- Theme: *spelling*
+
+**Task 12**
+
+Select one or more word rows in which all the words (typically, verbs and gerunds) should be completed with the same letter; the open gap is placed within a suffix or morpheme boundary.
+
+- Task type: *multiple_choice*
+- Maximum number of points: *1*
+- Theme: *spelling*
+
+**Task 13**
+
+Select one out of 5 sentences in which the specified word is written separately with the previous one in the given context. 
+
+- Task type: *text*
+- Maximum number of points: *1*
+- Theme: *spelling*
+
+**Task 14**
+
+Select one out of 5 sentences in which two specific words (typically, complex conjunctions) are written separately in the given context.
+
+- Task type: *text*
+- Maximum number of points: *1*
+- Theme: *spelling*
+
+**Task 15**
+
+Select gaps (up to 9 gaps in a sentence) corresponding to the specified spelling, typically letter combination within an affix or morpheme boundary in the given context.
+
+- Task type: *text*
+- Maximum number of points: *1*
+- Theme: *spelling*
+
+**Task 16**
+
+Restore the punctuation in 5 task choices and select one or more sentences containing only one comma.
+
+- Task type: *multiple_choice*
+- Maximum number of points: *2*
+- Theme: *punctuation*
+
+**Tasks 17-20**
+
+Restore sentence punctuation and select the gaps (up to 11 gaps) corresponding to the comma in the given context.
+
+- Task type: *multiple_choice*
+- Maximum number of points: *1*
+- Theme: *punctuation*
+
+**Task 21**
+
+Select 2 or more sentences that share the same syntactic rule on the use of versatile punctuation marks.
+
+- Task type: *multiple_choice*
+- Maximum number of points: *1*
+- Theme: *punctuation*
+
+**Task 22**
+
+Select one or more statements relevant to a task text content with 5 choices provided.
+
+- Task type: *multiple_choice*
+- Maximum number of points: *1*
+- Theme: *logic*
+
+**Task 23**
+
+Select one or more relevant or irrelevant statements concerning versatile discourse types of task text sentences.
+
+- Task type: *multiple_choice*
+- Maximum number of points: *1*
+- Theme: *text analysis*
+
+**Task 24**
+
+Find specific literary means in the given range of enumerated sentences; typically, contextual synonyms, contextual antonyms, phraseological units, etc. 
+
+- Task type: *text*
+- Maximum number of points: *1*
+- Theme: *semantics*
+
+**Task 25**
+
+Select a sentence which is linked to the previous one with a versatile connector within the specified sentences range, if any.
+
+- Task type: *multiple_choice*
+- Maximum number of points: *1*
+- Theme: *text analysis*
+
+**Task 26**
+
+One-to-one matching of 4 sentences with 9 out of 40 possible versatile literary means.
+
+- Task type: *matching*
+- Maximum number of points: *4*
+- Theme: *text analysis*
+
 ### Data Fields
 
 - `instruction` is a string containing instructions for the task and information about the requirements for the model output format;
