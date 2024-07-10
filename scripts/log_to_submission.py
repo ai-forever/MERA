@@ -11,8 +11,7 @@ import numpy as np
 from tqdm.auto import tqdm
 
 from lm_eval.loggers.evaluation_tracker import GeneralConfigTracker
-#MERA_FOLDER=/workspace/MERA/fix-mera/mera_run_030/test_mera_run
-#MERA_MODEL_STRING="pretrained=/app/superllama,dtype=auto,max_length=16384"
+
 BENCHMARK_STORAGE: Optional[str] = "ai-forever/MERA"
 _TASKS = {}
 GENERATIVE_SUFFIX = "_gen"
