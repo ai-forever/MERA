@@ -12,6 +12,7 @@ from tqdm.auto import tqdm
 
 from lm_eval.loggers.evaluation_tracker import GeneralConfigTracker
 
+
 BENCHMARK_STORAGE: Optional[str] = "ai-forever/MERA"
 _TASKS = {}
 GENERATIVE_SUFFIX = "_gen"
