@@ -11,8 +11,8 @@ import numpy as np
 from tqdm.auto import tqdm
 
 from lm_eval.loggers.evaluation_tracker import GeneralConfigTracker
-
-
+#MERA_FOLDER=/workspace/MERA/fix-mera/mera_run_030/test_mera_run
+#MERA_MODEL_STRING="pretrained=/app/superllama,dtype=auto,max_length=16384"
 BENCHMARK_STORAGE: Optional[str] = "ai-forever/MERA"
 _TASKS = {}
 GENERATIVE_SUFFIX = "_gen"
@@ -370,7 +370,7 @@ class ruTiE(TextTask):
                 # check that question_id was passed to LM
                 if question_id_outputs is not None:
                     new_question = {
-                        "outputs": question_id_outputs,
+                        "outputs": question_id_outputs['outputs'],
                         "meta": {
                             "dialog_id": dialog_id,
                             "question_id": question_id,
@@ -402,6 +402,15 @@ class ruTiE(TextTask):
 
 @register_task
 class ruHumanEval(TextTask):
+
+    def outputs_to_submission(self, outputs):
+        res = []
+        for doc in outputs:
+            doc_id = int(self.doc_to_id(doc["doc"]))
+            resp = doc["filtered_resps"][0]
+            res.extend([self.doc_outputs_to_submission(doc_id, resp)])
+        return {"data": {"test": res}}
+    
     def doc_outputs_to_submission(self, doc_id, outputs):
         res = {
             "outputs": outputs,
