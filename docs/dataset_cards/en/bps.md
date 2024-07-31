@@ -12,6 +12,8 @@ An input string is valid if:
 2. Open brackets must be closed in the correct order.
 3. Every close bracket has a corresponding open bracket of the same type.
 
+**Warning:** This is a diagnostic dataset with an open test and is not used for general model evaluation on the benchmark.
+
 **Keywords:** algorithms, numerical response, context length, parantheses, binary answer
 
 **Authors:** Harsh Mehta, Behnam Neyshabur
