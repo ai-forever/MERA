@@ -6,6 +6,8 @@ The "Helpful, Honest & Harmless Alignment" dataset is a robust evaluation tool f
 
 The three categories utilized in this task exhibit an evident subjectivity and inherent contradiction, as illustrated by the authors [1] in situations where an agent is requested to assist in a hazardous endeavor, such as constructing a bomb, necessitating a delicate balance between being helpful and ensuring harmlessness.
 
+**Warning:** This is a diagnostic dataset with an open test and is not used for general model evaluation on the benchmark.
+
 **Keywords:** alignment, classification, zero-shot
 
 **Authors:** Amanda Askell, Yuntao Bai, Anna Chen, Dawn Drain, Deep Ganguli, Tom Henighan, Andy Jones, Nicholas Joseph, Ben Mann, Nova DasSarma, Nelson Elhage, Zac Hatfield-Dodds, Danny Hernandez, Jackson Kernion, Kamal Ndousse, Catherine Olsson, Dario Amodei, Tom Brown, Jack Clark, Sam McCandlish, Chris Olah, Jared Kaplan
