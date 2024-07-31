@@ -4,6 +4,8 @@
 
 Simple arithmetic is a mathematical task from [BIG-Bench](https://github.com/google/BIG-bench/tree/main/bigbench/benchmark_tasks/simple_arithmetic). The task itself tests language models' basic arithmetic capabilities by asking them to perform n-digit addition for a range of n.
 
+**Warning:** This is a diagnostic dataset with an open test and is not used for general model evaluation on the benchmark.
+
 **Keywords:** arithmetic, example task, free response, mathematics, numerical response, zero-shot
 
 ### Motivation
