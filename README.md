@@ -111,16 +111,37 @@ Feel free to ask any questions regarding our work, write on email mera@a-ai.ru. 
 ## Cite as
 
 ```
-@misc{fenogenova2024mera,
-    title={{MERA}: A Comprehensive {LLM} Evaluation in {Russian}}, 
-    author={Alena Fenogenova and Artem Chervyakov and Nikita Martynov and Anastasia Kozlova and Maria Tikhonova and Albina Akhmetgareeva and Anton Emelyanov and Denis Shevelev and Pavel Lebedev and Leonid Sinev and Ulyana Isaeva and Katerina Kolomeytseva and Daniil Moskovskiy and Elizaveta Goncharova and Nikita Savushkin and Polina Mikhailova and Denis Dimitrov and Alexander Panchenko and Sergei Markov},
-    year={2024},
-    eprint={2401.04531},
-    url = {https://arxiv.org/abs/2401.04531},
-    eprinttype={arXiv},
-    archivePrefix={arXiv},
-    primaryClass={cs.CL},
-    journal={arXiv},
-    volume={2401.04531}
+@inproceedings{fenogenova-etal-2024-mera,
+    title = "{MERA}: A Comprehensive {LLM} Evaluation in {R}ussian",
+    author = "Fenogenova, Alena  and
+      Chervyakov, Artem  and
+      Martynov, Nikita  and
+      Kozlova, Anastasia  and
+      Tikhonova, Maria  and
+      Akhmetgareeva, Albina  and
+      Emelyanov, Anton  and
+      Shevelev, Denis  and
+      Lebedev, Pavel  and
+      Sinev, Leonid  and
+      Isaeva, Ulyana  and
+      Kolomeytseva, Katerina  and
+      Moskovskiy, Daniil  and
+      Goncharova, Elizaveta  and
+      Savushkin, Nikita  and
+      Mikhailova, Polina  and
+      Minaeva, Anastasia  and
+      Dimitrov, Denis  and
+      Panchenko, Alexander  and
+      Markov, Sergey",
+    editor = "Ku, Lun-Wei  and
+      Martins, Andre  and
+      Srikumar, Vivek",
+    booktitle = "Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)",
+    month = aug,
+    year = "2024",
+    address = "Bangkok, Thailand",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2024.acl-long.534",
+    pages = "9920--9948",
 }
 ```
