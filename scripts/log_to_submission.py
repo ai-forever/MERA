@@ -1,5 +1,6 @@
 import argparse
 import glob
+import hashlib
 import json
 import os
 import shutil
@@ -11,17 +12,35 @@ import numpy as np
 from tqdm.auto import tqdm
 
 from lm_eval.loggers.evaluation_tracker import GeneralConfigTracker
+from lm_eval.utils import load_yaml_config, sanitize_model_name
 
 
-BENCHMARK_STORAGE: Optional[str] = "ai-forever/MERA"
+CUSTOM_TASK_PATH = "./benchmark_tasks/custom_loglikelihood_task.yaml"
+BENCHMARK_STORAGE: Optional[str] = load_yaml_config(CUSTOM_TASK_PATH).get(
+    "dataset_path"
+)
 _TASKS = {}
 GENERATIVE_SUFFIX = "_gen"
 INPUT_DATE_FORMAT = "%Y-%m-%dT%H-%M-%S.%f"
+DATASETS_TO_TRUNCATION = ["rutie"]
+SAMPLES_SUFFIX = "samples_"
+RESULTS_SUFFIX = "results_"
+GENERATIVE_TASKS = [
+    "chegeka",
+    "multiq",
+    "rudetox",
+    "ruhumaneval",
+    "rumodar",
+    "rumultiar",
+    "simplear",
+    "use",
+]
+INDEX_TO_GET = 0
 
 
 def get_files_from_dir(dir_path):
     f = []
-    for dir_path, dirn_ames, filenames in os.walk(dir_path):
+    for _, _, filenames in os.walk(dir_path):
         for fn in filenames:
             fn = os.path.join(dir_path, fn)
             f.extend([fn])
@@ -45,6 +64,13 @@ def load_jsonl(path):
     return result
 
 
+def save_jsonl(file, path):
+    with open(path, "w", encoding="utf-8") as outfile:
+        for entry in file:
+            json.dump(entry, outfile, ensure_ascii=False)
+            outfile.write("\n")
+
+
 def extract_date(file_name: str) -> datetime:
     extract_str_date = file_name.split(".json")[0].split("_")[-1]
     date = datetime.strptime(extract_str_date, INPUT_DATE_FORMAT)
@@ -66,22 +92,22 @@ class BaseTask:
         return self.__class__.__name__
 
     @property
-    def outputs_path(self, index_to_get=0):
+    def outputs_path(self):
         if self.gen:
             filelist = glob.glob(
                 os.path.join(
                     self.outputs_dir,
-                    f"samples_{self.src_name}{GENERATIVE_SUFFIX}*.json",
+                    f"samples_{self.src_name}{GENERATIVE_SUFFIX}*.json*",
                 )
             )
             if len(filelist) == 0:
                 # called only for originally generative tasks like multiq, chegeka, etc.
                 filelist = glob.glob(
-                    os.path.join(self.outputs_dir, f"samples_{self.src_name}*.json")
+                    os.path.join(self.outputs_dir, f"samples_{self.src_name}*.json*")
                 )
         else:
             filelist = glob.glob(
-                os.path.join(self.outputs_dir, f"samples_{self.src_name}*.json")
+                os.path.join(self.outputs_dir, f"samples_{self.src_name}*.json*")
             )
             # filter out all tasks with GENERATIVE_SUFFIX as we don't need to process them
             filelist = list(filter(lambda x: GENERATIVE_SUFFIX not in x, filelist))
@@ -92,7 +118,7 @@ class BaseTask:
             )
         # sorting filelist to get the latest
         filelist = sorted(filelist, key=extract_date, reverse=True)
-        res = filelist[index_to_get]
+        res = filelist[INDEX_TO_GET]
         return res
 
     @property
@@ -110,7 +136,7 @@ class BaseTask:
         dataset = datasets.load_dataset(path=BENCHMARK_STORAGE, name=self.src_name)[
             "test"
         ]
-        examples = dict()
+        examples = {}
         for example in dataset:
             doct_id = self.doc_to_id(example)
             examples[doct_id] = example
@@ -162,7 +188,7 @@ class ClassificationTask(BaseTask):
             log_probs = np.zeros(len(outputs))
             for idx, doc in enumerate(outputs):
                 prob = self.parse_doc(doc)
-                log_probs[int(idx)] = prob
+                log_probs[idx] = prob
             idx = log_probs.argmax()
             res = self.choices[idx]
         return {
@@ -394,10 +420,7 @@ class ruTiE(TextTask):
                 log_probs[idx] = prob
             idx = log_probs.argmax()
             res = self.choices[idx]
-        return {
-            "outputs": res,
-            "meta": {"id": doc_id},
-        }
+        return res
 
 
 @register_task
@@ -438,13 +461,29 @@ def get_args():
     return res
 
 
-def pack_submission_logs(outputs_dir: str, dst_dir: str):
+def pack_submission_logs(outputs_dir: str, dst_dir: str, gen: bool):
     if os.path.isdir(outputs_dir):
         zip_dir = os.path.join(dst_dir, "logs_public")
         os.makedirs(zip_dir, exist_ok=True)
-        files_to_pack = glob.glob(os.path.join(outputs_dir, "*.json"))
+        files_to_pack = glob.glob(os.path.join(outputs_dir, "*.json*"))
         for file_path in files_to_pack:
-            shutil.copy2(file_path, zip_dir)
+            file_name = os.path.split(file_path)[-1].lower()
+            if file_name.startswith(SAMPLES_SUFFIX):
+                # task may be inherently generative like CheGeKa, copy it anyway
+                is_truly_generative = any(
+                    [elem in file_name for elem in GENERATIVE_TASKS]
+                )
+                # 0 for gen logs with gen tasks and loglike logs with loglike tasks
+                invalid_file = np.logical_xor([GENERATIVE_SUFFIX in file_name], [gen])[
+                    0
+                ]
+                if not invalid_file or is_truly_generative:
+                    # copy with possible truncation of outputs
+                    copy_and_truncate(file_path, zip_dir)
+            elif file_name.startswith(RESULTS_SUFFIX):
+                copy_and_truncate(file_path, zip_dir)
+            else:
+                print("Unknown file {fn}".format(fn=file_path))
         zip_path = shutil.make_archive(zip_dir, "zip", zip_dir)
         shutil.rmtree(zip_dir)
         print("Logs to add with public submission stored at", zip_path)
@@ -460,7 +499,7 @@ def create_submission(outputs_dir, dst_dir, gen: bool):
         _ = task.convert()
         print("---------------------")
     print("Packing logs for public submission...")
-    pack_submission_logs(outputs_dir, dst_dir)
+    pack_submission_logs(outputs_dir, dst_dir, gen)
     zip_path = shutil.make_archive(dst_dir, "zip", dst_dir)
     print("Submission stored at", zip_path)
 
@@ -473,22 +512,53 @@ def preprocess_outputs_dir(outputs_dir: str, model_args: str) -> str:
     Otherwise, return the initial outputs_dir with no changes.
     """
     if model_args:
-        # init predefined Tracker
-        eval_tracker = GeneralConfigTracker()
-        # init Tracker params and extract model_name_sanitized
-        # model_source is not used yet,
-        # do not need system_instruction and chat_template to find subdir name
-        eval_tracker.log_experiment_args(
-            model_args=model_args,
-            model_source="",
-            system_instruction="",
-            chat_template="",
-        )
-        subdirectory = eval_tracker.model_name_sanitized
+        # get model_name cleared of "pretrained=" and everything after first comma
+        model_name = GeneralConfigTracker._get_model_name(model_args)
+        # use func to find the name of subdir from model_name
+        subdirectory = sanitize_model_name(model_name)
         # join paths
         full_path = os.path.join(outputs_dir, subdirectory)
         return full_path
     return outputs_dir
+
+
+def truncate_outputs(path):
+    """
+    Function that takes `path` to file, reads it and substitute all 'arg_0' values
+    of each item 'arguments' keys with their sha256 codes.
+    """
+    if path.endswith("json"):
+        data = load_json(path)
+    elif path.endswith("jsonl"):
+        data = load_jsonl(path)
+    else:
+        raise ValueError("Undefined format of {directory} file".format(directory=path))
+    for line in data:
+        for key in line["arguments"]:
+            if isinstance(line["arguments"][key]["arg_0"], str):
+                line["arguments"][key]["arg_0"] = hashlib.sha256(
+                    line["arguments"][key]["arg_0"].encode()
+                ).hexdigest()
+            else:
+                line["arguments"][key]["arg_0"] = hashlib.sha256(
+                    line["arguments"][key]["arg_0"][0].encode()
+                ).hexdigest()
+    return data
+
+
+def copy_and_truncate(file_path, zip_dir):
+    """
+    For datasets in DATASETS_TO_TRUNCATION truncates the outputs in logs while copying
+    the file into zip_dir. For other files just make copy.
+    """
+    for file in DATASETS_TO_TRUNCATION:
+        if file in os.path.split(file_path)[-1]:
+            data = truncate_outputs(file_path)
+            name = os.path.split(file_path)[-1]
+            save_jsonl(data, os.path.join(zip_dir, name))
+            return
+    shutil.copy2(file_path, zip_dir)
+    return
 
 
 def main():

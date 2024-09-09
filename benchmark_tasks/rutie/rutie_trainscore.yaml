@@ -1,6 +1,0 @@
-include: rutie.yaml
-group:
-  - mera_all_train
-  - mera_train
-task: rutie_trainscore
-test_split: train

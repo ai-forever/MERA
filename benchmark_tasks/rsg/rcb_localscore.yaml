@@ -1,0 +1,6 @@
+include: rcb.yaml
+tag:
+  - mera_all_local
+  - mera_local
+task: rcb_localscore
+test_split: train

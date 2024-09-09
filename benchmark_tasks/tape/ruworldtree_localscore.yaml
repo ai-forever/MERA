@@ -1,0 +1,6 @@
+include: ruworldtree.yaml
+tag:
+  - mera_all_local
+  - mera_local
+task: ruworldtree_localscore
+test_split: train

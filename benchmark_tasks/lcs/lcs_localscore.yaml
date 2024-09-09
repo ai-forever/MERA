@@ -1,0 +1,6 @@
+include: lcs.yaml
+tag:
+  - mera_all_local
+  - mera_local
+task: lcs_localscore
+test_split: public_test

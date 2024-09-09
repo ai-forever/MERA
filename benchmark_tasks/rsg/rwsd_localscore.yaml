@@ -1,0 +1,6 @@
+include: rwsd.yaml
+tag:
+  - mera_all_local
+  - mera_local
+task: rwsd_localscore
+test_split: train

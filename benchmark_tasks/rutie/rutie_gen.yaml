@@ -1,7 +1,8 @@
 # inherit from right to left
 include: [../digit_choice_gen_task.yaml, rutie.yaml]
-group:
+tag:
   - mera_gen
   - mera_all
 task: rutie_gen
-doc_to_text: "{{query}}"
+doc_to_text: "{{instruction.replace('{', '{{').replace('}', '}}').replace('{{question}}', '{question}').replace('{{choice1}}', '{choice1}').replace('{{choice2}}', '{choice2}').format(**inputs).strip()}}"
+doc_to_target: "{{'RUTIE_TARGET_{idx}'.format(idx=meta['question_id'])}}"

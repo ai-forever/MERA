@@ -1,129 +1,129 @@
 import datasets
 import numpy as np
 
+from lm_eval.filters.extraction import RegexFilter
+from lm_eval.models.api_models import JsonChatStr
+
 
 CONTEXT_PLACEHOLDER = "<CONTEXT_PLACEHOLDER>"
 OUTPUT_TYPE = "loglikelihood"
-RUTIE_END_DIALOGUE_ID = 0
-RUTIE_END_QUESTION_ID = 429
+FALLBACK = "-1"
+RUTIE_END_QUESTION_ID = 499
 
-
-def _process_doc(doc: dict) -> dict:
-    choices = ["1", "2"]
-    if doc["outputs"]:
-        gold = choices.index(doc["outputs"])
-    else:
-        gold = ""
-    prompt = (
-        doc["instruction"]
-        .format(
-            context=CONTEXT_PLACEHOLDER,
-            question=doc["inputs"]["question"],
-            choice1=doc["inputs"]["choice1"],
-            choice2=doc["inputs"]["choice2"],
-        )
-        .replace("\n\n", "\n")
-        + "\nОтвет:"
-    )
-
-    doc_to_text_without_instruction = (
-        "{context}\n{question}\n1. {choice1}\n2. {choice2}".format(
-            context=CONTEXT_PLACEHOLDER,
-            question=doc["inputs"]["question"],
-            choice1=doc["inputs"]["choice1"],
-            choice2=doc["inputs"]["choice2"],
-        ).replace("\n\n", "\n")
-        + "\nОтвет:"
-    )
-
-    doc["doc_to_text_without_instruction"] = doc_to_text_without_instruction.strip()
-    doc["choices"] = choices
-    doc["gold"] = gold
-    doc["query"] = prompt.strip()
-    return doc
+REGEXP = RegexFilter(regex_pattern=r"(\b([0-9])\b)", group_select=0, fallback=FALLBACK)
 
 
 def process_docs(dataset: datasets.Dataset) -> datasets.Dataset:
+    # make sure the datasets is sorted in ascending order for each dialog
     return datasets.Dataset.from_list(
         sorted(
-            list(dataset.map(_process_doc)),
+            dataset,
             key=lambda x: [int(x["meta"]["dialog_id"]), int(x["meta"]["question_id"])],
         )
     )
 
 
+def replace_targets(string, max_num, storage):
+    # for consistency only
+    if max_num == 0:
+        return string
+
+    # string contains parts like RUTIE_TARGET_0, RUTIE_TARGET_1, so on
+    template = "RUTIE_TARGET_{idx}"
+    for idx in range(max_num):
+        to_fill = template.format(idx=idx)
+        # replace each part with corresponding answer from storage
+        string = string.replace(to_fill, storage["answers"][to_fill])
+    return string
+
+
 def _update_request(storage, request):
+    # sanity check, if req_id > 0 and storage is empty => something went wrong
     if len(storage) == 0 and request.doc["meta"]["question_id"] != 0:
         print("No previous responses logged in storage!")
         return request
-    if request.doc["meta"]["question_id"] == 0:
-        # no update for first request in dialog
-        update_ctx = ""
-    else:
-        update_ctx = storage["string"]
 
-    new_pair = (
-        request.arguments[0].replace(CONTEXT_PLACEHOLDER, update_ctx),
-        request.arguments[1],
-    )
-    request.arguments = new_pair
+    max_num = request.doc["meta"]["question_id"]
+
+    # when string passed (everywhere except for API calls)
+    if isinstance(request.arguments[0], str):
+        max_num = request.doc["meta"]["question_id"]
+        new_pair = (
+            replace_targets(request.arguments[0], max_num, storage),
+            request.arguments[1],
+        )
+        request.arguments = new_pair
+    else:
+        max_num = request.doc["meta"]["question_id"]
+        req = request.arguments[0].prompt
+        kwargs = request.arguments[1]
+
+        new_req = replace_targets(req, max_num, storage)
+        new_req = JsonChatStr(new_req)
+        request.arguments = (new_req, kwargs)
+
     return request
 
 
 def _update_storage(storage, request):
-    default_rutie_end = (
-        request.doc["meta"]["dialog_id"] == RUTIE_END_DIALOGUE_ID
-        and request.doc["meta"]["question_id"] == RUTIE_END_QUESTION_ID
-    )
+    req_id = request.doc["meta"]["question_id"]
+
+    # check that the set is over to clear storage
+    if not isinstance(request.arguments[1], dict):
+        dialog_ends = (
+            request.doc["meta"]["question_id"] == RUTIE_END_QUESTION_ID
+            and len(storage["candidates"]) == 1
+        )
+    else:
+        dialog_ends = request.doc["meta"]["question_id"] == RUTIE_END_QUESTION_ID
+
+    # clear storage after rutie ends
+    if dialog_ends:
+        return {}
+
     # loglikelihood setup
     if not isinstance(request.arguments[1], dict):
-        # check that the set is over to clear storage
-        rutie_ends = default_rutie_end and len(storage["candidates"]) == 1
-        # clear storage after rutie ends
-        if rutie_ends:
-            return {}
         # update storage only after running 2 requests for the same sample
         storage.setdefault("candidates", []).extend([request.resps[0][0]])
+        # need 2 probas to decide on the answer
         if len(storage["candidates"]) == 2:
             # decide on the answer
-            res = ["1", "2"][np.argmax(storage["candidates"])]
+            result = ["1", "2"][np.argmax(storage["candidates"])]
             # get string that includes the context
-            storage["string"] = storage.get("string", "")
-            # update the previous context with the new one and answer
-            storage[
-                "string"
-            ] += "\n{question}\n1. {choice1}\n2. {choice2}\nОтвет: {result}".format(
-                question=request.doc["inputs"]["question"],
-                choice1=request.doc["inputs"]["choice1"],
-                choice2=request.doc["inputs"]["choice2"],
-                result=res,
-            )
-            # remove the first \n as it is already in instruction
-            if storage["string"].startswith("\n"):
-                storage["string"] = storage["string"][1:]
+            storage.setdefault("answers", {})[f"RUTIE_TARGET_{req_id}"] = result
+            # discard candidates
             storage["candidates"] = []
+
     # generative setup
     else:
-        # check that the set is over to clear storage
-        # for gen task only one request per sample
-        rutie_ends = default_rutie_end
-        # clear storage after rutie ends
-        if rutie_ends:
-            return {}
-        if request.resps[0].startswith(" "):
-            # no need for leading space caused by no space in prompt end
-            storage["candidates"] = request.resps[0][1:]
-        else:
-            storage["candidates"] = request.resps[0]
-        storage["string"] = storage.get("string", "")
-        storage[
-            "string"
-        ] += "\n{question}\n1. {choice1}\n2. {choice2}\nОтвет: {result}".format(
-            question=request.doc["inputs"]["question"],
-            choice1=request.doc["inputs"]["choice1"],
-            choice2=request.doc["inputs"]["choice2"],
-            result=storage["candidates"].strip(),
+        # pick LM answer and truncate spaces
+        storage["candidates"] = request.resps[0].strip()
+
+        # apply filter to response to get digit out of LM answer
+        string_answer = extract_string([storage["candidates"]])
+        filtered_answer = REGEXP.apply([[string_answer]], None)
+
+        # might not find pattern - replace with FALLBACK
+        result = (
+            FALLBACK
+            if (not len(filtered_answer) or not filtered_answer[0])
+            else filtered_answer[0][0]
         )
-        if storage["string"].startswith("\n"):
-            storage["string"] = storage["string"][1:]
+
+        # store LM filtered answer
+        storage.setdefault("answers", {})[f"RUTIE_TARGET_{req_id}"] = result
+
     return storage
+
+
+def extract_string(nested_list):
+    for item in nested_list:
+        if isinstance(item, list):
+            # If the item is a list, call the function recursively
+            result = extract_string(item)
+            if result is not None:
+                return result
+        elif isinstance(item, str):
+            # If the item is a string, return it
+            return item
+    return None

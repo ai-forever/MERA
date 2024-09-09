@@ -1,6 +1,0 @@
-include: rwsd.yaml
-group:
-  - mera_all_train
-  - mera_train
-task: rwsd_trainscore
-test_split: train

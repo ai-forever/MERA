@@ -1,6 +1,6 @@
 # inherit from right to left
 include: [../letter_choice_gen_task.yaml, rummlu.yaml]
-group:
+tag:
   - mera_gen
   - mera_all
 task: rummlu_gen

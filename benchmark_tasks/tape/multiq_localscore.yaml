@@ -1,0 +1,7 @@
+include: multiq.yaml
+tag:
+  - mera_all_local
+  - mera_gen_local
+  - mera_local
+task: multiq_localscore
+test_split: train

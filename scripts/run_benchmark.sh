@@ -11,13 +11,15 @@ FEWSHOTS=(
   2
   5
   0
+  1
 )
 
 TASKS=(
 "chegeka"
 "bps lcs"
 "mathlogicqa ruworldtree ruopenbookqa simplear rumultiar rummlu"
-"multiq parus rcb rumodar rwsd use rudetox ruethics ruhatespeech ruhhh rutie"
+"multiq parus rcb rumodar rwsd use rudetox ruethics ruhatespeech ruhhh"
+"rutie"
 )
 
 for fewshot_idx in "${!FEWSHOTS[@]}"

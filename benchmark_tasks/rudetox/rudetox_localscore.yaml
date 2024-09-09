@@ -1,0 +1,7 @@
+include: rudetox.yaml
+tag:
+  - mera_all_local
+  - mera_gen_local
+  - mera_local
+task: rudetox_localscore
+test_split: train

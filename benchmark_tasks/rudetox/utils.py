@@ -10,17 +10,12 @@ from lm_eval.api.filter import Filter
 from lm_eval.api.registry import register_filter
 
 
-def _process_results(doc, results):
+def process_results(doc: Dict, results: List[str]) -> Dict:
     # - simple identity function that returns results
     if len(doc["outputs"]) > 0:
         sta, sim, fl, j, _ = results[0]
         return {"j": j, "sta": sta, "sim": sim, "fl": fl}
     return {"j": 0, "sta": 0, "sim": 0, "fl": 0}
-
-
-def process_results(doc: dict, results: List[str]) -> Dict[str, int]:
-    processed_results = _process_results(doc, results)
-    return processed_results
 
 
 class InterpolationParams(TypedDict):

@@ -1,0 +1,7 @@
+include: ruhumaneval.yaml
+tag:
+  - mera_all_local
+  - mera_gen_local
+  - mera_local
+task: ruhumaneval_localscore
+test_split: public_test

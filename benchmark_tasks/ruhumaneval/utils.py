@@ -16,7 +16,7 @@ from lm_eval.api.filter import Filter
 from lm_eval.api.registry import register_filter
 
 
-def _process_results(doc, results):
+def process_results(doc: Dict, results: List[str]) -> Dict[str, float]:
     if len(doc["outputs"]) > 0:
         output_results = []
         code_outputs = results[0]
@@ -40,11 +40,6 @@ def _process_results(doc, results):
     }  # if no label provided (test answers are secret)
 
 
-def process_results(doc: dict, results: List[str]) -> Dict[str, int]:
-    processed_results = _process_results(doc, results)
-    return processed_results
-
-
 @register_filter("ruhumanevalscoring")
 class ruHumanEvalScoring(Filter):
     def __init__(self) -> None:
@@ -61,10 +56,28 @@ class ruHumanEvalScoring(Filter):
         for idx, sample in enumerate(resps):
             sample_metrics = []
             for completion in sample:
-                result = execute_function(completion, docs[idx])  # List
+                processed_completion = preprocess_generation(completion)
+                result = execute_function(processed_completion, docs[idx])  # List
                 sample_metrics.extend([result])
             code_results.extend([sample_metrics])
         return code_results
+
+
+def preprocess_generation(generation):
+    """Function that is intended to truncate markdown cover of the generation"""
+    # check for empty string
+    if len(generation):
+        # we cannot know for sure which symbols may be used
+        first = generation[0]
+        if first in [" ", "\n", "\t"]:
+            return generation
+        # like for " ```python *generation* ``` "
+        # leave only "*generation*"
+        begin_pattern = first * 3 + "python"
+        end_pattern = first * 3
+        if generation.startswith(begin_pattern) and generation.endswith(end_pattern):
+            return generation[len(begin_pattern):-len(end_pattern)]
+    return generation
 
 
 def execute_function(resp_func, doc, timeout=3.0, num_workers=2):
@@ -310,14 +323,11 @@ def check_solution(true, pred):
     # pred should have len(true) items or fail
     if len(true) != len(pred):
         return 0
-    # type of pred items should coincide with true items or fail
-    if not isinstance(true[0], type(pred[0])):
-        return 0
     tests = []
     for idx, test in enumerate(true):
         try:
-            # require exact match
-            if test == pred[idx]:
+            # require exact match of string representations
+            if str(test) == str(pred[idx]):
                 tests.append(1)
             else:
                 tests.append(0)

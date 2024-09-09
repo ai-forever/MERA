@@ -1,0 +1,6 @@
+include: mathlogicqa.yaml
+tag:
+  - mera_all_local
+  - mera_local
+task: mathlogicqa_localscore
+test_split: train

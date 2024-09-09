@@ -28,7 +28,7 @@ do
     OPENAI_API_KEY="${OPENAI_API_KEY}" PYTHONPATH=$PWD \
     lm_eval --model_args "${MERA_MODEL_STRING}" --tasks $cur_task \
     --num_fewshot=${FEWSHOTS[$fewshot_idx]} \
-    --output_path="${MERA_FOLDER}" ${MERA_COMMON_SETUP} \
+    --output_path="${MERA_FOLDER}/${cur_task}_result.json" ${MERA_COMMON_SETUP} \
     --include_path=./benchmark_tasks
   done
 done
@@ -38,12 +38,12 @@ HF_DATASETS_CACHE="${MERA_FOLDER}/ds_cache" TOKENIZERS_PARALLELISM=false HF_DATA
 OPENAI_API_KEY="${OPENAI_API_KEY}" PYTHONPATH=$PWD \
 lm_eval --model_args "${MERA_MODEL_STRING}" --tasks ruhumaneval \
 --num_fewshot=0 --gen_kwargs="${RUHUMANEVAL_GEN_KWARGS}" \
---output_path="${MERA_FOLDER}" ${MERA_COMMON_SETUP} \
+--output_path="${MERA_FOLDER}/ruhumaneval_result.json" ${MERA_COMMON_SETUP} \
 --include_path=./benchmark_tasks
 
 # Try to save submission
 HF_DATASETS_CACHE="${MERA_FOLDER}/ds_cache" HF_DATASETS_IN_MEMORY_MAX_SIZE=23400000 \
-python scripts/log_to_submission.py --outputs_dir "${MERA_FOLDER}" --dst_dir "${MERA_FOLDER}_submission" --model_args ${MERA_MODEL_STRING}
+python scripts/log_to_submission.py --outputs_dir "${MERA_FOLDER}" --dst_dir "${MERA_FOLDER}_submission"
 
 # Remove datasets cache folder
 rm -r "${MERA_FOLDER}/ds_cache"

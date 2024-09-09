@@ -29,21 +29,23 @@ def process_docs(dataset: datasets.Dataset) -> datasets.Dataset:
     return dataset.map(_process_doc)
 
 
-def _process_results(doc, results):
+def process_results(doc: Dict, results: List[str]) -> Dict:
     variant = doc["meta"]["variant"]
+    id_task = doc["meta"]["id_task"]
+    max_score = doc["meta"]["score"]
     if len(doc["outputs"]) > 0:
-        id_task = doc["meta"]["id_task"]
         task_type = doc["meta"]["type"]
         answer = doc["outputs"]
         prediction = results[0]
         score = get_scores(task_type, id_task, answer, prediction)
-        return {"grade_norm": (score, variant)}
-    return {"grade_norm": (0.0, variant)}
-
-
-def process_results(doc: dict, results: List[str]) -> Dict[str, int]:
-    processed_results = _process_results(doc, results)
-    return processed_results
+        return {
+            "grade_norm": (score, variant, max_score),
+            f"grade_norm.task{id_task}": (score, id_task, max_score),
+        }
+    return {
+        "grade_norm": (0.0, variant, max_score),
+        f"grade_norm.task{id_task}": (0.0, id_task, max_score),
+    }
 
 
 def multiple_choice_score(answer: str, prediction: str, is_task16=False) -> int:
@@ -96,15 +98,32 @@ def get_scores(task_type, id_task, answer, prediction):
     return score
 
 
-def overall_score(items, max_grade_point=34):
+def overall_score(items):
     overall_scores = {}
+    overall_max_scores = {}
     for item in items:
-        score, variant = item[0], item[1]
+        score, variant, max_score = item[0], item[1], item[2]
         if variant not in overall_scores:
             overall_scores[variant] = 0
         overall_scores[variant] += score
+        if variant not in overall_max_scores:
+            overall_max_scores[variant] = 0
+        overall_max_scores[variant] += max_score
 
     average_overall_score = mean(
-        [score / max_grade_point for score in overall_scores.values()]
+        [
+            score / overall_max_scores[variant]
+            for variant, score in overall_scores.items()
+        ]
     )
+    return average_overall_score
+
+
+def task_score(items):
+    overall_scores = []
+    for item in items:
+        score, id_task, max_score = item[0], item[1], item[2]  # noqa: F841
+        overall_scores.append(score / max_score)
+
+    average_overall_score = mean(overall_scores)
     return average_overall_score

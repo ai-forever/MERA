@@ -1,0 +1,7 @@
+include: use.yaml
+tag:
+  - mera_all_local
+  - mera_gen_local
+  - mera_local
+task: use_localscore
+test_split: train

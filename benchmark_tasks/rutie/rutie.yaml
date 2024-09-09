@@ -1,5 +1,5 @@
 include: ../custom_loglikelihood_task.yaml
-group:
+tag:
   - mera
   - mera_all
 task: rutie
@@ -7,8 +7,14 @@ dataset_name: rutie
 context_based: true
 request_updater: !function utils._update_request
 storage_updater: !function utils._update_storage
+fewshot_split: test
+fewshot_config:
+  sampler: !function ../custom_context_formers.ruTiEContextFormer  # processes no instruction doc and changes doc_to_text
+  doc_to_text_without_instruction: "{{'{question}\n1. {choice1}\n2. {choice2}\nОтвет: RUTIE_TARGET_{idx}'.format(idx=meta['question_id'], **inputs).lstrip()}}"
+  doc_to_text_without_target: "{{'{question}\n1. {choice1}\n2. {choice2}\nОтвет:'.format(**inputs).lstrip()}}"
 process_docs: !function utils.process_docs
-doc_to_text: "{{query}}"
+doc_to_text: "{{instruction.replace('{', '{{').replace('}', '}}').replace('{{question}}', '{question}').replace('{{choice1}}', '{choice1}').replace('{{choice2}}', '{choice2}').format(**inputs).strip()}}"
+doc_to_target: "{{'RUTIE_TARGET_{idx}'.format(idx=meta['question_id'])}}"
 doc_to_choice: ["1", "2"]
 num_fewshot: null
 metadata:

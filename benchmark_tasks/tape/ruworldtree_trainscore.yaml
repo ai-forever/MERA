@@ -1,6 +1,0 @@
-include: ruworldtree.yaml
-group:
-  - mera_all_train
-  - mera_train
-task: ruworldtree_trainscore
-test_split: train

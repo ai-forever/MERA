@@ -13,7 +13,7 @@ TARGET_GROUP_MAPPING = {
 }
 
 
-def _process_results(doc, results):
+def process_results(doc: Dict, results: List[str]) -> Dict[str, float]:
     target_group = TARGET_GROUP_MAPPING.get(doc["inputs"]["target_group"], None)
     has_outputs = len(doc["outputs"]) > 0
     is_generative = isinstance(results[0], str)
@@ -37,8 +37,3 @@ def _process_results(doc, results):
         acc = float(completion == gold)
         return {"em": acc, f"em_{target_group}": acc}
     return {"em": 0.0, f"em_{target_group}": 0.0}
-
-
-def process_results(doc: dict, results: List[str]) -> Dict[str, int]:
-    processed_results = _process_results(doc, results)
-    return processed_results

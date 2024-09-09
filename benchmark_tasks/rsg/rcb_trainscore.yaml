@@ -1,6 +1,0 @@
-include: rcb.yaml
-group:
-  - mera_all_train
-  - mera_train
-task: rcb_trainscore
-test_split: train

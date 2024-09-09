@@ -1,0 +1,6 @@
+include: bps.yaml
+tag:
+  - mera_all_local
+  - mera_local
+task: bps_localscore
+test_split: train

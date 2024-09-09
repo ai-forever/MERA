@@ -5,7 +5,7 @@ from transformers.data.metrics import squad_metrics
 from lm_eval.api.metrics import metric_max_over_ground_truths
 
 
-def _process_results_chegeka(doc, results):
+def process_results_chegeka(doc: Dict, results: List[str]) -> Dict:
     # - Pick the maximum likelihood prediction entity
     # - Evaluate the accuracy and token F1 PER EXAMPLE
     # - Average over all examples
@@ -24,12 +24,7 @@ def _process_results_chegeka(doc, results):
     return {"f1": 0, "em": 0}  # if no label provided (test answers are secret)
 
 
-def process_results_chegeka(doc: dict, results: List[str]) -> Dict[str, int]:
-    processed_results = _process_results_chegeka(doc, results)
-    return processed_results
-
-
-def _process_results_multiq(doc, results):
+def process_results_multiq(doc: Dict, results: List[str]) -> Dict[str, int]:
     # - Pick the maximum likelihood prediction entity
     # - Evaluate the accuracy and token F1 PER EXAMPLE
     # - Average over all examples
@@ -46,8 +41,3 @@ def _process_results_multiq(doc, results):
 
         return {"f1": f1, "em": em}
     return {"f1": 0, "em": 0}  # if no label provided (test answers are secret)
-
-
-def process_results_multiq(doc: dict, results: List[str]) -> Dict[str, int]:
-    processed_results = _process_results_multiq(doc, results)
-    return processed_results

@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # internal MERA_COMMON_SETUP will be assigned 'default' value if external MERA_COMMON_SETUP not set or null.
 # The value of external MERA_COMMON_SETUP remains untouched.
 MERA_COMMON_SETUP_default="--model hf --device cuda --batch_size=1 --predict_only --log_samples --seed 1234 --verbosity ERROR"
@@ -9,13 +11,15 @@ FEWSHOTS=(
   2
   5
   0
+  1
 )
 
 TASKS=(
 "chegeka"
 "bps lcs bps_gen lcs_gen"
 "mathlogicqa ruworldtree ruopenbookqa rummlu mathlogicqa_gen ruworldtree_gen ruopenbookqa_gen simplear rumultiar rummlu_gen"
-"multiq parus rcb parus_gen rcb_gen rumodar rwsd rwsd_gen use rudetox ruethics ruethics_gen ruhatespeech ruhatespeech_gen ruhhh ruhhh_gen rutie rutie_gen"
+"multiq parus rcb parus_gen rcb_gen rumodar rwsd rwsd_gen use rudetox ruethics ruethics_gen ruhatespeech ruhatespeech_gen ruhhh ruhhh_gen"
+"rutie rutie_gen"
 )
 
 for fewshot_idx in "${!FEWSHOTS[@]}"

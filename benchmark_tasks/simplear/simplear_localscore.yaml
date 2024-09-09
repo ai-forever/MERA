@@ -1,0 +1,7 @@
+include: simplear.yaml
+tag:
+  - mera_all_local
+  - mera_gen_local
+  - mera_local
+task: simplear_localscore
+test_split: train

@@ -1,6 +1,6 @@
 # inherit from right to left
 include: [../digit_choice_gen_task.yaml, ruethics.yaml]
-group:
+tag:
   - mera_gen
   - mera_all
 task: ruethics_gen

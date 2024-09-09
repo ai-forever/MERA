@@ -1,4 +1,4 @@
 [submodule "lm-evaluation-harness"]
 	path = lm-evaluation-harness
 	url = https://github.com/artemorloff/lm-evaluation-harness.git
-	branch = feature/context_tasks
+	branch = update_release

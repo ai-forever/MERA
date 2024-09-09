@@ -1,0 +1,7 @@
+include: rumultiar.yaml
+tag:
+  - mera_all_local
+  - mera_gen_local
+  - mera_local
+task: rumultiar_localscore
+test_split: train

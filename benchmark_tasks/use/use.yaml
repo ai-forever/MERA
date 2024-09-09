@@ -1,5 +1,5 @@
 include: ../custom_generate_task.yaml
-group:
+tag:
   - mera
   - mera_gen
   - mera_all
@@ -20,6 +20,96 @@ process_results: !function utils.process_results
 metric_list:
   - metric: grade_norm
     aggregation: !function utils.overall_score
+    higher_is_better: true
+  - metric: grade_norm.task1
+    aggregation: !function utils.task_score
+    higher_is_better: true
+  - metric: grade_norm.task2
+    aggregation: !function utils.task_score
+    higher_is_better: true
+  - metric: grade_norm.task3
+    aggregation: !function utils.task_score
+    higher_is_better: true
+  - metric: grade_norm.task4
+    aggregation: !function utils.task_score
+    higher_is_better: true
+  - metric: grade_norm.task5
+    aggregation: !function utils.task_score
+    higher_is_better: true
+  - metric: grade_norm.task6
+    aggregation: !function utils.task_score
+    higher_is_better: true
+  - metric: grade_norm.task7
+    aggregation: !function utils.task_score
+    higher_is_better: true
+  - metric: grade_norm.task8_0
+    aggregation: !function utils.task_score
+    higher_is_better: true
+  - metric: grade_norm.task8_1
+    aggregation: !function utils.task_score
+    higher_is_better: true
+  - metric: grade_norm.task8_2
+    aggregation: !function utils.task_score
+    higher_is_better: true
+  - metric: grade_norm.task8_3
+    aggregation: !function utils.task_score
+    higher_is_better: true
+  - metric: grade_norm.task8_4
+    aggregation: !function utils.task_score
+    higher_is_better: true
+  - metric: grade_norm.task9
+    aggregation: !function utils.task_score
+    higher_is_better: true
+  - metric: grade_norm.task10
+    aggregation: !function utils.task_score
+    higher_is_better: true
+  - metric: grade_norm.task11
+    aggregation: !function utils.task_score
+    higher_is_better: true
+  - metric: grade_norm.task12
+    aggregation: !function utils.task_score
+    higher_is_better: true
+  - metric: grade_norm.task13
+    aggregation: !function utils.task_score
+    higher_is_better: true
+  - metric: grade_norm.task14
+    aggregation: !function utils.task_score
+    higher_is_better: true
+  - metric: grade_norm.task15
+    aggregation: !function utils.task_score
+    higher_is_better: true
+  - metric: grade_norm.task16
+    aggregation: !function utils.task_score
+    higher_is_better: true
+  - metric: grade_norm.task17
+    aggregation: !function utils.task_score
+    higher_is_better: true
+  - metric: grade_norm.task18
+    aggregation: !function utils.task_score
+    higher_is_better: true
+  - metric: grade_norm.task19
+    aggregation: !function utils.task_score
+    higher_is_better: true
+  - metric: grade_norm.task20
+    aggregation: !function utils.task_score
+    higher_is_better: true
+  - metric: grade_norm.task21
+    aggregation: !function utils.task_score
+    higher_is_better: true
+  - metric: grade_norm.task22
+    aggregation: !function utils.task_score
+    higher_is_better: true
+  - metric: grade_norm.task23
+    aggregation: !function utils.task_score
+    higher_is_better: true
+  - metric: grade_norm.task24
+    aggregation: !function utils.task_score
+    higher_is_better: true
+  - metric: grade_norm.task25
+    aggregation: !function utils.task_score
+    higher_is_better: true
+  - metric: grade_norm.task26
+    aggregation: !function utils.task_score
     higher_is_better: true
 metadata:
   version: 1.0

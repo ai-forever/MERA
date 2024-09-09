@@ -1,0 +1,6 @@
+include: ruopenbookqa.yaml
+tag:
+  - mera_all_local
+  - mera_local
+task: ruopenbookqa_localscore
+test_split: train

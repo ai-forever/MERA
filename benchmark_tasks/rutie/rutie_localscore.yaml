@@ -1,0 +1,7 @@
+include: rutie.yaml
+tag:
+  - mera_all_local
+  - mera_local
+task: rutie_localscore
+test_split: train
+fewshot_split: train

@@ -1,0 +1,6 @@
+include: parus_gen.yaml
+tag:
+  - mera_all_local
+  - mera_gen_local
+task: parus_gen_localscore
+test_split: train

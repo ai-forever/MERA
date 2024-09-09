@@ -3,7 +3,7 @@ from typing import Dict, List
 from numpy import argmax
 
 
-def _process_results(doc, results):
+def process_results(doc: Dict, results: List[str]) -> Dict[str, float]:
     dataset_idx = doc["meta"]["criteria"]
     has_outputs = len(doc["outputs"]) > 0
     is_generative = isinstance(results[0], str)
@@ -27,8 +27,3 @@ def _process_results(doc, results):
         acc = float(completion == gold)
         return {"em": acc, f"em_{dataset_idx}": acc}
     return {"em": 0.0, f"em_{dataset_idx}": 0.0}
-
-
-def process_results(doc: dict, results: List[str]) -> Dict[str, int]:
-    processed_results = _process_results(doc, results)
-    return processed_results

@@ -1,6 +1,0 @@
-include: ruopenbookqa_gen.yaml
-group:
-  - mera_all_train
-  - mera_gen_train
-task: ruopenbookqa_gen_trainscore
-test_split: train

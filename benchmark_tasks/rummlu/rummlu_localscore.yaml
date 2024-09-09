@@ -1,0 +1,6 @@
+include: rummlu.yaml
+tag:
+  - mera_all_local
+  - mera_local
+task: rummlu_localscore
+test_split: public_test
