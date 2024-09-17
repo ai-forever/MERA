@@ -5,11 +5,9 @@ from lm_eval.filters.extraction import RegexFilter
 from lm_eval.models.api_models import JsonChatStr
 
 
-CONTEXT_PLACEHOLDER = "<CONTEXT_PLACEHOLDER>"
-OUTPUT_TYPE = "loglikelihood"
 FALLBACK = "-1"
 RUTIE_END_QUESTION_ID = 499
-
+TEMPLATE = "RUTIE_TARGET_{idx}"
 REGEXP = RegexFilter(regex_pattern=r"(\b([0-9])\b)", group_select=0, fallback=FALLBACK)
 
 
@@ -29,9 +27,8 @@ def replace_targets(string, max_num, storage):
         return string
 
     # string contains parts like RUTIE_TARGET_0, RUTIE_TARGET_1, so on
-    template = "RUTIE_TARGET_{idx}"
-    for idx in range(max_num):
-        to_fill = template.format(idx=idx)
+    for idx in range(max_num - 1, -1, -1):
+        to_fill = TEMPLATE.format(idx=idx)
         # replace each part with corresponding answer from storage
         string = string.replace(to_fill, storage["answers"][to_fill])
     return string
@@ -47,20 +44,12 @@ def _update_request(storage, request):
 
     # when string passed (everywhere except for API calls)
     if isinstance(request.arguments[0], str):
-        max_num = request.doc["meta"]["question_id"]
-        new_pair = (
-            replace_targets(request.arguments[0], max_num, storage),
-            request.arguments[1],
-        )
-        request.arguments = new_pair
+        new_req = replace_targets(request.arguments[0], max_num, storage)
+        request.arguments = (new_req, request.arguments[1])
     else:
-        max_num = request.doc["meta"]["question_id"]
-        req = request.arguments[0].prompt
-        kwargs = request.arguments[1]
-
-        new_req = replace_targets(req, max_num, storage)
+        new_req = replace_targets(request.arguments[0].prompt, max_num, storage)
         new_req = JsonChatStr(new_req)
-        request.arguments = (new_req, kwargs)
+        request.arguments = (new_req, request.arguments[1])
 
     return request
 
@@ -90,7 +79,7 @@ def _update_storage(storage, request):
             # decide on the answer
             result = ["1", "2"][np.argmax(storage["candidates"])]
             # get string that includes the context
-            storage.setdefault("answers", {})[f"RUTIE_TARGET_{req_id}"] = result
+            storage.setdefault("answers", {})[TEMPLATE.format(idx=req_id)] = result
             # discard candidates
             storage["candidates"] = []
 
@@ -111,7 +100,7 @@ def _update_storage(storage, request):
         )
 
         # store LM filtered answer
-        storage.setdefault("answers", {})[f"RUTIE_TARGET_{req_id}"] = result
+        storage.setdefault("answers", {})[TEMPLATE.format(idx=req_id)] = result
 
     return storage
 

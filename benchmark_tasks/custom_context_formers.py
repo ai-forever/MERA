@@ -1,5 +1,24 @@
 from lm_eval.api.samplers import ContextSampler
-from lm_eval.utils import apply_template
+
+### Copy of code from lm_eval_utils
+from jinja2 import BaseLoader, Environment, StrictUndefined
+import re
+
+
+def regex_replace(string, pattern, repl, count: int = 0):
+    """Implements the `re.sub` function as a custom Jinja filter."""
+    return re.sub(pattern, repl, string, count=count)
+
+
+env = Environment(
+    loader=BaseLoader, undefined=StrictUndefined, keep_trailing_newline=True
+)
+env.filters["regex_replace"] = regex_replace
+### End of copy
+# TODO: make env creation a function to be imported
+# TODO: make rendering of envs a function to use it
+
+SPLIT_VALUE = "{context}"
 
 
 class ruTiEContextFormer(ContextSampler):
@@ -18,9 +37,9 @@ class ruTiEContextFormer(ContextSampler):
     4.1. Without chat_template get_context method applies doc_to_text_without_instruction
     pattern to each doc, joins them in one string and puts inside "{context}" part of
     each test sample. The method itself returns empty string as the test sample is simply
-    added to the fewshots, so we jsut put fewshots in the test sample's instruction!
+    added to the fewshots, so we just put fewshots in the test sample's instruction!
     4.2. With chat_template, but without fewshot_as_multiturn one dictionary is
-    formed out of the result of get_context method. It returnes "", so the test sample
+    formed out of the result of get_context method. It returns "", so the test sample
     with fewshots already inserted in the instruction is added to this empty string to form
     the valid dictionary.
     4.3. With chat_template and fewshot_as_multiturn each few-shot goes in a separate pair
@@ -41,19 +60,12 @@ class ruTiEContextFormer(ContextSampler):
         # id that tells how many previous samples to add as fewshots
         sample_id = doc["meta"]["question_id"]
         dialog_id = doc["meta"]["dialog_id"]
-        # choose only docs from the same dialog and assure they are sorted by q_id
-        docs_for_sampling = [
-            elem for elem in self.docs if elem["meta"]["dialog_id"] == dialog_id
-        ]
-        docs_for_sampling = sorted(
-            docs_for_sampling, key=lambda x: x["meta"]["question_id"]
-        )
-        # pick only previous docs from the same dialog in ascending order
-        samples = [
-            elem
-            for elem in docs_for_sampling
-            if elem["meta"]["question_id"] < sample_id
-        ]
+
+        # the dialogs are already sorted by process_docs, need to pick only the required samples
+        start_idx = dialog_id * 500
+        end_idx = start_idx + sample_id
+        # choose only docs from the same dialog and assure they have q_id < doc[q_id]
+        samples = self.docs[start_idx:end_idx]
         return samples
 
     def get_context(self, doc, num_fewshot):
@@ -64,21 +76,40 @@ class ruTiEContextFormer(ContextSampler):
         no_instruction_template = self.config.fewshot_config.get(
             "doc_to_text_without_instruction", self.config.doc_to_text
         )
+        # make fillable env beforehand
+        no_instruction_env = env.from_string(no_instruction_template)
 
-        # all shots in short versions joined in a string
+        # split the instruction of the test question into two parts:
+        # 1. part that contains some info and context tag only
+        # 2. part that contains the question itself and all other tags (question, choice, etc.)
+        first_part, second_part = doc["instruction"].split(SPLIT_VALUE)
+
         if len(fewshotex) == 0:
-            joined_samples = ""
+            labeled_examples = ""
         else:
-            samples = [
-                apply_template(no_instruction_template, elem) for elem in fewshotex
+            # the first fewshot should include the first part of the test question instruction
+            # it is the imitation of placing all fewshots inside <context> tag of doc instruction
+            labeled_examples = [
+                first_part + no_instruction_env.render(**elem)
+                if idx == 0
+                else no_instruction_env.render(**elem)
+                for idx, elem in enumerate(fewshotex)
             ]
-            joined_samples = "\n" + self.fewshot_delimiter.join(samples) + "\n"
 
-        # put fewshots inside the current test sample instruction instead of context
-        doc["instruction"] = doc["instruction"].replace("{context}", joined_samples)
+        if len(fewshotex) != 0:
+            # the first part is already at the beginning of user prompt
+            # this second part is at the end with the test question itself
+            doc["instruction"] = second_part
+        else:
+            # 0 samples to add as context = no context at all
+            doc["instruction"] = doc["instruction"].replace(SPLIT_VALUE, "")
 
-        # no need to return anything, fewshots are already place in doc's instruction
-        return ""
+        # join in a string, add fewshot_delimiter to separate the last fewshot from test question
+        labeled_examples = (
+            self.fewshot_delimiter.join(labeled_examples) + self.fewshot_delimiter
+        )
+
+        return labeled_examples
 
     # used when apply_chat_template=True
     def get_chat_context(
@@ -98,6 +129,10 @@ class ruTiEContextFormer(ContextSampler):
         )
         only_target_template = self.config.doc_to_target
 
+        # make fillable envs beforehand
+        no_instruction_env = env.from_string(no_instruction_template)
+        only_target_env = env.from_string(only_target_template)
+
         if not fewshot_as_multiturn:
             # get fewshot context as one user turn
             chat_history.extend(
@@ -110,11 +145,11 @@ class ruTiEContextFormer(ContextSampler):
             )
         else:
             if doc["meta"]["question_id"] > 0:
-                first_part, second_part = doc["instruction"].split("{context}")
+                first_part, second_part = doc["instruction"].split(SPLIT_VALUE)
                 doc["instruction"] = second_part
                 for idx, document in enumerate(fewshotex):
-                    processed_doc = apply_template(no_instruction_template, document)
-                    processed_target = apply_template(only_target_template, document)
+                    processed_doc = no_instruction_env.render(**document)
+                    processed_target = only_target_env.render(**document)
 
                     if idx == 0:
                         processed_doc = first_part + processed_doc
