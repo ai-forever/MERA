@@ -5,9 +5,6 @@
 Russian HumanEval (ruHumanEval) is the Russian analogue of the original HumanEval dataset, created to evaluate the ability of language models to generate code in the Python programming language to solve simple problems.
 The dataset is aimed at measuring the functional correctness of code generation based on information from the function's documentation lines — a text description of the function's operation and several examples of results for different input data.
 
-**Warning:** to avoid data leakage for ruHumanEval, we created the NEW closed test set that follows the original HumanEval design. Thus, **results on the HumanEval and ruHumanEval datasets cannot be directly compared with each other.**
-
-**Warning:** open data is the public test set of the original ruHumanEval dataset. Do not use it in train purposes!
 
 **Warning:** This is a diagnostic dataset with an open test and is not used for general model evaluation on the benchmark.
 
@@ -65,7 +62,7 @@ Below is an example from the dataset:
 
 ### Data Splits
 
-The public test contains `164` tasks with test cases and answers from the original dataset. The closed test set contains `164` tasks with closed answers specially collected by authors for this benchmark. For the test set, we provide only test cases without outputs and solutions.
+The public test contains `164` tasks with test cases and answers from the original dataset. 
 
 ### Prompts
 
