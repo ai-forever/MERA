@@ -45,7 +45,7 @@ The public test includes `320` examples, and the closed test set includes `500` 
 
 ### Prompts
 
-6 prompts of varying difficulty were created for this task. Example:
+10 prompts of varying difficulty were created for this task. Example:
 
 `"Для двух строк: \"{inputs}\" найдите длину наибольшей общей подпоследовательности. Пересекающиеся символы должны идти в том же порядке, но могут быть разделены другими символами."`.
 
