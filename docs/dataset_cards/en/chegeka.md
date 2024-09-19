@@ -54,7 +54,7 @@ The dataset consists of 29376 training examples (train set) and 416 test example
 
 ### Prompts
 
-We use four different prompts written in natural language for this task. An example of the prompt is given below:
+We use 10 different prompts written in natural language for this task. An example of the prompt is given below:
 
 `"Вы участвуете в викторине “Что? Где? Когда?”. Категория вопроса: {topic}\nВнимательно прочитайте вопрос и ответьте на него: {text}\nОтвет:"`.
 
