@@ -53,7 +53,7 @@ The train consists of `250` examples, and the test set includes `1000` examples.
 
 ### Prompts
 
-8 prompts of varying difficulty were created for this task. Example:
+10 prompts of varying difficulty were created for this task. Example:
 
 `"Проверьте, сбалансирована ли входная последовательность скобок.\n"{inputs}"\nВыведите 1, если да и 0 в противном случае. Сперва закрывающей скобкой своего типа должна закрываться последняя из открытых скобок, и лишь потом соответствующей закрывающей скобкой может закрываться та, что была открыта перед ней."`.
 
