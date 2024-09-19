@@ -6,7 +6,7 @@ Russian HumanEval (ruHumanEval) is the Russian analogue of the original HumanEva
 The dataset is aimed at measuring the functional correctness of code generation based on information from the function's documentation lines — a text description of the function's operation and several examples of results for different input data.
 
 
-**Warning:** This is a diagnostic dataset with an open test and is not used for general model evaluation on the benchmark.
+**Warning:** This is a diagnostic dataset with an open test and is not used for general model evaluation on the benchmark. Results on the HumanEval and ruHumanEval datasets cannot be directly compared with each other.
 
 **Keywords:** PLP, programming, Python
 
