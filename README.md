@@ -1,3 +1,5 @@
+# WARNING! This is the deprecated version. The new MERA datasets are [here](https://huggingface.co/datasets/MERA-evaluation/MERA) and the codebase is [here](https://github.com/MERA-Evaluation/MERA)
+
 # MERA
 
 <p align="center">
