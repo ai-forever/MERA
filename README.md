@@ -1,4 +1,4 @@
-# WARNING! This is the deprecated version. The new MERA datasets are [here](https://huggingface.co/datasets/MERA-evaluation/MERA) and the codebase is [here](https://github.com/MERA-Evaluation/MERA)
+## WARNING! This is the deprecated version. The new MERA datasets are [here](https://huggingface.co/datasets/MERA-evaluation/MERA) and the codebase is [here](https://github.com/MERA-Evaluation/MERA). The old leaderboard is frozen and may be found [here](https://mera.a-ai.ru/ru/leaderboard-old). It is no longer accessible for uploading submissions. All new submissions are made following the [instructions](https://github.com/MERA-Evaluation/MERA?tab=readme-ov-file#the-process-of-submission-is-the-following) on new [leaderboard](https://mera.a-ai.ru/ru/leaderboard).
 
 # MERA
 
