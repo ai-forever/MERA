@@ -144,6 +144,7 @@ Feel free to ask any questions regarding our work, write on email mera@a-ai.ru. 
     address = "Bangkok, Thailand",
     publisher = "Association for Computational Linguistics",
     url = "https://aclanthology.org/2024.acl-long.534",
+    doi = "10.18653/v1/2024.acl-long.534",
     pages = "9920--9948",
 }
 ```
