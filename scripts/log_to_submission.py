@@ -396,7 +396,7 @@ class ruTiE(TextTask):
                 # check that question_id was passed to LM
                 if question_id_outputs is not None:
                     new_question = {
-                        "outputs": question_id_outputs,
+                        "outputs": question_id_outputs['outputs'],
                         "meta": {
                             "dialog_id": dialog_id,
                             "question_id": question_id,
@@ -425,6 +425,15 @@ class ruTiE(TextTask):
 
 @register_task
 class ruHumanEval(TextTask):
+
+    def outputs_to_submission(self, outputs):
+        res = []
+        for doc in outputs:
+            doc_id = int(self.doc_to_id(doc["doc"]))
+            resp = doc["filtered_resps"][0]
+            res.extend([self.doc_outputs_to_submission(doc_id, resp)])
+        return {"data": {"test": res}}
+    
     def doc_outputs_to_submission(self, doc_id, outputs):
         res = {
             "outputs": outputs,
